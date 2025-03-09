@@ -50,12 +50,13 @@ Ref<RenderingNativeSurfaceWayland> RenderingNativeSurfaceWayland::create(struct 
 	return result;
 }
 
-RenderingContextDriver *RenderingNativeSurfaceWayland::create_rendering_context() {
+RenderingContextDriver *RenderingNativeSurfaceWayland::create_rendering_context(const String &p_driver_name) {
 #if defined(VULKAN_ENABLED)
-	return memnew(RenderingContextDriverVulkanWayland);
-#else
-	return nullptr;
+	if (p_driver_name == "vulkan") {
+		return memnew(RenderingContextDriverVulkanWayland);
+	}
 #endif
+	return nullptr;
 }
 
 RenderingNativeSurfaceWayland::RenderingNativeSurfaceWayland() {

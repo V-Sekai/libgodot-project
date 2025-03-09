@@ -17,11 +17,6 @@
 			<description>
 			</description>
 		</method>
-		<method name="shutdown">
-			<return type="void" />
-			<description>
-			</description>
-		</method>
 		<method name="start">
 			<return type="bool" />
 			<description>

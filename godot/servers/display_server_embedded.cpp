@@ -32,20 +32,13 @@
 
 #include "core/config/project_settings.h"
 #include "core/io/file_access_pack.h"
+#include "servers/rendering/gles_context.h"
 
 #ifdef RD_ENABLED
 #if defined(VULKAN_ENABLED)
-#include "drivers/vulkan/rendering_context_driver_vulkan_moltenvk.h"
-
-#ifdef USE_VOLK
-#include <volk.h>
-#else
-#include <vulkan/vulkan.h>
-#endif
+#include "drivers/vulkan/godot_vulkan.h"
 #endif // VULKAN_ENABLED
 #endif // RD_ENABLED
-
-#include "drivers/apple/rendering_native_surface_apple.h"
 
 Ref<RenderingNativeSurface> DisplayServerEmbedded::native_surface = nullptr;
 
@@ -59,12 +52,17 @@ void DisplayServerEmbedded::set_native_surface(Ref<RenderingNativeSurface> p_nat
 
 void DisplayServerEmbedded::_bind_methods() {
 	ClassDB::bind_static_method("DisplayServerEmbedded", D_METHOD("set_native_surface", "native_surface"), &DisplayServerEmbedded::set_native_surface);
+	ClassDB::bind_static_method("DisplayServerEmbedded", D_METHOD("get_singleton"), &DisplayServerEmbedded::get_singleton);
 	ClassDB::bind_method(D_METHOD("resize_window", "size", "id"), &DisplayServerEmbedded::resize_window);
 	ClassDB::bind_method(D_METHOD("set_content_scale", "content_scale"), &DisplayServerEmbedded::set_content_scale);
+	ClassDB::bind_method(D_METHOD("touch_press", "idx", "x", "y", "pressed", "double_click", "window"), &DisplayServerEmbedded::touch_press);
+	ClassDB::bind_method(D_METHOD("touch_drag", "idx", "prev_x", "prev_y", "x", "y", "pressure", "tilt", "window"), &DisplayServerEmbedded::touch_drag);
+	ClassDB::bind_method(D_METHOD("touches_canceled", "idx", "window"), &DisplayServerEmbedded::touches_canceled);
+	ClassDB::bind_method(D_METHOD("key", "key", "char", "unshifted", "physical", "modifiers", "pressed", "window"), &DisplayServerEmbedded::key, DEFVAL(MAIN_WINDOW_ID));
 }
 
-DisplayServerEmbedded::DisplayServerEmbedded(const String &p_rendering_driver, DisplayServer::WindowMode p_mode, DisplayServer::VSyncMode p_vsync_mode, uint32_t p_flags, const Vector2i *p_position, const Vector2i &p_resolution, int p_screen, DisplayServer::Context p_context, Error &r_error) {
-	ERR_FAIL_NULL_MSG(native_surface, "Native surface has not been set.");
+DisplayServerEmbedded::DisplayServerEmbedded(const String &p_rendering_driver, WindowMode p_mode, DisplayServer::VSyncMode p_vsync_mode, uint32_t p_flags, const Vector2i *p_position, const Vector2i &p_resolution, int p_screen, Context p_context, Error &r_error) {
+	ERR_FAIL_COND_MSG(native_surface.is_null(), "Native surface has not been set.");
 
 	rendering_driver = p_rendering_driver;
 
@@ -74,11 +72,9 @@ DisplayServerEmbedded::DisplayServerEmbedded(const String &p_rendering_driver, D
 	rendering_context = nullptr;
 	rendering_device = nullptr;
 
-#if defined(VULKAN_ENABLED)
-	if (rendering_driver == "vulkan") {
-		rendering_context = native_surface->create_rendering_context();
+	if (rendering_driver == "vulkan" || rendering_driver == "metal" || rendering_driver == "d3d12") {
+		rendering_context = native_surface->create_rendering_context(rendering_driver);
 	}
-#endif
 
 	if (rendering_context) {
 		if (rendering_context->initialize() != OK) {
@@ -106,7 +102,15 @@ DisplayServerEmbedded::DisplayServerEmbedded(const String &p_rendering_driver, D
 
 #if defined(GLES3_ENABLED)
 	if (rendering_driver == "opengl3") {
-		ERR_FAIL_MSG("Embedded OpenGL rendering is not yet supported.");
+		gles_context = native_surface->create_gles_context();
+	}
+	if (gles_context) {
+		gles_context->initialize();
+		if (create_native_window(native_surface) != MAIN_WINDOW_ID) {
+			ERR_PRINT(vformat("Failed to create %s window.", rendering_driver));
+			r_error = ERR_UNAVAILABLE;
+			return;
+		}
 	}
 #endif
 
@@ -134,9 +138,17 @@ DisplayServerEmbedded::~DisplayServerEmbedded() {
 		rendering_context = nullptr;
 	}
 #endif
+
+#if defined(GLES3_ENABLED)
+	if (gles_context) {
+		gles_context->deinitialize();
+		memdelete(gles_context);
+		gles_context = nullptr;
+	}
+#endif
 }
 
-DisplayServer *DisplayServerEmbedded::create_func(const String &p_rendering_driver, DisplayServer::WindowMode p_mode, DisplayServer::VSyncMode p_vsync_mode, uint32_t p_flags, const Vector2i *p_position, const Vector2i &p_resolution, int p_screen, DisplayServer::Context p_context, Error &r_error) {
+DisplayServer *DisplayServerEmbedded::create_func(const String &p_rendering_driver, WindowMode p_mode, VSyncMode p_vsync_mode, uint32_t p_flags, const Vector2i *p_position, const Vector2i &p_resolution, int p_screen, Context p_context, int64_t p_parent_window, Error &r_error) {
 	return memnew(DisplayServerEmbedded(p_rendering_driver, p_mode, p_vsync_mode, p_flags, p_position, p_resolution, p_screen, p_context, r_error));
 }
 
@@ -146,9 +158,12 @@ Vector<String> DisplayServerEmbedded::get_rendering_drivers_func() {
 #if defined(VULKAN_ENABLED)
 	drivers.push_back("vulkan");
 #endif
-	//#if defined(GLES3_ENABLED)
-	//	drivers.push_back("opengl3");
-	//#endif
+#if defined(METAL_ENABLED)
+	drivers.push_back("metal");
+#endif
+#if defined(GLES3_ENABLED)
+	drivers.push_back("opengl3");
+#endif
 
 	return drivers;
 }
@@ -183,11 +198,22 @@ void DisplayServerEmbedded::process_events() {
 }
 
 void DisplayServerEmbedded::_dispatch_input_events(const Ref<InputEvent> &p_event) {
-	DisplayServerEmbedded::get_singleton()->send_input_event(p_event);
+	Ref<InputEventFromWindow> event_from_window = p_event;
+	WindowID window_id = INVALID_WINDOW_ID;
+	if (event_from_window.is_valid()) {
+		window_id = event_from_window->get_window_id();
+	}
+	DisplayServerEmbedded::get_singleton()->send_input_event(p_event, window_id);
 }
 
 void DisplayServerEmbedded::send_input_event(const Ref<InputEvent> &p_event, WindowID p_id) const {
-	_window_callback(input_event_callbacks[p_id], p_event);
+	if (p_id != INVALID_WINDOW_ID) {
+		_window_callback(input_event_callbacks[p_id], p_event);
+	} else {
+		for (const KeyValue<WindowID, Callable> &E : input_event_callbacks) {
+			_window_callback(E.value, p_event);
+		}
+	}
 }
 
 void DisplayServerEmbedded::send_input_text(const String &p_text, WindowID p_id) const {
@@ -208,10 +234,11 @@ void DisplayServerEmbedded::_window_callback(const Callable &p_callable, const V
 
 // MARK: Touches
 
-void DisplayServerEmbedded::touch_press(int p_idx, int p_x, int p_y, bool p_pressed, bool p_double_click) {
+void DisplayServerEmbedded::touch_press(int p_idx, int p_x, int p_y, bool p_pressed, bool p_double_click, DisplayServer::WindowID p_window) {
 	Ref<InputEventScreenTouch> ev;
 	ev.instantiate();
 
+	ev->set_window_id(p_window);
 	ev->set_index(p_idx);
 	ev->set_pressed(p_pressed);
 	ev->set_position(Vector2(p_x, p_y));
@@ -219,9 +246,10 @@ void DisplayServerEmbedded::touch_press(int p_idx, int p_x, int p_y, bool p_pres
 	perform_event(ev);
 }
 
-void DisplayServerEmbedded::touch_drag(int p_idx, int p_prev_x, int p_prev_y, int p_x, int p_y, float p_pressure, Vector2 p_tilt) {
+void DisplayServerEmbedded::touch_drag(int p_idx, int p_prev_x, int p_prev_y, int p_x, int p_y, float p_pressure, Vector2 p_tilt, DisplayServer::WindowID p_window) {
 	Ref<InputEventScreenDrag> ev;
 	ev.instantiate();
+	ev->set_window_id(p_window);
 	ev->set_index(p_idx);
 	ev->set_pressure(p_pressure);
 	ev->set_tilt(p_tilt);
@@ -235,8 +263,33 @@ void DisplayServerEmbedded::perform_event(const Ref<InputEvent> &p_event) {
 	Input::get_singleton()->parse_input_event(p_event);
 }
 
-void DisplayServerEmbedded::touches_canceled(int p_idx) {
-	touch_press(p_idx, -1, -1, false, false);
+void DisplayServerEmbedded::touches_canceled(int p_idx, DisplayServer::WindowID p_window) {
+	touch_press(p_idx, -1, -1, false, false, p_window);
+}
+
+void DisplayServerEmbedded::key(Key p_key, char32_t p_char, Key p_unshifted, Key p_physical, BitField<KeyModifierMask> p_modifiers, bool p_pressed, DisplayServer::WindowID p_window) {
+	Ref<InputEventKey> ev;
+	ev.instantiate();
+	ev->set_window_id(p_window);
+	ev->set_echo(false);
+	ev->set_pressed(p_pressed);
+	ev->set_keycode(fix_keycode(p_char, p_key));
+	if (p_key != Key::SHIFT) {
+		ev->set_shift_pressed(p_modifiers.has_flag(KeyModifierMask::SHIFT));
+	}
+	if (p_key != Key::CTRL) {
+		ev->set_ctrl_pressed(p_modifiers.has_flag(KeyModifierMask::CTRL));
+	}
+	if (p_key != Key::ALT) {
+		ev->set_alt_pressed(p_modifiers.has_flag(KeyModifierMask::ALT));
+	}
+	if (p_key != Key::META) {
+		ev->set_meta_pressed(p_modifiers.has_flag(KeyModifierMask::META));
+	}
+	ev->set_key_label(p_unshifted);
+	ev->set_physical_keycode(p_physical);
+	ev->set_unicode(fix_unicode(p_char));
+	perform_event(ev);
 }
 
 // MARK: -
@@ -314,22 +367,32 @@ DisplayServer::WindowID DisplayServerEmbedded::get_window_at_screen_position(con
 }
 
 DisplayServer::WindowID DisplayServerEmbedded::create_native_window(Ref<RenderingNativeSurface> p_native_surface) {
-#if defined(RD_ENABLED)
-
 	WindowID window_id = window_id_counter++;
+	window_surfaces[window_id] = p_native_surface;
 
-	if (rendering_context->window_create(window_id, p_native_surface) != OK) {
-		ERR_PRINT(vformat("Failed to create native window."));
-		return INVALID_WINDOW_ID;
-	}
+#if defined(RD_ENABLED)
+	if (rendering_context) {
+		if (rendering_context->window_create(window_id, p_native_surface) != OK) {
+			ERR_PRINT(vformat("Failed to create native window."));
+			return INVALID_WINDOW_ID;
+		}
 
-	if (rendering_device) {
-		rendering_device->screen_create(window_id);
+		if (rendering_device) {
+			rendering_device->screen_create(window_id);
+		}
+		return window_id;
 	}
-	return window_id;
-#else
-	ERR_FAIL_V_MSG(INVALID_WINDOW_ID, "Cannot create native window with current driver.");
 #endif
+
+#if defined(GLES3_ENABLED)
+	if (gles_context) {
+		gles_context->create_framebuffer(window_id, p_native_surface);
+		gles_context->begin_rendering(window_id);
+		RasterizerGLES3::make_current(false);
+		return window_id;
+	}
+#endif
+	ERR_FAIL_V_MSG(INVALID_WINDOW_ID, "Cannot create native window with current driver.");
 }
 
 bool DisplayServerEmbedded::is_native_window(DisplayServer::WindowID p_id) {
@@ -346,18 +409,38 @@ void DisplayServerEmbedded::delete_native_window(DisplayServer::WindowID p_id) {
 		rendering_context->window_destroy(p_id);
 	}
 #endif
+
+#if defined(GLES3_ENABLED)
+	if (gles_context) {
+		gles_context->destroy_framebuffer(p_id);
+	}
+#endif
+
+	window_surfaces.erase(p_id);
 }
 
 int64_t DisplayServerEmbedded::window_get_native_handle(HandleType p_handle_type, WindowID p_window) const {
-	return 0; // Not supported.
+	switch (p_handle_type) {
+#if defined(GLES3_ENABLED)
+		case OPENGL_FBO: {
+			if (gles_context) {
+				return gles_context->get_fbo(p_window);
+			}
+			return 0;
+		}
+#endif
+		default: {
+			return 0; // Not supported.
+		}
+	}
 }
 
 void DisplayServerEmbedded::window_attach_instance_id(ObjectID p_instance, WindowID p_window) {
-	window_attached_instance_id = p_instance;
+	window_attached_instance_id[p_window] = p_instance;
 }
 
 ObjectID DisplayServerEmbedded::window_get_attached_instance_id(WindowID p_window) const {
-	return window_attached_instance_id;
+	return window_attached_instance_id[p_window];
 }
 
 void DisplayServerEmbedded::window_set_title(const String &p_title, WindowID p_window) {
@@ -481,6 +564,12 @@ void DisplayServerEmbedded::resize_window(Size2i p_size, WindowID p_id) {
 	}
 #endif
 
+#if defined(GLES3_ENABLED)
+	if (gles_context) {
+		gles_context->resized(p_id);
+	}
+#endif
+
 	Variant resize_rect = Rect2i(Point2i(), size);
 	_window_callback(window_resize_callbacks[p_id], resize_rect);
 }
@@ -495,4 +584,21 @@ void DisplayServerEmbedded::window_set_vsync_mode(DisplayServer::VSyncMode p_vsy
 
 DisplayServer::VSyncMode DisplayServerEmbedded::window_get_vsync_mode(WindowID p_window) const {
 	return DisplayServer::VSYNC_ENABLED;
+}
+
+void DisplayServerEmbedded::swap_buffers() {
+#if defined(GLES3_ENABLED)
+	if (gles_context) {
+		gles_context->end_rendering(current_window);
+	}
+#endif
+}
+
+void DisplayServerEmbedded::gl_window_make_current(DisplayServer::WindowID p_window_id) {
+#if defined(GLES3_ENABLED)
+	if (gles_context) {
+		gles_context->begin_rendering(p_window_id);
+	}
+	current_window = p_window_id;
+#endif
 }

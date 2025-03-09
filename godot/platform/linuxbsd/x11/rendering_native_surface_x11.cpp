@@ -50,12 +50,13 @@ Ref<RenderingNativeSurfaceX11> RenderingNativeSurfaceX11::create(::Window p_wind
 	return result;
 }
 
-RenderingContextDriver *RenderingNativeSurfaceX11::create_rendering_context() {
+RenderingContextDriver *RenderingNativeSurfaceX11::create_rendering_context(const String &p_driver_name) {
 #if defined(VULKAN_ENABLED)
-	return memnew(RenderingContextDriverVulkanX11);
-#else
-	return nullptr;
+	if (p_driver_name == "vulkan") {
+		return memnew(RenderingContextDriverVulkanX11);
+	}
 #endif
+	return nullptr;
 }
 
 RenderingNativeSurfaceX11::RenderingNativeSurfaceX11() {

@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from misc.utility.scons_hints import *
 
 Import("env")
 
@@ -61,6 +62,15 @@ def generate_bundle(target, source, env):
 common_ios_lib_files = [
     "os_ios.mm",
     "ios.mm",
+    "display_server_ios.mm",
+    "godot_view.mm",
+    "tts_ios.mm",
+    "display_layer.mm",
+    "godot_app_delegate.m",
+    "godot_view_renderer.mm",
+    "device_metrics.m",
+    "keyboard_input_view.mm",
+    "key_mapping_ios.mm",
     "joypad_ios.mm",
     "ios_terminal_logger.mm",
 ]
@@ -82,7 +92,7 @@ ios_lib_files = [
 ]
 
 ios_libgodot_files = [
-    "godot_runtime_api.mm",
+    "libgodot_ios.mm",
 ]
 
 env_ios = env.Clone()

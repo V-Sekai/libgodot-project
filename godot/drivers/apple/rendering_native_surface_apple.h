@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef RENDERING_NATIVE_SURFACE_APPLE_H
-#define RENDERING_NATIVE_SURFACE_APPLE_H
+#pragma once
 
 #include "core/variant/native_ptr.h"
 #include "servers/rendering/rendering_native_surface.h"
@@ -37,24 +36,24 @@
 class RenderingNativeSurfaceApple : public RenderingNativeSurface {
 	GDCLASS(RenderingNativeSurfaceApple, RenderingNativeSurface);
 
-	static void _bind_methods();
-
-	void *layer = nullptr;
-
 public:
 	// TODO: Remove workaround when SwiftGodot starts to support const void * arguments.
 	static Ref<RenderingNativeSurfaceApple> create_api(/* GDExtensionConstPtr<const void> */ uint64_t p_layer);
 
 	static Ref<RenderingNativeSurfaceApple> create(void *p_layer);
 
-	void *get_metal_layer() const {
+	void *get_layer() const {
 		return layer;
-	};
+	}
 
-	RenderingContextDriver *create_rendering_context() override;
+	RenderingContextDriver *create_rendering_context(const String &p_driver_name) override;
+	GLESContext *create_gles_context() override;
 
 	RenderingNativeSurfaceApple();
 	~RenderingNativeSurfaceApple();
-};
 
-#endif // RENDERING_NATIVE_SURFACE_APPLE_H
+private:
+	static void _bind_methods();
+
+	void *layer = nullptr;
+};

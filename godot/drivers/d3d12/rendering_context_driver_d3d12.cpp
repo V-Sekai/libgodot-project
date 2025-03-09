@@ -35,8 +35,9 @@
 #include "core/string/ustring.h"
 #include "core/templates/local_vector.h"
 #include "core/version.h"
-#include "platform/windows/rendering_native_surface_windows.h"
 #include "servers/rendering/rendering_device.h"
+
+#include "platform/windows/rendering_native_surface_windows.h"
 
 #if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic push
@@ -97,6 +98,9 @@ RenderingContextDriverD3D12::~RenderingContextDriverD3D12() {
 	if (lib_dxgi) {
 		FreeLibrary(lib_dxgi);
 	}
+	if (lib_dcomp) {
+		FreeLibrary(lib_dcomp);
+	}
 }
 
 Error RenderingContextDriverD3D12::_init_device_factory() {
@@ -108,6 +112,9 @@ Error RenderingContextDriverD3D12::_init_device_factory() {
 
 	lib_dxgi = LoadLibraryW(L"DXGI.dll");
 	ERR_FAIL_NULL_V(lib_dxgi, ERR_CANT_CREATE);
+
+	lib_dcomp = LoadLibraryW(L"Dcomp.dll");
+	ERR_FAIL_NULL_V(lib_dcomp, ERR_CANT_CREATE);
 
 	// Note: symbol is not available in MinGW import library.
 	PFN_D3D12_GET_INTERFACE d3d_D3D12GetInterface = (PFN_D3D12_GET_INTERFACE)(void *)GetProcAddress(lib_d3d12, "D3D12GetInterface");
@@ -179,7 +186,7 @@ Error RenderingContextDriverD3D12::_initialize_devices() {
 
 		Device &device = driver_devices[i];
 		device.name = desc.Description;
-		device.vendor = Vendor(desc.VendorId);
+		device.vendor = desc.VendorId;
 		device.workarounds = Workarounds();
 
 		if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) {
@@ -253,7 +260,7 @@ void RenderingContextDriverD3D12::driver_free(RenderingDeviceDriver *p_driver) {
 }
 
 RenderingContextDriver::SurfaceID RenderingContextDriverD3D12::surface_create(Ref<RenderingNativeSurface> p_native_surface) {
-	Ref<RenderingNativeSurfaceWindows> windows_native_surface = p_native_surface;
+	Ref<RenderingNativeSurfaceWindows> windows_native_surface = Object::cast_to<RenderingNativeSurfaceWindows>(*p_native_surface);
 	ERR_FAIL_COND_V(windows_native_surface.is_null(), SurfaceID());
 	Surface *surface = memnew(Surface);
 	surface->hwnd = windows_native_surface->get_window_handle();

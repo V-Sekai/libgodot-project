@@ -31,9 +31,18 @@
 #ifndef GODOT_INSTANCE_H
 #define GODOT_INSTANCE_H
 
-#include "core/error/error_list.h"
+#include "core/extension/gdextension_interface.h"
 #include "core/object/class_db.h"
 #include "core/object/object.h"
+
+class GodotInstance;
+class GodotInstanceCallbacks {
+public:
+	virtual ~GodotInstanceCallbacks() {}
+	virtual void before_setup2(GodotInstance *p_instance) = 0;
+	virtual void before_start(GodotInstance *p_instance) = 0;
+	virtual void after_start(GodotInstance *p_instance) = 0;
+};
 
 class GodotInstance : public Object {
 	GDCLASS(GodotInstance, Object);
@@ -42,14 +51,18 @@ class GodotInstance : public Object {
 
 	bool started = false;
 
+	GodotInstanceCallbacks *callbacks = nullptr;
+
 public:
 	GodotInstance();
 	~GodotInstance();
 
-	virtual bool start();
-	virtual bool is_started();
-	virtual bool iteration();
-	virtual void shutdown();
+	bool initialize(GDExtensionInitializationFunction p_init_func, GodotInstanceCallbacks *p_callbacks = nullptr);
+
+	bool start();
+	bool is_started();
+	bool iteration();
+	void stop();
 };
 
 #endif // GODOT_INSTANCE_H

@@ -37,6 +37,48 @@
 
 #include "platform_gl.h"
 
+class FramebufferBinding {
+public:
+	FramebufferBinding(GLenum p_target) :
+			FramebufferBinding(p_target, 0, false) {}
+
+	FramebufferBinding(GLenum p_target, GLuint p_framebuffer) :
+			FramebufferBinding(p_target, p_framebuffer, true) {}
+
+	FramebufferBinding(GLenum p_target, GLuint p_framebuffer, bool p_bind) {
+		target = p_target;
+		GLenum binding_target = 0;
+		switch (p_target) {
+			case GL_FRAMEBUFFER:
+				binding_target = GL_FRAMEBUFFER_BINDING;
+				break;
+			case GL_READ_FRAMEBUFFER:
+				binding_target = GL_READ_FRAMEBUFFER_BINDING;
+				break;
+			case GL_DRAW_FRAMEBUFFER:
+				binding_target = GL_DRAW_FRAMEBUFFER_BINDING;
+				break;
+		}
+		glGetIntegerv(binding_target, &framebuffer);
+		if (p_bind) {
+			glBindFramebuffer(p_target, p_framebuffer);
+		}
+	}
+	~FramebufferBinding() {
+		reset();
+	}
+	void reset() {
+		if (target != 0) {
+			glBindFramebuffer(target, framebuffer);
+			target = 0;
+		}
+	}
+
+private:
+	GLenum target = 0;
+	GLint framebuffer;
+};
+
 namespace GLES3 {
 
 /* VISIBILITY NOTIFIER */
@@ -165,8 +207,8 @@ public:
 
 	/* VISIBILITY NOTIFIER */
 
-	VisibilityNotifier *get_visibility_notifier(RID p_rid) { return visibility_notifier_owner.get_or_null(p_rid); };
-	bool owns_visibility_notifier(RID p_rid) const { return visibility_notifier_owner.owns(p_rid); };
+	VisibilityNotifier *get_visibility_notifier(RID p_rid) { return visibility_notifier_owner.get_or_null(p_rid); }
+	bool owns_visibility_notifier(RID p_rid) const { return visibility_notifier_owner.owns(p_rid); }
 
 	virtual RID visibility_notifier_allocate() override;
 	virtual void visibility_notifier_initialize(RID p_notifier) override;
@@ -226,6 +268,8 @@ public:
 	virtual String get_video_adapter_api_version() const override;
 
 	virtual Size2i get_maximum_viewport_size() const override;
+	virtual uint32_t get_maximum_shader_varyings() const override;
+	virtual uint64_t get_maximum_uniform_buffer_size() const override;
 };
 
 } // namespace GLES3

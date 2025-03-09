@@ -33,6 +33,7 @@
 #include "cubemap_filter.h"
 
 #include "../storage/texture_storage.h"
+#include "../storage/utilities.h"
 #include "core/config/project_settings.h"
 
 using namespace GLES3;
@@ -41,7 +42,10 @@ CubemapFilter *CubemapFilter::singleton = nullptr;
 
 CubemapFilter::CubemapFilter() {
 	singleton = this;
-	ggx_samples = GLOBAL_GET("rendering/reflections/sky_reflections/ggx_samples");
+	// Use a factor 4 larger for the compatibility renderer to make up for the fact
+	// That we don't use an array texture. We will reduce samples on low roughness
+	// to compensate.
+	ggx_samples = 4 * uint32_t(GLOBAL_GET("rendering/reflections/sky_reflections/ggx_samples"));
 
 	{
 		String defines;
@@ -57,10 +61,10 @@ CubemapFilter::CubemapFilter() {
 		const float qv[6] = {
 			-1.0f,
 			-1.0f,
-			3.0f,
-			-1.0f,
 			-1.0f,
 			3.0f,
+			3.0f,
+			-1.0f,
 		};
 
 		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6, qv, GL_STATIC_DRAW);
@@ -126,7 +130,7 @@ Vector2 hammersley(uint32_t i, uint32_t N) {
 void CubemapFilter::filter_radiance(GLuint p_source_cubemap, GLuint p_dest_cubemap, GLuint p_dest_framebuffer, int p_source_size, int p_mipmap_count, int p_layer) {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, p_source_cubemap);
-	glBindFramebuffer(GL_FRAMEBUFFER, p_dest_framebuffer);
+	FramebufferBinding binding(GL_FRAMEBUFFER, p_dest_framebuffer);
 
 	CubemapFilterShaderGLES3::ShaderVariant mode = CubemapFilterShaderGLES3::MODE_DEFAULT;
 
@@ -146,10 +150,11 @@ void CubemapFilter::filter_radiance(GLuint p_source_cubemap, GLuint p_dest_cubem
 	}
 
 	if (p_layer > 0) {
-		const uint32_t sample_counts[4] = { 1, ggx_samples / 4, ggx_samples / 2, ggx_samples };
-		uint32_t sample_count = sample_counts[MIN(3, p_layer)];
+		const uint32_t sample_counts[5] = { 1, ggx_samples / 16, ggx_samples / 8, ggx_samples / 4, ggx_samples };
+		uint32_t sample_count = sample_counts[MIN(4, p_layer)];
 
-		float roughness = float(p_layer) / (p_mipmap_count);
+		float roughness = float(p_layer) / (p_mipmap_count - 1);
+		roughness *= roughness; // Convert to non-perceptual roughness.
 		float roughness4 = roughness * roughness;
 		roughness4 *= roughness4;
 
@@ -165,7 +170,7 @@ void CubemapFilter::filter_radiance(GLuint p_source_cubemap, GLuint p_dest_cubem
 			Vector3 dir = importance_sample_GGX(xi, roughness4);
 			Vector3 light_vec = (2.0 * dir.z * dir - Vector3(0.0, 0.0, 1.0));
 
-			if (light_vec.z < 0.0) {
+			if (light_vec.z <= 0.0) {
 				continue;
 			}
 
@@ -203,7 +208,6 @@ void CubemapFilter::filter_radiance(GLuint p_source_cubemap, GLuint p_dest_cubem
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 	}
 	glBindVertexArray(0);
-	glBindFramebuffer(GL_FRAMEBUFFER, GLES3::TextureStorage::system_fbo);
 }
 
 #endif // GLES3_ENABLED

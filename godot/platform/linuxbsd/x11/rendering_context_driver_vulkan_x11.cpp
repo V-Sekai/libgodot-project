@@ -34,11 +34,7 @@
 #include "drivers/vulkan/rendering_native_surface_vulkan.h"
 #include "rendering_native_surface_x11.h"
 
-#ifdef USE_VOLK
-#include <volk.h>
-#else
-#include <vulkan/vulkan.h>
-#endif
+#include "drivers/vulkan/godot_vulkan.h"
 
 const char *RenderingContextDriverVulkanX11::_get_platform_surface_extension() const {
 	return VK_KHR_XLIB_SURFACE_EXTENSION_NAME;
@@ -54,7 +50,7 @@ RenderingContextDriver::SurfaceID RenderingContextDriverVulkanX11::surface_creat
 	create_info.window = x11_native_surface->get_window();
 
 	VkSurfaceKHR vk_surface = VK_NULL_HANDLE;
-	VkResult err = vkCreateXlibSurfaceKHR(instance_get(), &create_info, nullptr, &vk_surface);
+	VkResult err = vkCreateXlibSurfaceKHR(instance_get(), &create_info, get_allocation_callbacks(VK_OBJECT_TYPE_SURFACE_KHR), &vk_surface);
 	ERR_FAIL_COND_V(err != VK_SUCCESS, SurfaceID());
 
 	Ref<RenderingNativeSurfaceVulkan> vulkan_surface = RenderingNativeSurfaceVulkan::create(vk_surface);

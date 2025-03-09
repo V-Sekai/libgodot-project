@@ -135,7 +135,7 @@ typedef BOOL(WINAPI *LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
 BOOL is_wow64() {
 	BOOL wow64 = FALSE;
 
-	LPFN_ISWOW64PROCESS fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(GetModuleHandle(TEXT("kernel32")), "IsWow64Process");
+	LPFN_ISWOW64PROCESS fnIsWow64Process = (LPFN_ISWOW64PROCESS)(void *)GetProcAddress(GetModuleHandle(TEXT("kernel32")), "IsWow64Process");
 
 	if (fnIsWow64Process) {
 		if (!fnIsWow64Process(GetCurrentProcess(), &wow64)) {
@@ -216,6 +216,7 @@ bool get_default_installation_dir(String &r_dotnet_root) {
 #endif
 }
 
+#ifndef WINDOWS_ENABLED
 bool get_install_location_from_file(const String &p_file_path, String &r_dotnet_root) {
 	Error err = OK;
 	Ref<FileAccess> f = FileAccess::open(p_file_path, FileAccess::READ, &err);
@@ -233,6 +234,7 @@ bool get_install_location_from_file(const String &p_file_path, String &r_dotnet_
 	r_dotnet_root = line;
 	return true;
 }
+#endif
 
 bool get_dotnet_self_registered_dir(String &r_dotnet_root) {
 #if defined(WINDOWS_ENABLED)
@@ -260,7 +262,7 @@ bool get_dotnet_self_registered_dir(String &r_dotnet_root) {
 		return false;
 	}
 
-	r_dotnet_root = String::utf16((const char16_t *)buffer.ptr());
+	r_dotnet_root = String::utf16((const char16_t *)buffer.ptr()).replace("\\", "/");
 	RegCloseKey(hkey);
 	return true;
 #else

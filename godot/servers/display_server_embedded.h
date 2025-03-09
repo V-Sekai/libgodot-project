@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef DISPLAY_SERVER_EMBEDDED_H
-#define DISPLAY_SERVER_EMBEDDED_H
+#pragma once
 
 #include "core/input/input.h"
 #include "servers/display_server.h"
@@ -41,6 +40,8 @@
 
 #if defined(GLES3_ENABLED)
 #include "drivers/gles3/rasterizer_gles3.h"
+
+class GLESContext;
 #endif // GLES3_ENABLED
 
 class DisplayServerEmbedded : public DisplayServer {
@@ -52,11 +53,14 @@ class DisplayServerEmbedded : public DisplayServer {
 	RenderingContextDriver *rendering_context = nullptr;
 	RenderingDevice *rendering_device = nullptr;
 #endif
+#if defined(GLES3_ENABLED)
+	GLESContext *gles_context = nullptr;
+#endif
 	NativeMenu *native_menu = nullptr;
 
 	DisplayServer::ScreenOrientation screen_orientation;
 
-	ObjectID window_attached_instance_id;
+	HashMap<WindowID, ObjectID> window_attached_instance_id;
 
 	HashMap<WindowID, Callable> window_event_callbacks;
 	HashMap<WindowID, Callable> window_resize_callbacks;
@@ -70,8 +74,13 @@ class DisplayServerEmbedded : public DisplayServer {
 	void perform_event(const Ref<InputEvent> &p_event);
 
 	static Ref<RenderingNativeSurface> native_surface;
+	HashMap<WindowID, Ref<RenderingNativeSurface>> window_surfaces;
 
-	DisplayServerEmbedded(const String &p_rendering_driver, DisplayServer::WindowMode p_mode, DisplayServer::VSyncMode p_vsync_mode, uint32_t p_flags, const Vector2i *p_position, const Vector2i &p_resolution, int p_screen, DisplayServer::Context p_context, Error &r_error);
+#if defined(GLES3_ENABLED)
+	WindowID current_window = INVALID_WINDOW_ID;
+#endif
+
+	DisplayServerEmbedded(const String &p_rendering_driver, DisplayServer::WindowMode p_mode, DisplayServer::VSyncMode p_vsync_mode, uint32_t p_flags, const Vector2i *p_position, const Vector2i &p_resolution, int p_screen, Context p_context, Error &r_error);
 	~DisplayServerEmbedded();
 
 protected:
@@ -85,7 +94,7 @@ public:
 	static void set_native_surface(Ref<RenderingNativeSurface> p_native_handle);
 
 	static void register_embedded_driver();
-	static DisplayServer *create_func(const String &p_rendering_driver, WindowMode p_mode, DisplayServer::VSyncMode p_vsync_mode, uint32_t p_flags, const Vector2i *p_position, const Vector2i &p_resolution, int p_screen, Context p_context, Error &r_error);
+	static DisplayServer *create_func(const String &p_rendering_driver, WindowMode p_mode, VSyncMode p_vsync_mode, uint32_t p_flags, const Vector2i *p_position, const Vector2i &p_resolution, int p_screen, Context p_context, int64_t p_parent_window, Error &r_error);
 	static Vector<String> get_rendering_drivers_func();
 
 	// MARK: - Events
@@ -108,9 +117,13 @@ public:
 
 	// MARK: Touches and Apple Pencil
 
-	void touch_press(int p_idx, int p_x, int p_y, bool p_pressed, bool p_double_click);
-	void touch_drag(int p_idx, int p_prev_x, int p_prev_y, int p_x, int p_y, float p_pressure, Vector2 p_tilt);
-	void touches_canceled(int p_idx);
+	void touch_press(int p_idx, int p_x, int p_y, bool p_pressed, bool p_double_click, DisplayServer::WindowID p_window);
+	void touch_drag(int p_idx, int p_prev_x, int p_prev_y, int p_x, int p_y, float p_pressure, Vector2 p_tilt, DisplayServer::WindowID p_window);
+	void touches_canceled(int p_idx, DisplayServer::WindowID p_window);
+
+	// MARK: Keyboard
+
+	void key(Key p_key, char32_t p_char, Key p_unshifted, Key p_physical, BitField<KeyModifierMask> p_modifiers, bool p_pressed, DisplayServer::WindowID p_window = MAIN_WINDOW_ID);
 
 	// MARK: -
 
@@ -184,7 +197,6 @@ public:
 
 	void resize_window(Size2i size, WindowID p_id);
 	void set_content_scale(float p_scale);
-	virtual void swap_buffers() override {}
+	virtual void swap_buffers() override;
+	virtual void gl_window_make_current(DisplayServer::WindowID p_window_id) override;
 };
-
-#endif // DISPLAY_SERVER_EMBEDDED_H

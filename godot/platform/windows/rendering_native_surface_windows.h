@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef RENDERING_NATIVE_SURFACE_WINDOWS_H
-#define RENDERING_NATIVE_SURFACE_WINDOWS_H
+#pragma once
 
 #include "core/variant/native_ptr.h"
 #include "servers/rendering/rendering_native_surface.h"
@@ -39,11 +38,6 @@
 
 class RenderingNativeSurfaceWindows : public RenderingNativeSurface {
 public:
-	enum class DriverType {
-		D3D12,
-		Vulkan
-	};
-
 private:
 	GDCLASS(RenderingNativeSurfaceWindows, RenderingNativeSurface);
 
@@ -51,32 +45,29 @@ private:
 
 	HWND window;
 	HINSTANCE instance;
-	DriverType driver_type;
 
 public:
 	static Ref<RenderingNativeSurfaceWindows> create_api(GDExtensionConstPtr<const void> p_window, GDExtensionConstPtr<const void> p_instance);
+
 	static Ref<RenderingNativeSurfaceWindows> create(HWND p_window, HINSTANCE p_instance);
 
 	HWND get_window_handle() const {
 		return window;
-	};
+	}
 
 	HINSTANCE get_instance() const {
 		return instance;
-	};
-
-	void set_driver_type(DriverType p_driver_type) {
-		driver_type = p_driver_type;
 	}
 
-	DriverType get_driver_type() {
-		return driver_type;
+	void set_window_handle(HWND p_window) {
+		window = p_window;
 	}
 
-	RenderingContextDriver *create_rendering_context() override;
+	void set_instance(HINSTANCE p_instance) {
+		instance = p_instance;
+	}
+	RenderingContextDriver *create_rendering_context(const String &p_driver_name) override;
 
 	RenderingNativeSurfaceWindows();
 	~RenderingNativeSurfaceWindows();
 };
-
-#endif // RENDERING_NATIVE_SURFACE_WINDOWS_H

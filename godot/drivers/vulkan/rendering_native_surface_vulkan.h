@@ -28,19 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef RENDERING_NATIVE_SURFACE_VULKAN_H
-#define RENDERING_NATIVE_SURFACE_VULKAN_H
+#pragma once
 
 #include "core/variant/native_ptr.h"
 #include "servers/rendering/rendering_native_surface.h"
 
-#ifdef VULKAN_ENABLED
-#ifdef USE_VOLK
-#include <volk.h>
-#else
-#include <vulkan/vulkan.h>
-#endif
-#endif
+#include "drivers/vulkan/godot_vulkan.h"
 
 class RenderingNativeSurfaceVulkan : public RenderingNativeSurface {
 	GDCLASS(RenderingNativeSurfaceVulkan, RenderingNativeSurface);
@@ -52,20 +45,18 @@ class RenderingNativeSurfaceVulkan : public RenderingNativeSurface {
 #endif
 
 public:
+#ifdef VULKAN_ENABLED
 	static Ref<RenderingNativeSurfaceVulkan> create_api(GDExtensionConstPtr<const void> vulkan_surface);
 
-#ifdef VULKAN_ENABLED
 	static Ref<RenderingNativeSurfaceVulkan> create(VkSurfaceKHR vulkan_surface);
 
 	VkSurfaceKHR get_vulkan_surface() const {
 		return vulkan_surface;
-	};
+	}
 #endif
 
-	RenderingContextDriver *create_rendering_context() override;
+	RenderingContextDriver *create_rendering_context(const String &p_driver_name) override;
 
 	RenderingNativeSurfaceVulkan();
 	~RenderingNativeSurfaceVulkan();
 };
-
-#endif // RENDERING_NATIVE_SURFACE_VULKAN_H

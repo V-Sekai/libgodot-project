@@ -29,6 +29,7 @@
 /**************************************************************************/
 
 #include "godot_instance.h"
+#include "core/extension/gdextension_manager.h"
 #include "main/main.h"
 #include "servers/display_server.h"
 
@@ -36,7 +37,6 @@ void GodotInstance::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("start"), &GodotInstance::start);
 	ClassDB::bind_method(D_METHOD("is_started"), &GodotInstance::is_started);
 	ClassDB::bind_method(D_METHOD("iteration"), &GodotInstance::iteration);
-	ClassDB::bind_method(D_METHOD("shutdown"), &GodotInstance::shutdown);
 }
 
 GodotInstance::GodotInstance() {
@@ -45,12 +45,31 @@ GodotInstance::GodotInstance() {
 GodotInstance::~GodotInstance() {
 }
 
+bool GodotInstance::initialize(GDExtensionInitializationFunction p_init_func, GodotInstanceCallbacks *p_callbacks) {
+	callbacks = p_callbacks;
+	GDExtensionManager *gdextension_manager = GDExtensionManager::get_singleton();
+	GDExtensionConstPtr<const GDExtensionInitializationFunction> ptr((const GDExtensionInitializationFunction *)&p_init_func);
+	GDExtensionManager::LoadStatus status = gdextension_manager->load_function_extension("libgodot://main", ptr);
+	return status == GDExtensionManager::LoadStatus::LOAD_STATUS_OK;
+}
+
+#define CALL_CB(cb)          \
+	if (callbacks) {         \
+		callbacks->cb(this); \
+	}
+
 bool GodotInstance::start() {
+	CALL_CB(before_setup2);
 	Error err = Main::setup2();
 	if (err != OK) {
 		return false;
 	}
+	CALL_CB(before_start);
 	started = Main::start() == EXIT_SUCCESS;
+	if (started) {
+		OS::get_singleton()->get_main_loop()->initialize();
+		CALL_CB(after_start);
+	}
 	return started;
 }
 
@@ -63,7 +82,9 @@ bool GodotInstance::iteration() {
 	return Main::iteration();
 }
 
-void GodotInstance::shutdown() {
+void GodotInstance::stop() {
+	if (started) {
+		OS::get_singleton()->get_main_loop()->finalize();
+	}
 	started = false;
-	Main::cleanup();
 }

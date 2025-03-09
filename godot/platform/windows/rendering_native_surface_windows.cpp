@@ -47,27 +47,23 @@ Ref<RenderingNativeSurfaceWindows> RenderingNativeSurfaceWindows::create_api(GDE
 
 Ref<RenderingNativeSurfaceWindows> RenderingNativeSurfaceWindows::create(HWND p_window, HINSTANCE p_instance) {
 	Ref<RenderingNativeSurfaceWindows> result = memnew(RenderingNativeSurfaceWindows);
-	result->window = p_window;
-	result->instance = p_instance;
+	result->set_window_handle(p_window);
+	result->set_instance(p_instance);
 	return result;
 }
 
-RenderingContextDriver *RenderingNativeSurfaceWindows::create_rendering_context() {
-	switch (driver_type) {
+RenderingContextDriver *RenderingNativeSurfaceWindows::create_rendering_context(const String &p_driver_name) {
 #if defined(VULKAN_ENABLED)
-		case RenderingNativeSurfaceWindows::DriverType::Vulkan:
-			return memnew(RenderingContextDriverVulkanWindows);
+	if (p_driver_name == "vulkan") {
+		return memnew(RenderingContextDriverVulkanWindows);
+	}
 #endif
 #if defined(D3D12_ENABLED)
-		case RenderingNativeSurfaceWindows::DriverType::D3D12:
-			return memnew(RenderingContextDriverD3D12);
-#else
-		case RenderingNativeSurfaceWindows::DriverType::D3D12:
-			return nullptr;
-#endif
-		default:
-			return nullptr;
+	if (p_driver_name == "d3d12") {
+		return memnew(RenderingContextDriverD3D12);
 	}
+#endif
+	return nullptr;
 }
 
 RenderingNativeSurfaceWindows::RenderingNativeSurfaceWindows() {

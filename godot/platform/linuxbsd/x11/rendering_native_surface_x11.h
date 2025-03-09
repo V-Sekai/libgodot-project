@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef RENDERING_NATIVE_SURFACE_X11_H
-#define RENDERING_NATIVE_SURFACE_X11_H
+#pragma once
 
 #include "core/variant/native_ptr.h"
 #include "servers/rendering/rendering_native_surface.h"
@@ -51,16 +50,14 @@ public:
 
 	::Window get_window() const {
 		return window;
-	};
+	}
 
 	Display *get_display() const {
 		return display;
-	};
+	}
 
-	RenderingContextDriver *create_rendering_context() override;
+	RenderingContextDriver *create_rendering_context(const String &p_driver_name) override;
 
 	RenderingNativeSurfaceX11();
 	~RenderingNativeSurfaceX11();
 };
-
-#endif // RENDERING_NATIVE_SURFACE_X11_H

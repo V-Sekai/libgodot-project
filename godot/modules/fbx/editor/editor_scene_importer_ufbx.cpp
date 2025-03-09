@@ -37,10 +37,6 @@
 
 #include "core/config/project_settings.h"
 
-uint32_t EditorSceneFormatImporterUFBX::get_import_flags() const {
-	return ImportFlags::IMPORT_SCENE | ImportFlags::IMPORT_ANIMATION;
-}
-
 void EditorSceneFormatImporterUFBX::get_extensions(List<String> *r_extensions) const {
 	r_extensions->push_back("fbx");
 }
@@ -88,7 +84,7 @@ Node *EditorSceneFormatImporterUFBX::import_scene(const String &p_path, uint32_t
 	return fbx->generate_scene(state, state->get_bake_fps(), (bool)p_options["animation/trimming"], false);
 }
 
-Variant EditorSceneFormatImporterUFBX::get_option_visibility(const String &p_path, bool p_for_animation,
+Variant EditorSceneFormatImporterUFBX::get_option_visibility(const String &p_path, const String &p_scene_import_type,
 		const String &p_option, const HashMap<StringName, Variant> &p_options) {
 	return true;
 }

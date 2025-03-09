@@ -28,13 +28,13 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef RENDERING_NATIVE_SURFACE_H
-#define RENDERING_NATIVE_SURFACE_H
+#pragma once
 
 #include "core/object/class_db.h"
 #include "core/object/ref_counted.h"
 
 class RenderingContextDriver;
+class GLESContext;
 
 class RenderingNativeSurface : public RefCounted {
 	GDCLASS(RenderingNativeSurface, RefCounted);
@@ -45,7 +45,6 @@ public:
 	RenderingNativeSurface();
 	~RenderingNativeSurface();
 
-	virtual RenderingContextDriver *create_rendering_context() = 0;
+	virtual RenderingContextDriver *create_rendering_context(const String &p_driver_name) = 0;
+	virtual GLESContext *create_gles_context() { return nullptr; }
 };
-
-#endif // RENDERING_NATIVE_SURFACE_H

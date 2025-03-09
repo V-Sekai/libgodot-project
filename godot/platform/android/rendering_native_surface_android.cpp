@@ -48,12 +48,13 @@ Ref<RenderingNativeSurfaceAndroid> RenderingNativeSurfaceAndroid::create(ANative
 	return result;
 }
 
-RenderingContextDriver *RenderingNativeSurfaceAndroid::create_rendering_context() {
+RenderingContextDriver *RenderingNativeSurfaceAndroid::create_rendering_context(const String &p_driver_name) {
 #if defined(VULKAN_ENABLED)
-	return memnew(RenderingContextDriverVulkanAndroid);
-#else
-	return nullptr;
+	if (p_driver_name == "vulkan") {
+		return memnew(RenderingContextDriverVulkanAndroid);
+	}
 #endif
+	return nullptr;
 }
 
 RenderingNativeSurfaceAndroid::RenderingNativeSurfaceAndroid() {
