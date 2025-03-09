@@ -21,7 +21,9 @@
 #include <godot_cpp/classes/tile_map.hpp>
 #include <godot_cpp/classes/tile_set.hpp>
 #include <godot_cpp/classes/viewport.hpp>
+#include <godot_cpp/variant/typed_dictionary.hpp>
 #include <godot_cpp/variant/variant.hpp>
+#include <godot_cpp/variant/variant_internal.hpp>
 
 #include <godot_cpp/core/binder_common.hpp>
 #include <godot_cpp/core/gdvirtual.gen.inc>
@@ -129,6 +131,8 @@ public:
 	int test_tarray_arg(const TypedArray<int64_t> &p_array);
 	TypedArray<Vector2> test_tarray() const;
 	Dictionary test_dictionary() const;
+	int test_tdictionary_arg(const TypedDictionary<String, int64_t> &p_dictionary);
+	TypedDictionary<Vector2, Vector2i> test_tdictionary() const;
 	Example *test_node_argument(Example *p_node) const;
 	String test_string_ops() const;
 	String test_str_utility() const;
@@ -145,6 +149,7 @@ public:
 	Vector2i test_variant_vector2i_conversion(const Variant &p_variant) const;
 	int test_variant_int_conversion(const Variant &p_variant) const;
 	float test_variant_float_conversion(const Variant &p_variant) const;
+	bool test_object_is_valid(const Variant &p_variant) const;
 
 	void test_add_child(Node *p_node);
 	void test_set_tileset(TileMap *p_tilemap, const Ref<TileSet> &p_tileset) const;
@@ -181,6 +186,8 @@ public:
 	Vector4 get_v4() const;
 
 	bool test_post_initialize() const;
+
+	int64_t test_get_internal(const Variant &p_input) const;
 
 	// Static method.
 	static int test_static(int p_a, int p_b);
@@ -271,6 +278,16 @@ public:
 
 	ExampleRuntime();
 	~ExampleRuntime();
+};
+
+class ExamplePrzykład : public RefCounted {
+	GDCLASS(ExamplePrzykład, RefCounted);
+
+protected:
+	static void _bind_methods();
+
+public:
+	String get_the_word() const;
 };
 
 #endif // EXAMPLE_CLASS_H

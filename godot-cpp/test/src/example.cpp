@@ -12,6 +12,7 @@
 #include <godot_cpp/classes/multiplayer_api.hpp>
 #include <godot_cpp/classes/multiplayer_peer.hpp>
 #include <godot_cpp/classes/os.hpp>
+#include <godot_cpp/variant/typed_dictionary.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 
 using namespace godot;
@@ -199,6 +200,8 @@ void Example::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("test_tarray_arg", "array"), &Example::test_tarray_arg);
 	ClassDB::bind_method(D_METHOD("test_tarray"), &Example::test_tarray);
 	ClassDB::bind_method(D_METHOD("test_dictionary"), &Example::test_dictionary);
+	ClassDB::bind_method(D_METHOD("test_tdictionary_arg", "dictionary"), &Example::test_tdictionary_arg);
+	ClassDB::bind_method(D_METHOD("test_tdictionary"), &Example::test_tdictionary);
 	ClassDB::bind_method(D_METHOD("test_node_argument"), &Example::test_node_argument);
 	ClassDB::bind_method(D_METHOD("test_string_ops"), &Example::test_string_ops);
 	ClassDB::bind_method(D_METHOD("test_str_utility"), &Example::test_str_utility);
@@ -215,6 +218,7 @@ void Example::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("test_variant_vector2i_conversion", "variant"), &Example::test_variant_vector2i_conversion);
 	ClassDB::bind_method(D_METHOD("test_variant_int_conversion", "variant"), &Example::test_variant_int_conversion);
 	ClassDB::bind_method(D_METHOD("test_variant_float_conversion", "variant"), &Example::test_variant_float_conversion);
+	ClassDB::bind_method(D_METHOD("test_object_is_valid", "variant"), &Example::test_object_is_valid);
 
 	ClassDB::bind_method(D_METHOD("test_add_child", "node"), &Example::test_add_child);
 	ClassDB::bind_method(D_METHOD("test_set_tileset", "tilemap", "tileset"), &Example::test_set_tileset);
@@ -239,6 +243,8 @@ void Example::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("def_args", "a", "b"), &Example::def_args, DEFVAL(100), DEFVAL(200));
 	ClassDB::bind_method(D_METHOD("callable_bind"), &Example::callable_bind);
 	ClassDB::bind_method(D_METHOD("test_post_initialize"), &Example::test_post_initialize);
+
+	ClassDB::bind_method(D_METHOD("test_get_internal", "a"), &Example::test_get_internal);
 
 	GDVIRTUAL_BIND(_do_something_virtual, "name", "value");
 	ClassDB::bind_method(D_METHOD("test_virtual_implemented_in_script"), &Example::test_virtual_implemented_in_script);
@@ -551,6 +557,23 @@ Dictionary Example::test_dictionary() const {
 	return dict;
 }
 
+int Example::test_tdictionary_arg(const TypedDictionary<String, int64_t> &p_dictionary) {
+	int sum = 0;
+	TypedArray<int64_t> values = p_dictionary.values();
+	for (int i = 0; i < p_dictionary.size(); i++) {
+		sum += (int)values[i];
+	}
+	return sum;
+}
+
+TypedDictionary<Vector2, Vector2i> Example::test_tdictionary() const {
+	TypedDictionary<Vector2, Vector2i> dict;
+
+	dict[Vector2(1, 2)] = Vector2i(2, 3);
+
+	return dict;
+}
+
 Example *Example::test_node_argument(Example *p_node) const {
 	return p_node;
 }
@@ -577,6 +600,10 @@ int Example::test_variant_int_conversion(const Variant &p_variant) const {
 
 float Example::test_variant_float_conversion(const Variant &p_variant) const {
 	return p_variant;
+}
+
+bool Example::test_object_is_valid(const Variant &p_variant) const {
+	return static_cast<bool>(p_variant.get_validated_object());
 }
 
 void Example::test_add_child(Node *p_node) {
@@ -717,6 +744,14 @@ String Example::test_library_path() {
 	return library_path;
 }
 
+int64_t Example::test_get_internal(const Variant &p_input) const {
+	if (p_input.get_type() != Variant::INT) {
+		return -1;
+	}
+
+	return *VariantInternal::get_int(&p_input);
+}
+
 void ExampleRuntime::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_prop_value", "value"), &ExampleRuntime::set_prop_value);
 	ClassDB::bind_method(D_METHOD("get_prop_value"), &ExampleRuntime::get_prop_value);
@@ -735,4 +770,12 @@ ExampleRuntime::ExampleRuntime() {
 }
 
 ExampleRuntime::~ExampleRuntime() {
+}
+
+void ExamplePrzykład::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("get_the_word"), &ExamplePrzykład::get_the_word);
+}
+
+String ExamplePrzykład::get_the_word() const {
+	return U"słowo to przykład";
 }

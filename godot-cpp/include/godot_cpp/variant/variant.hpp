@@ -49,6 +49,7 @@ class Variant {
 
 	friend class GDExtensionBinding;
 	friend class MethodBind;
+	friend class VariantInternal;
 
 	static void init_bindings();
 
@@ -264,6 +265,8 @@ public:
 	operator PackedColorArray() const;
 	operator PackedVector4Array() const;
 
+	Object *get_validated_object() const;
+
 	Variant &operator=(const Variant &other);
 	Variant &operator=(Variant &&other);
 	bool operator==(const Variant &other) const;
@@ -327,8 +330,6 @@ public:
 	bool booleanize() const;
 	String stringify() const;
 	Variant duplicate(bool deep = false) const;
-	static void blend(const Variant &a, const Variant &b, float c, Variant &r_dst);
-	static void interpolate(const Variant &a, const Variant &b, float c, Variant &r_dst);
 
 	static String get_type_name(Variant::Type type);
 	static bool can_convert(Variant::Type from, Variant::Type to);

@@ -76,10 +76,10 @@ def options(opts):
     mingw = os.getenv("MINGW_PREFIX", "")
 
     opts.Add(BoolVariable("use_mingw", "Use the MinGW compiler instead of MSVC - only effective on Windows", False))
-    opts.Add(BoolVariable("use_clang_cl", "Use the clang driver instead of MSVC - only effective on Windows", False))
     opts.Add(BoolVariable("use_static_cpp", "Link MinGW/MSVC C++ runtime libraries statically", True))
     opts.Add(BoolVariable("silence_msvc", "Silence MSVC's cl/link stdout bloat, redirecting errors to stderr.", True))
-    opts.Add(BoolVariable("use_llvm", "Use the LLVM compiler", False))
+    opts.Add(BoolVariable("debug_crt", "Compile with MSVC's debug CRT (/MDd)", False))
+    opts.Add(BoolVariable("use_llvm", "Use the LLVM compiler (MVSC or MinGW depending on the use_mingw flag)", False))
     opts.Add("mingw_prefix", "MinGW prefix", mingw)
 
 
@@ -114,14 +114,18 @@ def generate(env):
         env.Append(CCFLAGS=["/utf-8"])
         env.Append(LINKFLAGS=["/WX"])
 
-        if env["use_clang_cl"]:
+        if env["use_llvm"]:
             env["CC"] = "clang-cl"
             env["CXX"] = "clang-cl"
 
-        if env["use_static_cpp"]:
-            env.Append(CCFLAGS=["/MT"])
+        if env["debug_crt"]:
+            # Always use dynamic runtime, static debug CRT breaks thread_local.
+            env.AppendUnique(CCFLAGS=["/MDd"])
         else:
-            env.Append(CCFLAGS=["/MD"])
+            if env["use_static_cpp"]:
+                env.AppendUnique(CCFLAGS=["/MT"])
+            else:
+                env.AppendUnique(CCFLAGS=["/MD"])
 
         if env["silence_msvc"] and not env.GetOption("clean"):
             silence_msvc(env)
@@ -198,5 +202,13 @@ def generate(env):
             my_spawn.configure(env)
 
     env.Append(CPPDEFINES=["WINDOWS_ENABLED"])
+
+    # Refer to https://github.com/godotengine/godot/blob/master/platform/windows/detect.py
+    if env["lto"] == "auto":
+        if env.get("is_msvc", False):
+            # No LTO by default for MSVC, doesn't help.
+            env["lto"] = "none"
+        else:  # Release
+            env["lto"] = "full"
 
     common_compiler_flags.generate(env)

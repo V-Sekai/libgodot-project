@@ -5,8 +5,8 @@
 ;
 [subrepo]
 	remote = https://github.com/v-sekai/godot-cpp.git
-	branch = master
-	commit = aed9b5c7df48a6563e30f6ed78570e6fe03dc6c9
-	parent = b04507866efb3f2ae02dc1756aacce9bf6d5dadd
+	branch = godot-4.4-stable
+	commit = 714c9e2c165db2dcb7e6ea57e62a04204d3cfbfa
+	parent = 91f4c876c94fbde987d7d8ade11cc7a9791921cf
 	method = merge
-	cmdver = 0.4.6
+	cmdver = 0.4.9

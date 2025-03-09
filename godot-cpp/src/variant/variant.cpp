@@ -35,6 +35,7 @@
 #include <godot_cpp/core/binder_common.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/defs.hpp>
+#include <godot_cpp/variant/variant_internal.hpp>
 
 #include <utility>
 
@@ -49,6 +50,7 @@ void Variant::init_bindings() {
 		from_type_constructor[i] = internal::gdextension_interface_get_variant_from_type_constructor((GDExtensionVariantType)i);
 		to_type_constructor[i] = internal::gdextension_interface_get_variant_to_type_constructor((GDExtensionVariantType)i);
 	}
+	VariantInternal::init_bindings();
 
 	StringName::init_bindings();
 	String::init_bindings();
@@ -448,12 +450,7 @@ Variant::operator ObjectID() const {
 	if (get_type() == Type::INT) {
 		return ObjectID(operator uint64_t());
 	} else if (get_type() == Type::OBJECT) {
-		Object *obj = operator Object *();
-		if (obj != nullptr) {
-			return ObjectID(obj->get_instance_id());
-		} else {
-			return ObjectID();
-		}
+		return ObjectID(internal::gdextension_interface_variant_get_object_instance_id(_native_ptr()));
 	} else {
 		return ObjectID();
 	}
@@ -513,6 +510,10 @@ Variant::operator PackedColorArray() const {
 
 Variant::operator PackedVector4Array() const {
 	return PackedVector4Array(this);
+}
+
+Object *Variant::get_validated_object() const {
+	return ObjectDB::get_instance(operator ObjectID());
 }
 
 Variant &Variant::operator=(const Variant &other) {
