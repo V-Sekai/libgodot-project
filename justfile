@@ -81,12 +81,6 @@ build_ios:
   cp -v {{build_dir}}/extension_api.json {{swift_godot_dir}}/Sources/ExtensionApi/
   cp -v {{godot_dir}}/core/extension/gdextension_interface.h {{swift_godot_dir}}/Sources/GDExtension/include/
 
-clean:
-  #!/usr/bin/env bash
-  rm -rf {{build_dir}}/*
-  cd {{godot_dir}} && scons --clean
-  cd {{godot_cpp_dir}} && scons --clean
-
 print_config:
   @echo "Build Configuration:"
   @echo "Host System: {{host_system}}"
