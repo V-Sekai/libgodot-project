@@ -32,15 +32,15 @@ This repository is set up for easy testing of LibGodot.
 
 Execute the following commands
 ```
-scoop install just cygwin
-# TODO: Setup cygwin
-
 git clone https://github.com/V-Sekai/libgodot_project.git
 
 cd libgodot_project
 
 # Build for the host platform (Mac and Linux)
-just
+python3 build_libgodot.py
+
+# Build for iOS (Mac only)
+python3 build_libgodot.py --target ios 
 ```
 
 ### C++ Sample
