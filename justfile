@@ -34,13 +34,15 @@ build: build_host generate_headers build_target build_godot_cpp copy_files
 build_host:
   #!/usr/bin/env bash
   mkdir -p {{scons_cache_dir}}
+  export SCONS_CACHE={{scons_cache_dir}}
   cd {{godot_dir}} && \
-  scons platform={{host_platform}} target=editor {{host_build_options}} library_type=executable cache_dir={{scons_cache_dir}}
+  scons platform={{host_platform}} target=editor {{host_build_options}} library_type=executable
 
 build_target:
   #!/usr/bin/env bash
+  export SCONS_CACHE={{scons_cache_dir}}
   cd {{godot_dir}} && \
-  scons platform={{target_platform}} target={{target}} {{target_build_options}} library_type=shared_library cache_dir={{scons_cache_dir}}
+  scons platform={{target_platform}} target={{target}} {{target_build_options}} library_type=shared_library
 
 generate_headers:
   #!/usr/bin/env bash
@@ -51,8 +53,9 @@ generate_headers:
 
 build_godot_cpp:
   #!/usr/bin/env bash
+  export SCONS_CACHE={{scons_cache_dir}}
   cd {{godot_cpp_dir}} && \
-  scons platform={{target_platform}} target={{target}} precision={{precision}} arch={{target_arch}} cache_dir={{scons_cache_dir}}
+  scons platform={{target_platform}} target={{target}} precision={{precision}} arch={{target_arch}}
   
   lib_name="libgodot-cpp.{{target_platform}}.{{target}}"
   [[ "{{precision}}" == "double" ]] && lib_name+=".double"
