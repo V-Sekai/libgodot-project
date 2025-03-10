@@ -1,6 +1,5 @@
-base_dir := `pwd`
-build_dir := join(base_dir, "build")
-scons_cache_dir := join(build_dir, "scons_cache")
+base_dir := `pwd` + "/"
+build_dir := join(base_dir, "build", "/")
 
 host_system := os()
 
@@ -28,9 +27,9 @@ precision := "double"
 lib_suffix := if host_system == "macos" { "dylib" } else if host_system == "windows" { "dll" } else { "so" }
 target := if target_platform == "ios" { "template_debug" } else { "editor" }
 
-godot_dir := join(base_dir, "godot")
-godot_cpp_dir := join(base_dir, "godot-cpp")
-swift_godot_dir := join(base_dir, "SwiftGodot")
+godot_dir := join(base_dir, "godot/")
+godot_cpp_dir := join(base_dir, "godot-cpp/")
+swift_godot_dir := join(base_dir, "SwiftGodot/")
 
 host_build_options := if precision == "double" { "precision=double" } else { "" }
 target_build_options := host_build_options
@@ -40,20 +39,19 @@ build: build_host generate_headers build_target build_godot_cpp copy_files
 
 build_host:
   #!/usr/bin/env bash
-  mkdir -p {{scons_cache_dir}}
-  export SCONS_CACHE={{scons_cache_dir}}
+  set -euxo pipefail
   cd {{godot_dir}} && \
   scons platform={{host_platform}} target=editor {{host_build_options}} library_type=executable
 
 build_target:
   #!/usr/bin/env bash
-  mkdir -p {{scons_cache_dir}}
-  export SCONS_CACHE={{scons_cache_dir}}
+  set -euxo pipefail
   cd {{godot_dir}} && \
   scons platform={{target_platform}} target={{target}} {{target_build_options}} library_type=shared_library
 
 generate_headers:
   #!/usr/bin/env bash
+  set -euxo pipefail
   mkdir -p {{build_dir}}
   {{godot_dir}}/bin/godot.* --dump-extension-api --headless
   cp -v {{build_dir}}/extension_api.json {{godot_cpp_dir}}/gdextension/
@@ -61,8 +59,7 @@ generate_headers:
 
 build_godot_cpp:
   #!/usr/bin/env bash
-  mkdir -p {{scons_cache_dir}}
-  export SCONS_CACHE={{scons_cache_dir}}
+  set -euxo pipefail
   cd {{godot_cpp_dir}} && \
   scons platform={{target_platform}} target={{target}} precision={{precision}}
   
@@ -81,6 +78,7 @@ build_godot_cpp:
 
 copy_files:
   #!/usr/bin/env bash
+  set -euxo pipefail
   mkdir -p {{build_dir}}
   cp -v {{godot_dir}}/bin/libgodot.* {{build_dir}}/libgodot.{{lib_suffix}}
   
@@ -91,12 +89,14 @@ copy_files:
 build_ios:
   just build target_platform=ios lib_suffix=a
   #!/usr/bin/env bash
+  set -euxo pipefail
   {{swift_godot_dir}}/scripts/make-libgodot.framework {{godot_dir}} {{build_dir}}
   cp -v {{build_dir}}/extension_api.json {{swift_godot_dir}}/Sources/ExtensionApi/
   cp -v {{godot_dir}}/core/extension/gdextension_interface.h {{swift_godot_dir}}/Sources/GDExtension/include/
 
 clean:
   #!/usr/bin/env bash
+  set -euxo pipefail
   cd {{godot_dir}} && scons --clean
   cd {{godot_cpp_dir}} && scons --clean
 

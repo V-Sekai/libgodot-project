@@ -32,8 +32,8 @@ This repository is set up for easy testing of LibGodot.
 
 Execute the following commands
 ```
-scoop install just msys2
-# TODO: Setup msys2
+scoop install just cygwin
+# TODO: Setup cygwin
 
 git clone https://github.com/V-Sekai/libgodot_project.git
 
