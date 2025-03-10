@@ -17,7 +17,6 @@ host_platform := if host_system == "linux" {
 target_platform := host_platform
 target_arch := if host_arch == "arm64" { "arm64" } else { "x86_64" }
 precision := "double"
-debug := "1"
 lib_suffix := if host_system == "darwin" { "dylib" } else if host_system == "windows" { "dll" } else { "so" }
 target := if target_platform == "ios" { "template_debug" } else { "editor" }
 
@@ -53,10 +52,9 @@ build_godot_cpp:
   cd {{godot_cpp_dir}} && \
   scons platform={{target_platform}} target={{target}} precision={{precision}} arch={{target_arch}}
   
-  # Handle library naming
-  lib_name="libgodot-cpp.{{target_platform}}.{{target}}.{{target_arch}}.a"
+  lib_name="libgodot-cpp.{{target_platform}}.{{target}}"
   [[ "{{precision}}" == "double" ]] && lib_name+=".double"
-  [[ "{{debug}}" == "1" ]] && lib_name+=".dev"
+  lib_name+=".{{target_arch}}.a"
   
   src="{{godot_cpp_dir}}/bin/${lib_name}"
   dest="{{godot_cpp_dir}}/bin/libgodot-cpp.a"
@@ -72,7 +70,6 @@ copy_files:
   mkdir -p {{build_dir}}
   cp -v {{godot_dir}}/bin/libgodot.* {{build_dir}}/libgodot.{{lib_suffix}}
   
-  # Copy to zig directory
   zig_bin="{{base_dir}}/godot-zig/zig-out/bin"
   mkdir -p "$zig_bin"
   cp -v {{build_dir}}/libgodot.{{lib_suffix}} "$zig_bin/"
@@ -96,4 +93,3 @@ print_config:
   @echo "Target Platform: {{target_platform}}"
   @echo "Architecture: {{target_arch}}"
   @echo "Precision: {{precision}}"
-  @echo "Debug Build: {{debug}}"
