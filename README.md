@@ -36,7 +36,9 @@ git clone https://github.com/V-Sekai/libgodot_project.git
 
 cd libgodot_project
 
-scons --target=windows --precision=double
+cmake -S . -GNinja -B build
+cd build
+ninja
 ```
 
 ### C++ Sample
