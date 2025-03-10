@@ -13,6 +13,8 @@ endif()
 set(BASE_DIR ${CMAKE_SOURCE_DIR})
 set(BUILD_DIR ${CMAKE_BINARY_DIR})
 
+set(SCONS_CACHE_PATH "${BUILD_DIR}/scons_cache")
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(host_platform "linuxbsd")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
@@ -54,6 +56,7 @@ add_custom_command(
         platform=${TARGET_PLATFORM}
         target=template_release
         precision=${PRECISION}
+        cache_path=${SCONS_CACHE_PATH}
         -j${num_cores}
     WORKING_DIRECTORY "${GODOT_DIR}"
     COMMENT "Building Godot executable with ${num_cores} cores"
@@ -76,6 +79,7 @@ add_custom_command(
         generate_bindings=yes
         platform=${TARGET_PLATFORM}
         precision=${PRECISION}
+        cache_path=${SCONS_CACHE_PATH}
         -j${num_cores}
     WORKING_DIRECTORY "${GODOT_CPP_DIR}"
     COMMENT "Building godot-cpp library"
@@ -116,3 +120,4 @@ message(STATUS "  Target platform:    ${TARGET_PLATFORM}")
 message(STATUS "  Floating precision: ${PRECISION}")
 message(STATUS "  Build directory:    ${BUILD_DIR}")
 message(STATUS "  CPU cores detected: ${num_cores}")
+message(STATUS "  SCons cache:        ${SCONS_CACHE_PATH}")
