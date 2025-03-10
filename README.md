@@ -32,7 +32,8 @@ This repository is set up for easy testing of LibGodot.
 
 Execute the following commands
 ```
-scoop install just
+scoop install just msys2
+# TODO: Setup msys2
 
 git clone https://github.com/V-Sekai/libgodot_project.git
 
