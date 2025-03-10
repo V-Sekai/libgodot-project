@@ -110,6 +110,50 @@ subprocess.run(["cp", "-v", target_godot, os.path.join(BUILD_DIR, f"libgodot.{li
 subprocess.run(["cp", "-v", os.path.join(BUILD_DIR, "extension_api.json"), os.path.join(GODOT_CPP_DIR, "gdextension")], cwd=GODOT_DIR)
 subprocess.run(["cp", "-v", os.path.join(GODOT_DIR, "core", "extension", "gdextension_interface.h"), os.path.join(GODOT_CPP_DIR, "gdextension")], cwd=GODOT_DIR)
 
+subprocess.run(
+    [
+        "scons",
+        f"platform={target_platform}",
+        f"target={target}",
+        f"precision={precision}",
+        f"arch={target_arch}",
+    ],
+    cwd=GODOT_CPP_DIR,
+    check=True
+)
+
+godot_cpp_lib_name = f"libgodot-cpp.{target_platform}.{target}.{target_arch}.a"
+if precision == "double":
+    godot_cpp_lib_name += ".double"
+if debug == 1:
+    godot_cpp_lib_name += ".dev"
+
+godot_cpp_source = os.path.join(GODOT_CPP_DIR, "bin", godot_cpp_lib_name)
+godot_cpp_dest = os.path.join(GODOT_CPP_DIR, "bin", "libgodot-cpp.a")
+
+if not os.path.exists(godot_cpp_source):
+    print(f"Error: Source file not found - {godot_cpp_source}")
+    print("Possible causes:")
+    print(f"1. Verify target platform '{target_platform}' and architecture '{target_arch}' are correct")
+    print(f"2. Check build parameters: target={target}, precision={precision}, debug={debug}")
+    sys.exit(1)
+
+try:
+    subprocess.run(
+        ["cp", "-v", godot_cpp_source, godot_cpp_dest],
+        cwd=GODOT_DIR,
+        check=True
+    )
+except subprocess.CalledProcessError as e:
+    print(f"Copy failed with error: {e}")
+    sys.exit(1)
+
+godot_cpp_lib_name = f"libgodot-cpp.{target_platform}.{target}.{target_arch}.a"
+godot_cpp_source = os.path.join(GODOT_CPP_DIR, "bin", godot_cpp_lib_name)
+godot_cpp_dest = os.path.join(GODOT_CPP_DIR, "bin", "libgodot-cpp.a")
+
+subprocess.run(["cp", "-v", godot_cpp_source, godot_cpp_dest], cwd=GODOT_DIR)
+
 zig_out_bin = os.path.join("godot-zig", "zig-out", "bin")
 os.makedirs(zig_out_bin, exist_ok=True)
 subprocess.run(["cp", "-v", os.path.join(BUILD_DIR, f"libgodot.{lib_suffix}"), os.path.join(BUILD_DIR, "..", zig_out_bin, f"libgodot.{lib_suffix}")], cwd=GODOT_DIR)

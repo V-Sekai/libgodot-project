@@ -69,7 +69,7 @@ char *dlerror() {
 
 typedef struct {
   void *handle;
-  GDExtensionObjectPtr (*func_gdextension_create_godot_instance)(
+  GDExtensionObjectPtr (*func_libgodot_create_godot_instance)(
       int, char *[], GDExtensionInitializationFunction);
 } LibGodot;
 
@@ -81,7 +81,7 @@ static int run_godot_instance(LibGodot *libgodot, int argc, char *argv[],
   }
 
   GDExtensionObjectPtr instance =
-      libgodot->func_gdextension_create_godot_instance(argc, argv, init_func);
+      libgodot->func_libgodot_create_godot_instance(argc, argv, init_func);
   if (instance == NULL) {
     fprintf(stderr, "Error creating Godot instance\n");
     return EXIT_FAILURE;
@@ -95,8 +95,6 @@ static int run_godot_instance(LibGodot *libgodot, int argc, char *argv[],
   while (!godot_instance->iteration()) {
   }
 
-  godot_instance->stop();
-
   return EXIT_SUCCESS;
 }
 
@@ -108,10 +106,10 @@ LibGodot *libgodot_new(const char *p_path) {
     free(self);
     return NULL;
   }
-  self->func_gdextension_create_godot_instance = (GDExtensionObjectPtr(*)(
+  self->func_libgodot_create_godot_instance = (GDExtensionObjectPtr(*)(
       int, char *[], GDExtensionInitializationFunction))
-      dlsym(self->handle, "gdextension_create_godot_instance");
-  if (self->func_gdextension_create_godot_instance == NULL) {
+      dlsym(self->handle, "libgodot_create_godot_instance");
+  if (self->func_libgodot_create_godot_instance == NULL) {
     fprintf(stderr, "Error acquiring function: %s\n", dlerror());
     dlclose(self->handle);
     free(self);

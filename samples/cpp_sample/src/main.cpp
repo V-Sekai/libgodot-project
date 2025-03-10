@@ -71,8 +71,8 @@ public:
             fprintf(stderr, "Error opening libgodot: %s\n", dlerror());
             return;
         }
-        func_gdextension_create_godot_instance = reinterpret_cast<GDExtensionObjectPtr (*)(int, char *[], GDExtensionInitializationFunction)>(dlsym(handle, "gdextension_create_godot_instance"));
-        if (func_gdextension_create_godot_instance == nullptr) {
+        func_libgodot_create_godot_instance = reinterpret_cast<GDExtensionObjectPtr (*)(int, char *[], GDExtensionInitializationFunction)>(dlsym(handle, "libgodot_create_godot_instance"));
+        if (func_libgodot_create_godot_instance == nullptr) {
             fprintf(stderr, "Error acquiring function: %s\n", dlerror());
             dlclose(handle);
             handle = nullptr;
@@ -87,14 +87,14 @@ public:
     }
 
     bool is_open() {
-        return handle != nullptr && func_gdextension_create_godot_instance != nullptr;
+        return handle != nullptr && func_libgodot_create_godot_instance != nullptr;
     }
 
     godot::GodotInstance *create_godot_instance(int p_argc, char *p_argv[], GDExtensionInitializationFunction p_init_func = gdextension_default_init) {
         if (!is_open()) {
             return nullptr;
         }
-        GDExtensionObjectPtr instance = func_gdextension_create_godot_instance(p_argc, p_argv, p_init_func);
+        GDExtensionObjectPtr instance = func_libgodot_create_godot_instance(p_argc, p_argv, p_init_func);
         if (instance == nullptr) {
             return nullptr;
         }
@@ -103,7 +103,7 @@ public:
 
 private:
     void *handle = nullptr;
-    GDExtensionObjectPtr (*func_gdextension_create_godot_instance)(int, char *[], GDExtensionInitializationFunction) = nullptr;
+    GDExtensionObjectPtr (*func_libgodot_create_godot_instance)(int, char *[], GDExtensionInitializationFunction) = nullptr;
 };
 
 int main(int argc, char **argv) {
@@ -130,7 +130,6 @@ int main(int argc, char **argv) {
 
     instance->start();
     while (!instance->iteration()) {}
-    instance->stop();
 
     return EXIT_SUCCESS;
 }
