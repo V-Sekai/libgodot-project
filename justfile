@@ -4,6 +4,15 @@ scons_cache_dir := join(build_dir, "scons_cache")
 
 host_system := os()
 
+arch_system := if host_system == "linux" {
+  "x86_64"
+} else if host_system == "macos" {
+  "universal"
+} else if host_system == "windows" {
+  "x86_64"
+} else {
+  error("Unsupported system: " + host_system)
+}
 host_platform := if host_system == "linux" {
   "linuxbsd"
 } else if host_system == "macos" {
@@ -59,7 +68,7 @@ build_godot_cpp:
   
   lib_name="libgodot-cpp.{{target_platform}}.{{target}}"
   [[ "{{precision}}" == "double" ]] && lib_name+=".double"
-  lib_name+=".a"
+  lib_name+="{{arch_system}}.a"
   
   src="{{godot_cpp_dir}}/bin/${lib_name}"
   dest="{{godot_cpp_dir}}/bin/libgodot-cpp.a"
