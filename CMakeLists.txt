@@ -54,7 +54,7 @@ else()
     set(EXE_SUFFIX "")
 endif()
 
-set(BUILD_SUFFIX "${TARGET_PLATFORM}.template_release.${PRECISION}")
+set(BUILD_SUFFIX "${TARGET_PLATFORM}.editor.${PRECISION}")
 
 set(GODOT_DIR "${BASE_DIR}/godot")
 set(GODOT_CPP_DIR "${BASE_DIR}/godot-cpp")
@@ -65,7 +65,7 @@ add_custom_command(
     OUTPUT "${GODOT_BIN_PATH}"
     COMMAND scons
         platform=${TARGET_PLATFORM}
-        target=template_release
+        target=editor
         precision=${PRECISION}
         arch=${ARCH_SUFFIX}
         cache_path=${SCONS_CACHE_PATH}
