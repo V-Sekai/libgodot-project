@@ -3,7 +3,6 @@ build_dir := join(base_dir, "build")
 scons_cache_dir := join(build_dir, "scons_cache")
 
 host_system := os()
-host_arch := arch()
 
 host_platform := if host_system == "linux" {
   "linuxbsd"
@@ -16,7 +15,6 @@ host_platform := if host_system == "linux" {
 }
 
 target_platform := host_platform
-target_arch := if host_arch == "arm64" { "arm64" } else { "x86_64" }
 precision := "double"
 lib_suffix := if host_system == "macos" { "dylib" } else if host_system == "windows" { "dll" } else { "so" }
 target := if target_platform == "ios" { "template_debug" } else { "editor" }
@@ -57,11 +55,11 @@ build_godot_cpp:
   mkdir -p {{scons_cache_dir}}
   export SCONS_CACHE={{scons_cache_dir}}
   cd {{godot_cpp_dir}} && \
-  scons platform={{target_platform}} target={{target}} precision={{precision}} arch={{target_arch}}
+  scons platform={{target_platform}} target={{target}} precision={{precision}}
   
   lib_name="libgodot-cpp.{{target_platform}}.{{target}}"
   [[ "{{precision}}" == "double" ]] && lib_name+=".double"
-  lib_name+=".{{target_arch}}.a"
+  lib_name+=".a"
   
   src="{{godot_cpp_dir}}/bin/${lib_name}"
   dest="{{godot_cpp_dir}}/bin/libgodot-cpp.a"
@@ -82,7 +80,7 @@ copy_files:
   cp -v {{build_dir}}/libgodot.{{lib_suffix}} "$zig_bin/"
 
 build_ios:
-  just build target_platform=ios target_arch=arm64 lib_suffix=a
+  just build target_platform=ios lib_suffix=a
   #!/usr/bin/env bash
   {{swift_godot_dir}}/scripts/make-libgodot.framework {{godot_dir}} {{build_dir}}
   cp -v {{build_dir}}/extension_api.json {{swift_godot_dir}}/Sources/ExtensionApi/
@@ -97,5 +95,4 @@ print_config:
   @echo "Build Configuration:"
   @echo "Host System: {{host_system}}"
   @echo "Target Platform: {{target_platform}}"
-  @echo "Architecture: {{target_arch}}"
   @echo "Precision: {{precision}}"
