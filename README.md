@@ -32,6 +32,8 @@ This repository is set up for easy testing of LibGodot.
 
 Execute the following commands
 ```
+scoop install just
+
 git clone https://github.com/V-Sekai/libgodot_project.git
 
 cd libgodot_project
@@ -50,6 +52,8 @@ The C++ sample shows how Godot can be controlled by a host process, by displayin
 After libgodot is compiled successfully, run the following commands to test the C++ sample:
 
 ```
+# Build for Windows (Windows only)
+# scoop install cmake ninja
 cd samples/cpp_sample
 cmake -S . -GNinja -B build
 cd build
