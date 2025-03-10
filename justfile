@@ -90,7 +90,6 @@ build_ios:
 
 clean:
   #!/usr/bin/env bash
-  rm -rf {{build_dir}}/*
   cd {{godot_dir}} && scons --clean
   cd {{godot_cpp_dir}} && scons --clean
 
