@@ -15,6 +15,17 @@ set(BUILD_DIR ${CMAKE_BINARY_DIR})
 
 set(SCONS_CACHE_PATH "${BUILD_DIR}/scons_cache")
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    execute_process(COMMAND uname -m OUTPUT_VARIABLE ARCHITECTURE OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if(ARCHITECTURE STREQUAL "arm64")
+        set(ARCH_SUFFIX "arm64")
+    else()
+        set(ARCH_SUFFIX "x86_64")
+    endif()
+else()
+    set(ARCH_SUFFIX "x86_64")
+endif()
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(host_platform "linuxbsd")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
@@ -48,7 +59,7 @@ set(BUILD_SUFFIX "${TARGET_PLATFORM}.template_release.${PRECISION}")
 set(GODOT_DIR "${BASE_DIR}/godot")
 set(GODOT_CPP_DIR "${BASE_DIR}/godot-cpp")
 set(SWIFT_DIR "${BASE_DIR}/SwiftGodot")
-set(GODOT_BIN_PATH "${GODOT_DIR}/bin/godot.${BUILD_SUFFIX}.x86_64${EXE_SUFFIX}")
+set(GODOT_BIN_PATH "${GODOT_DIR}/bin/godot.${BUILD_SUFFIX}.${ARCH_SUFFIX}${EXE_SUFFIX}")
 
 add_custom_command(
     OUTPUT "${GODOT_BIN_PATH}"
@@ -56,6 +67,7 @@ add_custom_command(
         platform=${TARGET_PLATFORM}
         target=template_release
         precision=${PRECISION}
+        arch=${ARCH_SUFFIX}
         cache_path=${SCONS_CACHE_PATH}
         -j${num_cores}
     WORKING_DIRECTORY "${GODOT_DIR}"
@@ -120,4 +132,5 @@ message(STATUS "  Target platform:    ${TARGET_PLATFORM}")
 message(STATUS "  Floating precision: ${PRECISION}")
 message(STATUS "  Build directory:    ${BUILD_DIR}")
 message(STATUS "  CPU cores detected: ${num_cores}")
+message(STATUS "  Architecture:       ${ARCH_SUFFIX}")
 message(STATUS "  SCons cache:        ${SCONS_CACHE_PATH}")
