@@ -40,6 +40,7 @@ build_host:
 
 build_target:
   #!/usr/bin/env bash
+  mkdir -p {{scons_cache_dir}}
   export SCONS_CACHE={{scons_cache_dir}}
   cd {{godot_dir}} && \
   scons platform={{target_platform}} target={{target}} {{target_build_options}} library_type=shared_library
@@ -53,6 +54,7 @@ generate_headers:
 
 build_godot_cpp:
   #!/usr/bin/env bash
+  mkdir -p {{scons_cache_dir}}
   export SCONS_CACHE={{scons_cache_dir}}
   cd {{godot_cpp_dir}} && \
   scons platform={{target_platform}} target={{target}} precision={{precision}} arch={{target_arch}}
