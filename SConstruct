@@ -3,6 +3,9 @@ import os
 from pathlib import Path
 from SCons.Script import *
 
+num_cores = os.cpu_count() or 1
+SetOption('num_jobs', num_cores)
+
 BASE_DIR = Path(os.getcwd()).resolve()
 BUILD_DIR = BASE_DIR / "build"
 
@@ -25,12 +28,11 @@ env = Environment(
     GODOT_DIR=BASE_DIR / 'godot',
     GODOT_CPP_DIR=BASE_DIR / 'godot-cpp',
     SWIFT_DIR=BASE_DIR / 'SwiftGodot',
-    TARGET_PLATFORM=GetOption('target'),  # Renamed from TARGET to TARGET_PLATFORM
+    TARGET_PLATFORM=GetOption('target'),
     REGENERATE=GetOption('regenerate'),
     PRECISION=GetOption('precision')
 )
 
-# Platform-specific configurations
 env['LIB_SUFFIX'] = 'so'
 if env['TARGET_PLATFORM'] == 'windows':
     env['LIB_SUFFIX'] = 'dll'
@@ -42,7 +44,7 @@ elif env['TARGET_PLATFORM'] == 'ios':
 
 env['BUILD_SUFFIX'] = '.'.join([
     env['TARGET_PLATFORM'],
-    'editor',
+    'template_release',
     'double' if env['PRECISION'] == 'double' else 'single'
 ])
 
@@ -50,7 +52,7 @@ def build_godot(env, target, source):
     cmd = [
         "scons",
         f"platform={env['TARGET_PLATFORM']}",
-        f"target={'template_release'}",
+        f"target=template_release",
         f"precision={env['PRECISION']}",
         f"-j{env.GetOption('num_jobs')}"
     ]
@@ -69,44 +71,34 @@ def generate_api(env, target, source):
         chdir=str(BUILD_DIR)
     )
 
-# Build targets
+godot_bin_path = env['GODOT_DIR'] / 'bin' / f"godot.windows.template_release.{'double' if env['PRECISION'] == 'double' else 'single'}.x86_64.exe"
 godot_bin = build_godot(
     env,
-    target=BUILD_DIR / f"godot.{env['BUILD_SUFFIX']}",
+    target=godot_bin_path,
     source=env['GODOT_DIR'] / "SConstruct"
 )
 
 api_file = generate_api(
     env,
     target=BUILD_DIR / "extension_api.json",
-    source=godot_bin
+    source=godot_bin_path
 )
 
-# File copy actions
-api_copy = env.Command(
-    target=env['GODOT_CPP_DIR'] / "gdextension/extension_api.json",
-    source=api_file,
-    action=Copy("$TARGET", "$SOURCE")
-)
-
-header_copy = env.Command(
-    target=env['GODOT_CPP_DIR'] / "gdextension/gdextension_interface.h",
-    source=env['GODOT_DIR'] / "core/extension/gdextension_interface.h",
-    action=Copy("$TARGET", "$SOURCE")
-)
-
-# Godot-cpp build
 cpp_lib = env.Command(
     target=BUILD_DIR / "libgodot-cpp.a",
-    source=[api_copy, header_copy],
+    source=[],
     action=[
-        f"scons generate_bindings=yes platform={env['TARGET_PLATFORM']} "
-        f"precision={env['PRECISION']} -j{env.GetOption('num_jobs')}"
+        [
+            "scons",
+            "generate_bindings=yes",
+            f"platform={env['TARGET_PLATFORM']}",
+            f"precision={env['PRECISION']}",
+            f"-j{env.GetOption('num_jobs')}"
+        ]
     ],
     chdir=str(env['GODOT_CPP_DIR'])
 )
 
-# SwiftGodot integration
 if env['TARGET_PLATFORM'] == 'ios':
     swift_framework = env.Command(
         target=BUILD_DIR / "libgodot.framework",
@@ -120,5 +112,4 @@ if env['TARGET_PLATFORM'] == 'ios':
     )
     Default(swift_framework)
 
-# Main build
 Default(godot_bin, cpp_lib)
