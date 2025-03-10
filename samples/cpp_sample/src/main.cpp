@@ -130,6 +130,7 @@ int main(int argc, char **argv) {
 
     instance->start();
     while (!instance->iteration()) {}
+    instance->stop();
 
     return EXIT_SUCCESS;
 }

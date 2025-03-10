@@ -95,6 +95,8 @@ static int run_godot_instance(LibGodot *libgodot, int argc, char *argv[],
   while (!godot_instance->iteration()) {
   }
 
+  godot_instance->stop();
+
   return EXIT_SUCCESS;
 }
 
