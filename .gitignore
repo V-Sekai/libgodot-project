@@ -3,3 +3,5 @@ samples/project/.godot/
 .DS_Store
 godot-zig/project/.godot/
 godot-cpp/gdextension/libgodot.dylib
+
+.sconsign.dblite
