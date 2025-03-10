@@ -37,7 +37,7 @@ git clone https://github.com/V-Sekai/libgodot_project.git
 cd libgodot_project
 
 # Build for the host platform (Mac and Linux)
-python3 build_libgodot.py
+python3 build_libgodot.py --target windows
 
 # Build for iOS (Mac only)
 python3 build_libgodot.py --target ios 
