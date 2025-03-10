@@ -17,7 +17,7 @@ host_platform := if host_system == "linux" {
 target_platform := host_platform
 target_arch := if host_arch == "arm64" { "arm64" } else { "x86_64" }
 precision := "double"
-lib_suffix := if host_system == "darwin" { "dylib" } else if host_system == "windows" { "dll" } else { "so" }
+lib_suffix := if host_system == "macos" { "dylib" } else if host_system == "windows" { "dll" } else { "so" }
 target := if target_platform == "ios" { "template_debug" } else { "editor" }
 
 godot_dir := join(base_dir, "godot")
