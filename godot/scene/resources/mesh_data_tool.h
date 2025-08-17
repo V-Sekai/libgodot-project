@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef MESH_DATA_TOOL_H
+#define MESH_DATA_TOOL_H
 
 #include "scene/resources/mesh.h"
 
@@ -135,3 +136,5 @@ public:
 
 	MeshDataTool();
 };
+
+#endif // MESH_DATA_TOOL_H

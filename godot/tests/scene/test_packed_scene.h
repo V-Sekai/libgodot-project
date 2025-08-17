@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_PACKED_SCENE_H
+#define TEST_PACKED_SCENE_H
 
 #include "scene/resources/packed_scene.h"
 
@@ -281,3 +282,5 @@ TEST_CASE("[PackedScene] Recreate State") {
 }
 
 } // namespace TestPackedScene
+
+#endif // TEST_PACKED_SCENE_H

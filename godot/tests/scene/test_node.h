@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_NODE_H
+#define TEST_NODE_H
 
 #include "core/object/class_db.h"
 #include "scene/main/node.h"
@@ -96,13 +97,6 @@ public:
 
 	void set_exported_nodes(const Array &p_nodes) { exported_nodes = p_nodes; }
 	Array get_exported_nodes() const { return exported_nodes; }
-
-	TestNode() {
-		Node *internal = memnew(Node);
-		add_child(internal, false, INTERNAL_MODE_FRONT);
-		internal = memnew(Node);
-		add_child(internal, false, INTERNAL_MODE_BACK);
-	}
 };
 
 TEST_CASE("[SceneTree][Node] Testing node operations with a very simple scene tree") {
@@ -505,24 +499,6 @@ TEST_CASE("[SceneTree][Node] Testing node operations with a more complex simple 
 	memdelete(node2);
 }
 
-TEST_CASE("[SceneTree][Node] Duplicating node with internal children") {
-	GDREGISTER_CLASS(TestNode);
-
-	TestNode *node = memnew(TestNode);
-	Node *child = memnew(Node);
-	child->set_name("Child");
-	node->add_child(child);
-
-	int child_count = node->get_child_count();
-
-	Node *dup = node->duplicate();
-	CHECK(dup->get_child_count() == child_count);
-	CHECK(dup->has_node(String("Child")));
-
-	memdelete(node);
-	memdelete(dup);
-}
-
 TEST_CASE("[SceneTree][Node]Exported node checks") {
 	TestNode *node = memnew(TestNode);
 	SceneTree::get_singleton()->get_root()->add_child(node);
@@ -548,7 +524,7 @@ TEST_CASE("[SceneTree][Node]Exported node checks") {
 
 		TestNode *dup = Object::cast_to<TestNode>(node->duplicate());
 		Node *new_exported = Object::cast_to<Node>(dup->get("exported_node"));
-		CHECK(new_exported == dup->get_child(0, false));
+		CHECK(new_exported == dup->get_child(0));
 
 		memdelete(dup);
 	}
@@ -603,10 +579,10 @@ TEST_CASE("[SceneTree][Node]Exported node checks") {
 		root->add_child(sub_child);
 		sub_child->set_owner(root);
 
-		sub_child->set("exported_node", sub_child->get_child(1, false));
+		sub_child->set("exported_node", sub_child->get_child(1));
 
 		children = Array();
-		children.append(sub_child->get_child(1, false));
+		children.append(sub_child->get_child(1));
 		sub_child->set("exported_nodes", children);
 
 		Ref<PackedScene> ps2;
@@ -917,3 +893,5 @@ TEST_CASE("[SceneTree][Node] Test the process priority") {
 }
 
 } // namespace TestNode
+
+#endif // TEST_NODE_H

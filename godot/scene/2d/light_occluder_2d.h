@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef LIGHT_OCCLUDER_2D_H
+#define LIGHT_OCCLUDER_2D_H
 
 #include "scene/2d/node_2d.h"
 
@@ -110,3 +111,5 @@ public:
 	LightOccluder2D();
 	~LightOccluder2D();
 };
+
+#endif // LIGHT_OCCLUDER_2D_H

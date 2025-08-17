@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_LRU_H
+#define TEST_LRU_H
 
 #include "core/templates/lru.h"
 
@@ -94,3 +95,5 @@ TEST_CASE("[LRU] Resize and clear") {
 	CHECK(!lru.has(4));
 }
 } // namespace TestLRU
+
+#endif // TEST_LRU_H

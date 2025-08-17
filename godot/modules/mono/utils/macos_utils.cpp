@@ -28,9 +28,9 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifdef MACOS_ENABLED
+#include "macos_utils.h"
 
-#import "macos_utils.h"
+#ifdef MACOS_ENABLED
 
 #include "core/string/print_string.h"
 
@@ -38,7 +38,7 @@
 #import <CoreServices/CoreServices.h>
 
 bool macos_is_app_bundle_installed(const String &p_bundle_id) {
-	CFStringRef bundle_id = CFStringCreateWithCString(nullptr, p_bundle_id.utf8().get_data(), kCFStringEncodingUTF8);
+	CFStringRef bundle_id = CFStringCreateWithCString(nullptr, p_bundle_id.utf8(), kCFStringEncodingUTF8);
 	CFArrayRef result = LSCopyApplicationURLsForBundleIdentifier(bundle_id, nullptr);
 	CFRelease(bundle_id);
 

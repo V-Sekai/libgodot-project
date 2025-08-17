@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SIGNAL_AWAITER_UTILS_H
+#define SIGNAL_AWAITER_UTILS_H
 
 #include "csharp_script.h"
 #include "mono_gc_handle.h"
@@ -97,3 +98,5 @@ public:
 
 	EventSignalCallable(Object *p_owner, const StringName &p_event_signal_name);
 };
+
+#endif // SIGNAL_AWAITER_UTILS_H

@@ -34,6 +34,8 @@
 
 #include "core/io/file_access.h"
 
+ZipArchive *ZipArchive::instance = nullptr;
+
 extern "C" {
 
 struct ZipData {
@@ -174,6 +176,7 @@ bool ZipArchive::try_open_pack(const String &p_path, bool p_replace_files, uint6
 
 	Package pkg;
 	pkg.filename = p_path;
+	pkg.zfile = zfile;
 	packages.push_back(pkg);
 	int pkg_num = packages.size() - 1;
 
@@ -200,8 +203,6 @@ bool ZipArchive::try_open_pack(const String &p_path, bool p_replace_files, uint6
 		}
 	}
 
-	unzClose(zfile);
-
 	return true;
 }
 
@@ -226,6 +227,10 @@ ZipArchive::ZipArchive() {
 }
 
 ZipArchive::~ZipArchive() {
+	for (int i = 0; i < packages.size(); i++) {
+		unzClose(packages[i].zfile);
+	}
+
 	packages.clear();
 	instance = nullptr;
 }

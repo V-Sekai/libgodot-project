@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef JOLT_CYLINDER_SHAPE_3D_H
+#define JOLT_CYLINDER_SHAPE_3D_H
 
 #include "jolt_shape_3d.h"
 
@@ -53,3 +54,5 @@ public:
 
 	String to_string() const;
 };
+
+#endif // JOLT_CYLINDER_SHAPE_3D_H

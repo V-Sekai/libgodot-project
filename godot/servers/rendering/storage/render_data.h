@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef RENDER_DATA_H
+#define RENDER_DATA_H
 
 #include "core/object/object.h"
 #include "render_scene_buffers.h"
@@ -65,3 +66,5 @@ protected:
 	GDVIRTUAL0RC(RID, _get_environment)
 	GDVIRTUAL0RC(RID, _get_camera_attributes)
 };
+
+#endif // RENDER_DATA_H

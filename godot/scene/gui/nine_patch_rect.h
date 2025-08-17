@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef NINE_PATCH_RECT_H
+#define NINE_PATCH_RECT_H
 
 #include "scene/gui/control.h"
 
@@ -81,3 +82,5 @@ public:
 };
 
 VARIANT_ENUM_CAST(NinePatchRect::AxisStretchMode)
+
+#endif // NINE_PATCH_RECT_H

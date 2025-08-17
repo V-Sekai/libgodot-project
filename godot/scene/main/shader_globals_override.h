@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SHADER_GLOBALS_OVERRIDE_H
+#define SHADER_GLOBALS_OVERRIDE_H
 
 #include "scene/main/node.h"
 
@@ -58,4 +59,8 @@ protected:
 
 public:
 	PackedStringArray get_configuration_warnings() const override;
+
+	ShaderGlobalsOverride();
 };
+
+#endif // SHADER_GLOBALS_OVERRIDE_H

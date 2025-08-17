@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef LUMINANCE_RD_H
+#define LUMINANCE_RD_H
 
 #include "servers/rendering/renderer_rd/pipeline_cache_rd.h"
 #include "servers/rendering/renderer_rd/shaders/effects/luminance_reduce.glsl.gen.h"
@@ -112,3 +113,5 @@ public:
 };
 
 } // namespace RendererRD
+
+#endif // LUMINANCE_RD_H

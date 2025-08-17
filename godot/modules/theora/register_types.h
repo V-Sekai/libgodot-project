@@ -28,9 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef THEORA_REGISTER_TYPES_H
+#define THEORA_REGISTER_TYPES_H
 
 #include "modules/register_module_types.h"
 
 void initialize_theora_module(ModuleInitializationLevel p_level);
 void uninitialize_theora_module(ModuleInitializationLevel p_level);
+
+#endif // THEORA_REGISTER_TYPES_H

@@ -40,6 +40,8 @@ static TaskSchedulerImpl* inst = nullptr;
 
 #ifdef THORVG_THREAD_SUPPORT
 
+static thread_local bool _async = true;
+
 struct TaskQueue {
     Inlist<Task>             taskDeque;
     mutex                    mtx;
@@ -155,7 +157,7 @@ struct TaskSchedulerImpl
     void request(Task* task)
     {
         //Async
-        if (threads.count > 0) {
+        if (threads.count > 0 && _async) {
             task->prepare();
             auto i = idx++;
             for (uint32_t n = 0; n < threads.count; ++n) {
@@ -175,6 +177,8 @@ struct TaskSchedulerImpl
 };
 
 #else //THORVG_THREAD_SUPPORT
+
+static bool _async = true;
 
 struct TaskSchedulerImpl
 {
@@ -215,4 +219,11 @@ uint32_t TaskScheduler::threads()
 {
     if (inst) return inst->threadCnt();
     return 0;
+}
+
+
+void TaskScheduler::async(bool on)
+{
+    //toggle async tasking for each thread on/off
+    _async = on;
 }

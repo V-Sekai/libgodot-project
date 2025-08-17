@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_ANIMATION_H
+#define TEST_ANIMATION_H
 
 #include "scene/resources/animation.h"
 
@@ -309,3 +310,5 @@ TEST_CASE("[Animation] Create Bezier track") {
 }
 
 } // namespace TestAnimation
+
+#endif // TEST_ANIMATION_H

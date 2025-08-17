@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_RECT2_H
+#define TEST_RECT2_H
 
 #include "core/math/rect2.h"
 #include "core/math/rect2i.h"
@@ -37,15 +38,15 @@
 
 namespace TestRect2 {
 TEST_CASE("[Rect2] Constructor methods") {
-	constexpr Rect2 rect = Rect2(0, 100, 1280, 720);
-	constexpr Rect2 rect_vector = Rect2(Vector2(0, 100), Vector2(1280, 720));
-	constexpr Rect2 rect_copy_rect = Rect2(rect);
+	const Rect2 rect = Rect2(0, 100, 1280, 720);
+	const Rect2 rect_vector = Rect2(Vector2(0, 100), Vector2(1280, 720));
+	const Rect2 rect_copy_rect = Rect2(rect);
 	const Rect2 rect_copy_recti = Rect2(Rect2i(0, 100, 1280, 720));
 
-	static_assert(
+	CHECK_MESSAGE(
 			rect == rect_vector,
 			"Rect2s created with the same dimensions but by different methods should be equal.");
-	static_assert(
+	CHECK_MESSAGE(
 			rect == rect_copy_rect,
 			"Rect2s created with the same dimensions but by different methods should be equal.");
 	CHECK_MESSAGE(
@@ -61,7 +62,7 @@ TEST_CASE("[Rect2] String conversion") {
 }
 
 TEST_CASE("[Rect2] Basic getters") {
-	constexpr Rect2 rect = Rect2(0, 100, 1280, 720);
+	const Rect2 rect = Rect2(0, 100, 1280, 720);
 	CHECK_MESSAGE(
 			rect.get_position().is_equal_approx(Vector2(0, 100)),
 			"get_position() should return the expected value.");
@@ -180,7 +181,7 @@ TEST_CASE("[Rect2] Expanding") {
 }
 
 TEST_CASE("[Rect2] Get support") {
-	constexpr Rect2 rect = Rect2(Vector2(-1.5, 2), Vector2(4, 5));
+	const Rect2 rect = Rect2(Vector2(-1.5, 2), Vector2(4, 5));
 	CHECK_MESSAGE(
 			rect.get_support(Vector2(1, 0)) == Vector2(2.5, 2),
 			"get_support() should return the expected value.");
@@ -323,8 +324,8 @@ TEST_CASE("[Rect2] Merging") {
 }
 
 TEST_CASE("[Rect2] Finite number checks") {
-	constexpr Vector2 x(0, 1);
-	constexpr Vector2 infinite(Math::NaN, Math::NaN);
+	const Vector2 x(0, 1);
+	const Vector2 infinite(NAN, NAN);
 
 	CHECK_MESSAGE(
 			Rect2(x, x).is_finite(),
@@ -343,3 +344,5 @@ TEST_CASE("[Rect2] Finite number checks") {
 }
 
 } // namespace TestRect2
+
+#endif // TEST_RECT2_H

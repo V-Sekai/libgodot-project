@@ -201,7 +201,7 @@ inline uint64_t rotateleft64(uint64_t v, int x)
 #endif
 
 #ifdef SIMD_SSE
-static void decodeFilterOctSimd8(signed char* data, size_t count)
+static void decodeFilterOctSimd(signed char* data, size_t count)
 {
 	const __m128 sign = _mm_set1_ps(-0.f);
 
@@ -246,7 +246,7 @@ static void decodeFilterOctSimd8(signed char* data, size_t count)
 	}
 }
 
-static void decodeFilterOctSimd16(short* data, size_t count)
+static void decodeFilterOctSimd(short* data, size_t count)
 {
 	const __m128 sign = _mm_set1_ps(-0.f);
 
@@ -295,9 +295,8 @@ static void decodeFilterOctSimd16(short* data, size_t count)
 		__m128i res_1 = _mm_unpackhi_epi16(xzr, y0r);
 
 		// patch in .w
-		__m128i maskw = _mm_set_epi32(0xffff0000, 0, 0xffff0000, 0);
-		res_0 = _mm_or_si128(res_0, _mm_and_si128(_mm_castps_si128(n4_0), maskw));
-		res_1 = _mm_or_si128(res_1, _mm_and_si128(_mm_castps_si128(n4_1), maskw));
+		res_0 = _mm_or_si128(res_0, _mm_and_si128(_mm_castps_si128(n4_0), _mm_set1_epi64x(0xffff000000000000)));
+		res_1 = _mm_or_si128(res_1, _mm_and_si128(_mm_castps_si128(n4_1), _mm_set1_epi64x(0xffff000000000000)));
 
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&data[(i + 0) * 4]), res_0);
 		_mm_storeu_si128(reinterpret_cast<__m128i*>(&data[(i + 2) * 4]), res_1);
@@ -405,7 +404,7 @@ inline float32x4_t vdivq_f32(float32x4_t x, float32x4_t y)
 #endif
 
 #ifdef SIMD_NEON
-static void decodeFilterOctSimd8(signed char* data, size_t count)
+static void decodeFilterOctSimd(signed char* data, size_t count)
 {
 	const int32x4_t sign = vdupq_n_s32(0x80000000);
 
@@ -454,7 +453,7 @@ static void decodeFilterOctSimd8(signed char* data, size_t count)
 	}
 }
 
-static void decodeFilterOctSimd16(short* data, size_t count)
+static void decodeFilterOctSimd(short* data, size_t count)
 {
 	const int32x4_t sign = vdupq_n_s32(0x80000000);
 
@@ -599,7 +598,7 @@ static void decodeFilterExpSimd(unsigned int* data, size_t count)
 #endif
 
 #ifdef SIMD_WASM
-static void decodeFilterOctSimd8(signed char* data, size_t count)
+static void decodeFilterOctSimd(signed char* data, size_t count)
 {
 	const v128_t sign = wasm_f32x4_splat(-0.f);
 
@@ -648,7 +647,7 @@ static void decodeFilterOctSimd8(signed char* data, size_t count)
 	}
 }
 
-static void decodeFilterOctSimd16(short* data, size_t count)
+static void decodeFilterOctSimd(short* data, size_t count)
 {
 	const v128_t sign = wasm_f32x4_splat(-0.f);
 	const v128_t zmask = wasm_i32x4_splat(0x7fff);
@@ -834,9 +833,9 @@ void meshopt_decodeFilterOct(void* buffer, size_t count, size_t stride)
 
 #if defined(SIMD_SSE) || defined(SIMD_NEON) || defined(SIMD_WASM)
 	if (stride == 4)
-		dispatchSimd(decodeFilterOctSimd8, static_cast<signed char*>(buffer), count, 4);
+		dispatchSimd(decodeFilterOctSimd, static_cast<signed char*>(buffer), count, 4);
 	else
-		dispatchSimd(decodeFilterOctSimd16, static_cast<short*>(buffer), count, 4);
+		dispatchSimd(decodeFilterOctSimd, static_cast<short*>(buffer), count, 4);
 #else
 	if (stride == 4)
 		decodeFilterOct(static_cast<signed char*>(buffer), count);

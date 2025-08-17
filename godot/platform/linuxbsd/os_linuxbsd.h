@@ -28,9 +28,11 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef OS_LINUXBSD_H
+#define OS_LINUXBSD_H
 
 #include "crash_handler_linuxbsd.h"
+#include "joypad_linux.h"
 
 #include "core/input/input.h"
 #include "drivers/alsa/audio_driver_alsa.h"
@@ -47,8 +49,6 @@
 #endif
 #endif
 
-class JoypadSDL;
-
 class OS_LinuxBSD : public OS_Unix {
 	virtual void delete_main_loop() override;
 
@@ -61,8 +61,8 @@ class OS_LinuxBSD : public OS_Unix {
 	int _stretch_to_fc(int p_stretch) const;
 #endif
 
-#ifdef SDL_ENABLED
-	JoypadSDL *joypad_sdl = nullptr;
+#ifdef JOYDEV_ENABLED
+	JoypadLinux *joypad = nullptr;
 #endif
 
 #ifdef ALSA_ENABLED
@@ -138,11 +138,11 @@ public:
 
 	virtual String get_system_ca_certificates() override;
 
-#ifdef TOOLS_ENABLED
 	virtual bool _test_create_rendering_device_and_gl(const String &p_display_driver) const override;
 	virtual bool _test_create_rendering_device(const String &p_display_driver) const override;
-#endif
 
 	OS_LinuxBSD();
 	~OS_LinuxBSD();
 };
+
+#endif // OS_LINUXBSD_H

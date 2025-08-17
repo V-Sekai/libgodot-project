@@ -31,7 +31,7 @@ def get_opts():
         ("osxcross_sdk", "OSXCross SDK version", "darwin16"),
         ("MACOS_SDK_PATH", "Path to the macOS SDK", ""),
         ("vulkan_sdk_path", "Path to the Vulkan SDK", ""),
-        EnumVariable("macports_clang", "Build using Clang from MacPorts", "no", ["no", "5.0", "devel"], ignorecase=2),
+        EnumVariable("macports_clang", "Build using Clang from MacPorts", "no", ("no", "5.0", "devel")),
         BoolVariable("use_ubsan", "Use LLVM/GCC compiler undefined behavior sanitizer (UBSAN)", False),
         BoolVariable("use_asan", "Use LLVM/GCC compiler address sanitizer (ASAN)", False),
         BoolVariable("use_tsan", "Use LLVM/GCC compiler thread sanitizer (TSAN)", False),
@@ -172,12 +172,9 @@ def configure(env: "SConsEnvironment"):
             env.Append(CCFLAGS=["-fsanitize=thread"])
             env.Append(LINKFLAGS=["-fsanitize=thread"])
 
-    # Only add stack size for executables, not for libraries
-    if env["library_type"] == "executable":
-        if env["use_ubsan"] or env["use_asan"] or env["use_tsan"]:
-            env.Append(LINKFLAGS=["-Wl,-stack_size," + hex(STACK_SIZE_SANITIZERS)])
-        else:
-            env.Append(LINKFLAGS=["-Wl,-stack_size," + hex(STACK_SIZE)])
+        env.Append(LINKFLAGS=["-Wl,-stack_size," + hex(STACK_SIZE_SANITIZERS)])
+    else:
+        env.Append(LINKFLAGS=["-Wl,-stack_size," + hex(STACK_SIZE)])
 
     if env["use_coverage"]:
         env.Append(CCFLAGS=["-ftest-coverage", "-fprofile-arcs"])
@@ -185,24 +182,8 @@ def configure(env: "SConsEnvironment"):
 
     ## Dependencies
 
-    if env["accesskit"]:
-        if env["accesskit_sdk_path"] != "":
-            env.Prepend(CPPPATH=[env["accesskit_sdk_path"] + "/include"])
-            if env["arch"] == "arm64" or env["arch"] == "universal":
-                env.Append(LINKFLAGS=["-L" + env["accesskit_sdk_path"] + "/lib/macos/arm64/static/"])
-            if env["arch"] == "x86_64" or env["arch"] == "universal":
-                env.Append(LINKFLAGS=["-L" + env["accesskit_sdk_path"] + "/lib/macos/x86_64/static/"])
-            env.Append(LINKFLAGS=["-laccesskit"])
-        else:
-            env.Append(CPPDEFINES=["ACCESSKIT_DYNAMIC"])
-        env.Append(CPPDEFINES=["ACCESSKIT_ENABLED"])
-
     if env["builtin_libtheora"] and env["arch"] == "x86_64":
         env["x86_libtheora_opt_gcc"] = True
-
-    if env["sdl"]:
-        env.Append(CPPDEFINES=["SDL_ENABLED"])
-        env.Append(LINKFLAGS=["-framework", "ForceFeedback"])
 
     ## Flags
 
@@ -238,13 +219,9 @@ def configure(env: "SConsEnvironment"):
             "Security",
             "-framework",
             "UniformTypeIdentifiers",
-            "-framework",
-            "IOSurface",
         ]
     )
     env.Append(LIBS=["pthread", "z"])
-
-    extra_frameworks = set()
 
     if env["opengl3"]:
         env.Append(CPPDEFINES=["GLES3_ENABLED"])
@@ -254,7 +231,7 @@ def configure(env: "SConsEnvironment"):
             env.Append(LINKFLAGS=["-lANGLE.macos." + env["arch"]])
             env.Append(LINKFLAGS=["-lEGL.macos." + env["arch"]])
             env.Append(LINKFLAGS=["-lGLES.macos." + env["arch"]])
-        env.Prepend(CPPEXTPATH=["#thirdparty/angle/include"])
+        env.Prepend(CPPPATH=["#thirdparty/angle/include"])
 
     env.Append(LINKFLAGS=["-rpath", "@executable_path/../Frameworks", "-rpath", "@executable_path"])
 
@@ -262,16 +239,19 @@ def configure(env: "SConsEnvironment"):
         print_warning("Target architecture '{}' does not support the Metal rendering driver".format(env["arch"]))
         env["metal"] = False
 
+    extra_frameworks = set()
+
     if env["metal"]:
         env.AppendUnique(CPPDEFINES=["METAL_ENABLED", "RD_ENABLED"])
         extra_frameworks.add("Metal")
         extra_frameworks.add("MetalKit")
         extra_frameworks.add("MetalFX")
-        env.Prepend(CPPEXTPATH=["#thirdparty/spirv-cross"])
+        env.Prepend(CPPPATH=["#thirdparty/spirv-cross"])
 
     if env["vulkan"]:
         env.AppendUnique(CPPDEFINES=["VULKAN_ENABLED", "RD_ENABLED"])
         extra_frameworks.add("Metal")
+        extra_frameworks.add("IOSurface")
         if not env["use_volk"]:
             env.Append(LINKFLAGS=["-lMoltenVK"])
 

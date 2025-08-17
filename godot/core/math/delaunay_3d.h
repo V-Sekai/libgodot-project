@@ -28,15 +28,17 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef DELAUNAY_3D_H
+#define DELAUNAY_3D_H
 
+#include "core/io/file_access.h"
 #include "core/math/aabb.h"
 #include "core/math/projection.h"
 #include "core/math/vector3.h"
-#include "core/templates/a_hash_map.h"
-#include "core/templates/list.h"
 #include "core/templates/local_vector.h"
+#include "core/templates/oa_hash_map.h"
 #include "core/templates/vector.h"
+#include "core/variant/variant.h"
 
 #include "thirdparty/misc/r128.h"
 
@@ -185,7 +187,7 @@ class Delaunay3D {
 			Plane p(p_points[p_simplex.points[i]], p_points[p_simplex.points[(i + 1) % 4]], p_points[p_simplex.points[(i + 2) % 4]]);
 			// This tolerance should not be smaller than the one used with
 			// Plane::has_point() when creating the LightmapGI probe BSP tree.
-			if (Math::abs(p.distance_to(p_points[p_simplex.points[(i + 3) % 4]])) < 0.001) {
+			if (ABS(p.distance_to(p_points[p_simplex.points[(i + 3) % 4]])) < 0.001) {
 				return true;
 			}
 		}
@@ -260,7 +262,7 @@ public:
 			circum_sphere_compute(points, root);
 		}
 
-		AHashMap<Triangle, uint32_t, TriangleHasher> triangles_inserted;
+		OAHashMap<Triangle, uint32_t, TriangleHasher> triangles_inserted;
 		LocalVector<Triangle> triangles;
 
 		for (uint32_t i = 0; i < point_count; i++) {
@@ -293,7 +295,7 @@ public:
 
 					for (uint32_t k = 0; k < 4; k++) {
 						Triangle t = Triangle(simplex->points[triangle_order[k][0]], simplex->points[triangle_order[k][1]], simplex->points[triangle_order[k][2]]);
-						uint32_t *p = triangles_inserted.getptr(t);
+						uint32_t *p = triangles_inserted.lookup_ptr(t);
 						if (p) {
 							// This Delaunay implementation uses the Bowyer-Watson algorithm.
 							// The rule is that you don't reuse any triangles that were
@@ -387,3 +389,5 @@ public:
 		return ret_simplices;
 	}
 };
+
+#endif // DELAUNAY_3D_H

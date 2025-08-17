@@ -28,10 +28,13 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef PLATFORM_GL_H
+#define PLATFORM_GL_H
 
 #ifndef GLES_API_ENABLED
 #define GLES_API_ENABLED // Allow using GLES.
 #endif
 
 #include <ES3/gl.h>
+
+#endif // PLATFORM_GL_H

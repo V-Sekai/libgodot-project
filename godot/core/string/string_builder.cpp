@@ -30,6 +30,8 @@
 
 #include "string_builder.h"
 
+#include <string.h>
+
 StringBuilder &StringBuilder::append(const String &p_string) {
 	if (p_string.is_empty()) {
 		return *this;
@@ -60,7 +62,7 @@ String StringBuilder::as_string() const {
 	}
 
 	String string;
-	string.resize_uninitialized(string_length + 1);
+	string.resize(string_length + 1);
 	char32_t *buffer = string.ptrw();
 
 	int current_position = 0;

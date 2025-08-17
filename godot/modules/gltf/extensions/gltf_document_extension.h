@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GLTF_DOCUMENT_EXTENSION_H
+#define GLTF_DOCUMENT_EXTENSION_H
 
 #include "../gltf_state.h"
 
@@ -93,3 +94,5 @@ public:
 	GDVIRTUAL4R(Error, _export_node, Ref<GLTFState>, Ref<GLTFNode>, Dictionary, Node *);
 	GDVIRTUAL1R(Error, _export_post, Ref<GLTFState>);
 };
+
+#endif // GLTF_DOCUMENT_EXTENSION_H

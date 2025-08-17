@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_ARRAYMESH_H
+#define TEST_ARRAYMESH_H
 
 #include "scene/resources/3d/primitive_meshes.h"
 #include "scene/resources/mesh.h"
@@ -148,7 +149,9 @@ TEST_CASE("[SceneTree][ArrayMesh] Adding and modifying blendshapes.") {
 		blend_shape[Mesh::ARRAY_VERTEX] = cylinder_array[Mesh::ARRAY_VERTEX];
 		blend_shape[Mesh::ARRAY_NORMAL] = cylinder_array[Mesh::ARRAY_NORMAL];
 		blend_shape[Mesh::ARRAY_TANGENT] = cylinder_array[Mesh::ARRAY_TANGENT];
-		Array blend_shapes = { blend_shape, blend_shape };
+		Array blend_shapes;
+		blend_shapes.push_back(blend_shape);
+		blend_shapes.push_back(blend_shape);
 		mesh->add_surface_from_arrays(Mesh::PRIMITIVE_TRIANGLES, cylinder_array, blend_shapes);
 		mesh->add_surface_from_arrays(Mesh::PRIMITIVE_TRIANGLES, cylinder_array, blend_shapes);
 
@@ -186,7 +189,9 @@ TEST_CASE("[SceneTree][ArrayMesh] Adding and modifying blendshapes.") {
 		blend_shape[Mesh::ARRAY_VERTEX] = cylinder_array[Mesh::ARRAY_VERTEX];
 		blend_shape[Mesh::ARRAY_NORMAL] = cylinder_array[Mesh::ARRAY_NORMAL];
 		blend_shape[Mesh::ARRAY_TANGENT] = cylinder_array[Mesh::ARRAY_TANGENT];
-		Array blend_shapes = { blend_shape, blend_shape };
+		Array blend_shapes;
+		blend_shapes.push_back(blend_shape);
+		blend_shapes.push_back(blend_shape);
 		mesh->add_surface_from_arrays(Mesh::PRIMITIVE_TRIANGLES, cylinder_array, blend_shapes);
 
 		ERR_PRINT_OFF
@@ -444,3 +449,5 @@ TEST_CASE("[SceneTree][ArrayMesh] Get/Set mesh metadata and actions") {
 }
 
 } // namespace TestArrayMesh
+
+#endif // TEST_ARRAYMESH_H

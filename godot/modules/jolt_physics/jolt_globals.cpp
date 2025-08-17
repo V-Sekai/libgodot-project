@@ -42,7 +42,7 @@
 
 #include "Jolt/RegisterTypes.h"
 
-#include <cstdarg>
+#include <stdarg.h>
 
 void *jolt_alloc(size_t p_size) {
 	return Memory::alloc_static(p_size);

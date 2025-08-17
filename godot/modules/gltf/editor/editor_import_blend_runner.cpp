@@ -30,10 +30,12 @@
 
 #include "editor_import_blend_runner.h"
 
+#ifdef TOOLS_ENABLED
+
 #include "core/io/http_client.h"
+#include "editor/editor_file_system.h"
 #include "editor/editor_node.h"
-#include "editor/file_system/editor_file_system.h"
-#include "editor/settings/editor_settings.h"
+#include "editor/editor_settings.h"
 
 static constexpr char PYTHON_SCRIPT_RPC[] = R"(
 import bpy, sys, threading
@@ -92,10 +94,11 @@ bpy.ops.export_scene.gltf(**opts['gltf_options'])
 
 String dict_to_python(const Dictionary &p_dict) {
 	String entries;
-	for (const KeyValue<Variant, Variant> &kv : p_dict) {
-		const String &key = kv.key;
+	Array dict_keys = p_dict.keys();
+	for (int i = 0; i < dict_keys.size(); i++) {
+		const String key = dict_keys[i];
 		String value;
-		const Variant &raw_value = kv.value;
+		Variant raw_value = p_dict[key];
 
 		switch (raw_value.get_type()) {
 			case Variant::Type::BOOL: {
@@ -124,10 +127,11 @@ String dict_to_python(const Dictionary &p_dict) {
 
 String dict_to_xmlrpc(const Dictionary &p_dict) {
 	String members;
-	for (const KeyValue<Variant, Variant> &kv : p_dict) {
-		const String &key = kv.key;
+	Array dict_keys = p_dict.keys();
+	for (int i = 0; i < dict_keys.size(); i++) {
+		const String key = dict_keys[i];
 		String value;
-		const Variant &raw_value = kv.value;
+		Variant raw_value = p_dict[key];
 
 		switch (raw_value.get_type()) {
 			case Variant::Type::BOOL: {
@@ -390,6 +394,8 @@ EditorImportBlendRunner::EditorImportBlendRunner() {
 }
 
 EditorImportBlendRunner::~EditorImportBlendRunner() {
-	_kill_blender();
+	ERR_FAIL_COND(singleton != this);
 	singleton = nullptr;
 }
+
+#endif // TOOLS_ENABLED

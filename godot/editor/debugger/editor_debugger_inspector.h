@@ -28,18 +28,13 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef EDITOR_DEBUGGER_INSPECTOR_H
+#define EDITOR_DEBUGGER_INSPECTOR_H
 
-#include "core/variant/typed_dictionary.h"
-#include "editor/inspector/editor_inspector.h"
+#include "editor/editor_inspector.h"
 
-class SceneDebuggerObject;
-
-class EditorDebuggerRemoteObjects : public Object {
-	GDCLASS(EditorDebuggerRemoteObjects, Object);
-
-private:
-	bool _set_impl(const StringName &p_name, const Variant &p_value, const String &p_field);
+class EditorDebuggerRemoteObject : public Object {
+	GDCLASS(EditorDebuggerRemoteObject, Object);
 
 protected:
 	bool _set(const StringName &p_name, const Variant &p_value);
@@ -48,16 +43,14 @@ protected:
 	static void _bind_methods();
 
 public:
-	TypedArray<uint64_t> remote_object_ids;
+	ObjectID remote_object_id;
 	String type_name;
 	List<PropertyInfo> prop_list;
-	HashMap<StringName, TypedDictionary<uint64_t, Variant>> prop_values;
+	HashMap<StringName, Variant> prop_values;
 
-	bool _hide_script_from_inspector() { return true; }
-	bool _hide_metadata_from_inspector() { return true; }
-
-	void set_property_field(const StringName &p_property, const Variant &p_value, const String &p_field);
+	ObjectID get_remote_object_id() { return remote_object_id; }
 	String get_title();
+
 	Variant get_variant(const StringName &p_name);
 
 	void clear() {
@@ -66,18 +59,21 @@ public:
 	}
 
 	void update() { notify_property_list_changed(); }
+
+	EditorDebuggerRemoteObject() {}
 };
 
 class EditorDebuggerInspector : public EditorInspector {
 	GDCLASS(EditorDebuggerInspector, EditorInspector);
 
 private:
-	LocalVector<EditorDebuggerRemoteObjects *> remote_objects_list;
+	ObjectID inspected_object_id;
+	HashMap<ObjectID, EditorDebuggerRemoteObject *> remote_objects;
 	HashSet<Ref<Resource>> remote_dependencies;
-	EditorDebuggerRemoteObjects *variables = nullptr;
+	EditorDebuggerRemoteObject *variables = nullptr;
 
 	void _object_selected(ObjectID p_object);
-	void _objects_edited(const String &p_prop, const TypedDictionary<uint64_t, Variant> &p_values, const String &p_field);
+	void _object_edited(ObjectID p_id, const String &p_prop, const Variant &p_value);
 
 protected:
 	void _notification(int p_what);
@@ -88,13 +84,14 @@ public:
 	~EditorDebuggerInspector();
 
 	// Remote Object cache
-	EditorDebuggerRemoteObjects *set_objects(const Array &p_array);
-	void clear_remote_inspector();
+	ObjectID add_object(const Array &p_arr);
+	Object *get_object(ObjectID p_id);
 	void clear_cache();
-	void invalidate_selection_from_cache(const TypedArray<uint64_t> &p_ids);
 
 	// Stack Dump variables
 	String get_stack_variable(const String &p_var);
 	void add_stack_variable(const Array &p_arr, int p_offset = -1);
 	void clear_stack_variables();
 };
+
+#endif // EDITOR_DEBUGGER_INSPECTOR_H

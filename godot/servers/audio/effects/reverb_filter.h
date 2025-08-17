@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef REVERB_FILTER_H
+#define REVERB_FILTER_H
 
 class Reverb {
 public:
@@ -113,3 +114,5 @@ public:
 
 	~Reverb();
 };
+
+#endif // REVERB_FILTER_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef NET_SOCKET_H
+#define NET_SOCKET_H
 
 #include "core/io/ip.h"
 #include "core/object/ref_counted.h"
@@ -78,3 +79,5 @@ public:
 
 	virtual ~NetSocket() {}
 };
+
+#endif // NET_SOCKET_H

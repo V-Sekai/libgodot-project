@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef DEBUG_ADAPTER_PARSER_H
+#define DEBUG_ADAPTER_PARSER_H
 
 #include "core/config/project_settings.h"
 #include "core/debugger/remote_debugger.h"
@@ -48,7 +49,7 @@ private:
 		// If path contains \, it's a Windows path, so we need to convert it to /, and check as case-insensitive.
 		if (p_path.contains_char('\\')) {
 			String project_path = ProjectSettings::get_singleton()->get_resource_path();
-			String path = p_path.replace_char('\\', '/');
+			String path = p_path.replace("\\", "/");
 			return path.containsn(project_path);
 		}
 		return p_path.begins_with(ProjectSettings::get_singleton()->get_resource_path());
@@ -102,3 +103,5 @@ public:
 	Dictionary ev_custom_data(const String &p_msg, const Array &p_data) const;
 	Dictionary ev_breakpoint(const DAP::Breakpoint &p_breakpoint, const bool &p_enabled) const;
 };
+
+#endif // DEBUG_ADAPTER_PARSER_H

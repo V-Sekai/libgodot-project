@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef JOLT_TYPE_CONVERSIONS_H
+#define JOLT_TYPE_CONVERSIONS_H
 
 #include "core/math/aabb.h"
 #include "core/math/color.h"
@@ -142,3 +143,5 @@ _FORCE_INLINE_ JPH::RMat44 to_jolt_r(const Transform3D &p_transform) {
 			JPH::Vec4(b[0][2], b[1][2], b[2][2], 0.0f),
 			JPH::RVec3(o.x, o.y, o.z));
 }
+
+#endif // JOLT_TYPE_CONVERSIONS_H

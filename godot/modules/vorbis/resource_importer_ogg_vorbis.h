@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef RESOURCE_IMPORTER_OGG_VORBIS_H
+#define RESOURCE_IMPORTER_OGG_VORBIS_H
 
 #include "audio_stream_ogg_vorbis.h"
 
@@ -67,3 +68,5 @@ public:
 
 	ResourceImporterOggVorbis();
 };
+
+#endif // RESOURCE_IMPORTER_OGG_VORBIS_H

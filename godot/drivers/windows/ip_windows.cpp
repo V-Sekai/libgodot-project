@@ -39,7 +39,9 @@
 
 #include <iphlpapi.h>
 
-#include <cstdio>
+#include <stdio.h>
+
+#include <string.h>
 
 static IPAddress _sockaddr2ip(struct sockaddr *p_addr) {
 	IPAddress ip;

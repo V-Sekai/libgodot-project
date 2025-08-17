@@ -69,14 +69,11 @@
 			<description>
 			</description>
 		</method>
-		<method name="set_method">
+		<method name="set_scope">
 			<return type="void" />
-			<param index="0" name="name" type="String" />
-			<param index="1" name="callback" type="Callable" />
+			<param index="0" name="scope" type="String" />
+			<param index="1" name="target" type="Object" />
 			<description>
-				Registers a callback for the given method name.
-				- [param name] The name that clients can use to access the callback.
-				- [param callback] The callback which will handle the specific method.
 			</description>
 		</method>
 	</methods>

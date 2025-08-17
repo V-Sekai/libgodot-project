@@ -16,9 +16,8 @@
 			<param index="2" name="char" type="int" />
 			<param index="3" name="font_size" type="int" />
 			<param index="4" name="modulate" type="Color" default="Color(1, 1, 1, 1)" />
-			<param index="5" name="oversampling" type="float" default="0.0" />
 			<description>
-				Draw a single Unicode character [param char] into a canvas item using the font, at a given position, with [param modulate] color. [param pos] specifies the baseline, not the top. To draw from the top, [i]ascent[/i] must be added to the Y axis. If [param oversampling] is greater than zero, it is used as font oversampling factor, otherwise viewport oversampling settings are used.
+				Draw a single Unicode character [param char] into a canvas item using the font, at a given position, with [param modulate] color. [param pos] specifies the baseline, not the top. To draw from the top, [i]ascent[/i] must be added to the Y axis.
 				[b]Note:[/b] Do not use this function to draw strings character by character, use [method draw_string] or [TextLine] instead.
 			</description>
 		</method>
@@ -30,9 +29,8 @@
 			<param index="3" name="font_size" type="int" />
 			<param index="4" name="size" type="int" default="-1" />
 			<param index="5" name="modulate" type="Color" default="Color(1, 1, 1, 1)" />
-			<param index="6" name="oversampling" type="float" default="0.0" />
 			<description>
-				Draw a single Unicode character [param char] outline into a canvas item using the font, at a given position, with [param modulate] color and [param size] outline size. [param pos] specifies the baseline, not the top. To draw from the top, [i]ascent[/i] must be added to the Y axis. If [param oversampling] is greater than zero, it is used as font oversampling factor, otherwise viewport oversampling settings are used.
+				Draw a single Unicode character [param char] outline into a canvas item using the font, at a given position, with [param modulate] color and [param size] outline size. [param pos] specifies the baseline, not the top. To draw from the top, [i]ascent[/i] must be added to the Y axis.
 				[b]Note:[/b] Do not use this function to draw strings character by character, use [method draw_string] or [TextLine] instead.
 			</description>
 		</method>
@@ -50,9 +48,8 @@
 			<param index="9" name="justification_flags" type="int" enum="TextServer.JustificationFlag" is_bitfield="true" default="3" />
 			<param index="10" name="direction" type="int" enum="TextServer.Direction" default="0" />
 			<param index="11" name="orientation" type="int" enum="TextServer.Orientation" default="0" />
-			<param index="12" name="oversampling" type="float" default="0.0" />
 			<description>
-				Breaks [param text] into lines using rules specified by [param brk_flags] and draws it into a canvas item using the font, at a given position, with [param modulate] color, optionally clipping the width and aligning horizontally. [param pos] specifies the baseline of the first line, not the top. To draw from the top, [i]ascent[/i] must be added to the Y axis. If [param oversampling] is greater than zero, it is used as font oversampling factor, otherwise viewport oversampling settings are used.
+				Breaks [param text] into lines using rules specified by [param brk_flags] and draws it into a canvas item using the font, at a given position, with [param modulate] color, optionally clipping the width and aligning horizontally. [param pos] specifies the baseline of the first line, not the top. To draw from the top, [i]ascent[/i] must be added to the Y axis.
 				See also [method CanvasItem.draw_multiline_string].
 			</description>
 		</method>
@@ -71,9 +68,8 @@
 			<param index="10" name="justification_flags" type="int" enum="TextServer.JustificationFlag" is_bitfield="true" default="3" />
 			<param index="11" name="direction" type="int" enum="TextServer.Direction" default="0" />
 			<param index="12" name="orientation" type="int" enum="TextServer.Orientation" default="0" />
-			<param index="13" name="oversampling" type="float" default="0.0" />
 			<description>
-				Breaks [param text] to the lines using rules specified by [param brk_flags] and draws text outline into a canvas item using the font, at a given position, with [param modulate] color and [param size] outline size, optionally clipping the width and aligning horizontally. [param pos] specifies the baseline of the first line, not the top. To draw from the top, [i]ascent[/i] must be added to the Y axis. If [param oversampling] is greater than zero, it is used as font oversampling factor, otherwise viewport oversampling settings are used.
+				Breaks [param text] to the lines using rules specified by [param brk_flags] and draws text outline into a canvas item using the font, at a given position, with [param modulate] color and [param size] outline size, optionally clipping the width and aligning horizontally. [param pos] specifies the baseline of the first line, not the top. To draw from the top, [i]ascent[/i] must be added to the Y axis.
 				See also [method CanvasItem.draw_multiline_string_outline].
 			</description>
 		</method>
@@ -89,9 +85,8 @@
 			<param index="7" name="justification_flags" type="int" enum="TextServer.JustificationFlag" is_bitfield="true" default="3" />
 			<param index="8" name="direction" type="int" enum="TextServer.Direction" default="0" />
 			<param index="9" name="orientation" type="int" enum="TextServer.Orientation" default="0" />
-			<param index="10" name="oversampling" type="float" default="0.0" />
 			<description>
-				Draw [param text] into a canvas item using the font, at a given position, with [param modulate] color, optionally clipping the width and aligning horizontally. [param pos] specifies the baseline, not the top. To draw from the top, [i]ascent[/i] must be added to the Y axis. If [param oversampling] is greater than zero, it is used as font oversampling factor, otherwise viewport oversampling settings are used.
+				Draw [param text] into a canvas item using the font, at a given position, with [param modulate] color, optionally clipping the width and aligning horizontally. [param pos] specifies the baseline, not the top. To draw from the top, [i]ascent[/i] must be added to the Y axis.
 				See also [method CanvasItem.draw_string].
 			</description>
 		</method>
@@ -108,9 +103,8 @@
 			<param index="8" name="justification_flags" type="int" enum="TextServer.JustificationFlag" is_bitfield="true" default="3" />
 			<param index="9" name="direction" type="int" enum="TextServer.Direction" default="0" />
 			<param index="10" name="orientation" type="int" enum="TextServer.Orientation" default="0" />
-			<param index="11" name="oversampling" type="float" default="0.0" />
 			<description>
-				Draw [param text] outline into a canvas item using the font, at a given position, with [param modulate] color and [param size] outline size, optionally clipping the width and aligning horizontally. [param pos] specifies the baseline, not the top. To draw from the top, [i]ascent[/i] must be added to the Y axis. If [param oversampling] is greater than zero, it is used as font oversampling factor, otherwise viewport oversampling settings are used.
+				Draw [param text] outline into a canvas item using the font, at a given position, with [param modulate] color and [param size] outline size, optionally clipping the width and aligning horizontally. [param pos] specifies the baseline, not the top. To draw from the top, [i]ascent[/i] must be added to the Y axis.
 				See also [method CanvasItem.draw_string_outline].
 			</description>
 		</method>
@@ -175,7 +169,7 @@
 		<method name="get_font_style" qualifiers="const">
 			<return type="int" enum="TextServer.FontStyle" is_bitfield="true" />
 			<description>
-				Returns font style flags.
+				Returns font style flags, see [enum TextServer.FontStyle].
 			</description>
 		</method>
 		<method name="get_font_style_name" qualifiers="const">
@@ -236,7 +230,7 @@
 			<return type="int" />
 			<param index="0" name="spacing" type="int" enum="TextServer.SpacingType" />
 			<description>
-				Returns the amount of spacing for the given [param spacing] type.
+				Returns the spacing for the given [code]type[/code] (see [enum TextServer.SpacingType]).
 			</description>
 		</method>
 		<method name="get_string_size" qualifiers="const">
@@ -288,9 +282,9 @@
 				fv.base_font = load("res://RobotoFlex.ttf")
 				var variation_list = fv.get_supported_variation_list()
 				for tag in variation_list:
-					var name = TextServerManager.get_primary_interface().tag_to_name(tag)
-					var values = variation_list[tag]
-					print("variation axis: %s (%d)\n\tmin, max, default: %s" % [name, tag, values])
+				    var name = TextServerManager.get_primary_interface().tag_to_name(tag)
+				    var values = variation_list[tag]
+				    print("variation axis: %s (%d)\n\tmin, max, default: %s" % [name, tag, values])
 				[/codeblock]
 				[b]Note:[/b] To set and get variation coordinates of a [FontVariation], use [member FontVariation.variation_opentype].
 			</description>

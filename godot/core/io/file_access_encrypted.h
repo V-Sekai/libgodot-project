@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef FILE_ACCESS_ENCRYPTED_H
+#define FILE_ACCESS_ENCRYPTED_H
 
 #include "core/crypto/crypto_core.h"
 #include "core/io/file_access.h"
@@ -36,8 +37,6 @@
 #define ENCRYPTED_HEADER_MAGIC 0x43454447
 
 class FileAccessEncrypted : public FileAccess {
-	GDSOFTCLASS(FileAccessEncrypted, FileAccess);
-
 public:
 	enum Mode : int32_t {
 		MODE_READ,
@@ -91,8 +90,6 @@ public:
 	virtual bool file_exists(const String &p_name) override; ///< return true if a file exists
 
 	virtual uint64_t _get_modified_time(const String &p_file) override;
-	virtual uint64_t _get_access_time(const String &p_file) override;
-	virtual int64_t _get_size(const String &p_file) override;
 	virtual BitField<FileAccess::UnixPermissionFlags> _get_unix_permissions(const String &p_file) override;
 	virtual Error _set_unix_permissions(const String &p_file, BitField<FileAccess::UnixPermissionFlags> p_permissions) override;
 
@@ -108,3 +105,5 @@ public:
 	FileAccessEncrypted() {}
 	~FileAccessEncrypted();
 };
+
+#endif // FILE_ACCESS_ENCRYPTED_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEXTURE_RECT_H
+#define TEXTURE_RECT_H
 
 #include "scene/gui/control.h"
 
@@ -94,3 +95,5 @@ public:
 
 VARIANT_ENUM_CAST(TextureRect::ExpandMode);
 VARIANT_ENUM_CAST(TextureRect::StretchMode);
+
+#endif // TEXTURE_RECT_H

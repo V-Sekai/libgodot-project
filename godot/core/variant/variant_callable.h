@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef VARIANT_CALLABLE_H
+#define VARIANT_CALLABLE_H
 
 #include "core/variant/callable.h"
 #include "core/variant/variant.h"
@@ -54,3 +55,5 @@ public:
 
 	VariantCallable(const Variant &p_variant, const StringName &p_method);
 };
+
+#endif // VARIANT_CALLABLE_H

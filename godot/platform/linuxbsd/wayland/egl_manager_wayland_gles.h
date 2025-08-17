@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef EGL_MANAGER_WAYLAND_GLES_H
+#define EGL_MANAGER_WAYLAND_GLES_H
 
 #ifdef WAYLAND_ENABLED
 #ifdef EGL_ENABLED
@@ -48,3 +49,5 @@ public:
 #endif // GLES3_ENABLED
 #endif // EGL_ENABLED
 #endif // WAYLAND_ENABLED
+
+#endif // EGL_MANAGER_WAYLAND_GLES_H

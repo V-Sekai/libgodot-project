@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef STYLE_BOX_FLAT_H
+#define STYLE_BOX_FLAT_H
 
 #include "scene/resources/style_box.h"
 
@@ -109,4 +110,9 @@ public:
 
 	virtual Rect2 get_draw_rect(const Rect2 &p_rect) const override;
 	virtual void draw(RID p_canvas_item, const Rect2 &p_rect) const override;
+
+	StyleBoxFlat();
+	~StyleBoxFlat();
 };
+
+#endif // STYLE_BOX_FLAT_H

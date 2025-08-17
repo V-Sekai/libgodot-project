@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SERVER_WRAP_MT_COMMON_H
+#define SERVER_WRAP_MT_COMMON_H
 
 #ifdef DEBUG_ENABLED
 #define MAIN_THREAD_SYNC_CHECK                                                                         \
@@ -809,3 +810,5 @@
 			server_name->m_type(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15);                                                                                                                  \
 		}                                                                                                                                                                                                           \
 	}
+
+#endif // SERVER_WRAP_MT_COMMON_H

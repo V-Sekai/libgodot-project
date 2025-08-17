@@ -81,16 +81,16 @@ Error ResourceImporterBMFont::import(ResourceUID::ID p_source_id, const String &
 	ERR_FAIL_COND_V_MSG(err != OK, err, "Cannot load font to file \"" + p_source_file + "\".");
 
 	// Update import settings for the image files used by font.
-	for (const String &file : image_files) {
+	for (List<String>::Element *E = image_files.front(); E; E = E->next()) {
 		Ref<ConfigFile> config;
 		config.instantiate();
 
-		err = config->load(file + ".import");
+		err = config->load(E->get() + ".import");
 		if (err == OK) {
 			config->clear();
 			config->set_value("remap", "importer", "skip");
 
-			config->save(file + ".import");
+			config->save(E->get() + ".import");
 		}
 	}
 
@@ -108,4 +108,7 @@ Error ResourceImporterBMFont::import(ResourceUID::ID p_source_id, const String &
 	ERR_FAIL_COND_V_MSG(err != OK, err, "Cannot save font to file \"" + p_save_path + ".res\".");
 	print_verbose("Done saving to: " + p_save_path + ".fontdata");
 	return OK;
+}
+
+ResourceImporterBMFont::ResourceImporterBMFont() {
 }

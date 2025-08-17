@@ -19,7 +19,7 @@ public readonly partial struct Callable
         {
             throw new ArgumentException(
                 "Invalid argument count for invoking callable." +
-                $" Expected {countExpected} argument(s), received {countReceived}.",
+                $" Expected {countExpected} arguments, received {countReceived}.",
                 paramName);
         }
     }

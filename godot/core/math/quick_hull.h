@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef QUICK_HULL_H
+#define QUICK_HULL_H
 
 #include "core/math/geometry_3d.h"
 #include "core/templates/list.h"
@@ -88,3 +89,5 @@ public:
 	static uint32_t debug_stop_after;
 	static Error build(const Vector<Vector3> &p_points, Geometry3D::MeshData &r_mesh);
 };
+
+#endif // QUICK_HULL_H

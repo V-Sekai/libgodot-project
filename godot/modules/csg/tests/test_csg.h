@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_CSG_H
+#define TEST_CSG_H
 
 #include "../csg.h"
 #include "../csg_shape.h"
@@ -109,3 +110,5 @@ TEST_CASE("[SceneTree][CSG] CSGPolygon3D") {
 }
 
 } // namespace TestCSG
+
+#endif // TEST_CSG_H

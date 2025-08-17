@@ -34,11 +34,6 @@
 #include "core/os/os.h"
 
 static PrintHandlerList *print_handler_list = nullptr;
-static thread_local bool is_printing = false;
-
-static void __print_fallback(const String &p_string, bool p_err) {
-	fprintf(p_err ? stderr : stdout, "While attempting to print a message, another message was printed:\n%s\n", p_string.utf8().get_data());
-}
 
 void add_print_handler(PrintHandlerList *p_handler) {
 	_global_lock();
@@ -76,13 +71,6 @@ void __print_line(const String &p_string) {
 		return;
 	}
 
-	if (is_printing) {
-		__print_fallback(p_string, false);
-		return;
-	}
-
-	is_printing = true;
-
 	OS::get_singleton()->print("%s\n", p_string.utf8().get_data());
 
 	_global_lock();
@@ -93,8 +81,6 @@ void __print_line(const String &p_string) {
 	}
 
 	_global_unlock();
-
-	is_printing = false;
 }
 
 void __print_line_rich(const String &p_string) {
@@ -124,7 +110,7 @@ void __print_line_rich(const String &p_string) {
 		int brk_end = p_string.find_char(']', brk_pos + 1);
 
 		if (brk_end == -1) {
-			txt += p_string.substr(brk_pos);
+			txt += p_string.substr(brk_pos, p_string.length() - brk_pos);
 			output += txt;
 			break;
 		}
@@ -162,7 +148,7 @@ void __print_line_rich(const String &p_string) {
 			output += "";
 		} else if (tag == "center") {
 			output += "\n\t\t\t";
-		} else if (tag == "/center") {
+		} else if (tag == "center") {
 			output += "";
 		} else if (tag == "right") {
 			output += "\n\t\t\t\t\t\t";
@@ -271,18 +257,10 @@ void __print_line_rich(const String &p_string) {
 		} else if (tag == "/fgcolor") {
 			output += "\u001b[39;49m";
 		} else {
-			output += "[";
-			pos = brk_pos + 1;
+			output += vformat("[%s]", tag);
 		}
 	}
 	output += "\u001b[0m"; // Reset.
-
-	if (is_printing) {
-		__print_fallback(output, false);
-		return;
-	}
-
-	is_printing = true;
 
 	OS::get_singleton()->print_rich("%s\n", output.utf8().get_data());
 
@@ -294,34 +272,12 @@ void __print_line_rich(const String &p_string) {
 	}
 
 	_global_unlock();
-
-	is_printing = false;
-}
-
-void print_raw(const String &p_string) {
-	if (is_printing) {
-		__print_fallback(p_string, true);
-		return;
-	}
-
-	is_printing = true;
-
-	OS::get_singleton()->print("%s", p_string.utf8().get_data());
-
-	is_printing = false;
 }
 
 void print_error(const String &p_string) {
 	if (!CoreGlobals::print_error_enabled) {
 		return;
 	}
-
-	if (is_printing) {
-		__print_fallback(p_string, true);
-		return;
-	}
-
-	is_printing = true;
 
 	OS::get_singleton()->printerr("%s\n", p_string.utf8().get_data());
 
@@ -333,8 +289,6 @@ void print_error(const String &p_string) {
 	}
 
 	_global_unlock();
-
-	is_printing = false;
 }
 
 bool is_print_verbose_enabled() {

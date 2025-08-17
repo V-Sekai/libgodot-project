@@ -28,11 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef EDITOR_FILE_SERVER_H
+#define EDITOR_FILE_SERVER_H
 
 #include "core/io/tcp_server.h"
 #include "core/os/thread.h"
-#include "editor/file_system/editor_file_system.h"
+#include "editor/editor_file_system.h"
 
 class EditorFileServer : public Object {
 	GDCLASS(EditorFileServer, Object);
@@ -54,3 +55,5 @@ public:
 	EditorFileServer();
 	~EditorFileServer();
 };
+
+#endif // EDITOR_FILE_SERVER_H

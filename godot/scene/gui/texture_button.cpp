@@ -418,3 +418,5 @@ void TextureButton::set_flip_v(bool p_flip) {
 bool TextureButton::is_flipped_v() const {
 	return vflip;
 }
+
+TextureButton::TextureButton() {}

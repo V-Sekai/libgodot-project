@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SYSLOG_LOGGER_H
+#define SYSLOG_LOGGER_H
 
 #ifdef UNIX_ENABLED
 
@@ -43,3 +44,5 @@ public:
 };
 
 #endif // UNIX_ENABLED
+
+#endif // SYSLOG_LOGGER_H

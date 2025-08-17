@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef FEED_EFFECTS_GLES3_H
+#define FEED_EFFECTS_GLES3_H
 
 #ifdef GLES3_ENABLED
 
@@ -64,3 +65,5 @@ private:
 } // namespace GLES3
 
 #endif // GLES3_ENABLED
+
+#endif // FEED_EFFECTS_GLES3_H

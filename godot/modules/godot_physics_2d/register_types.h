@@ -28,9 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GODOT_PHYSICS_2D_REGISTER_TYPES_H
+#define GODOT_PHYSICS_2D_REGISTER_TYPES_H
 
 #include "modules/register_module_types.h"
 
 void initialize_godot_physics_2d_module(ModuleInitializationLevel p_level);
 void uninitialize_godot_physics_2d_module(ModuleInitializationLevel p_level);
+
+#endif // GODOT_PHYSICS_2D_REGISTER_TYPES_H

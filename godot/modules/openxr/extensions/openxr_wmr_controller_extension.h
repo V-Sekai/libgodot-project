@@ -28,16 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef OPENXR_WMR_CONTROLLER_EXTENSION_H
+#define OPENXR_WMR_CONTROLLER_EXTENSION_H
 
 #include "openxr_extension_wrapper.h"
 
 class OpenXRWMRControllerExtension : public OpenXRExtensionWrapper {
-	GDCLASS(OpenXRWMRControllerExtension, OpenXRExtensionWrapper);
-
-protected:
-	static void _bind_methods() {}
-
 public:
 	enum WMRControllers {
 		WMR_HPMR,
@@ -55,3 +51,5 @@ public:
 private:
 	bool available[WMR_MAX_CONTROLLERS] = { false, false };
 };
+
+#endif // OPENXR_WMR_CONTROLLER_EXTENSION_H

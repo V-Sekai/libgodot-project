@@ -1,15 +1,18 @@
 /*******************************************************************************
 * Author    :  Angus Johnson                                                   *
 * Date      :  1 November 2023                                                 *
-* Website   :  https://www.angusj.com                                          *
+* Website   :  http://www.angusj.com                                           *
 * Copyright :  Angus Johnson 2010-2023                                         *
 * Purpose   :  Minkowski Sum and Difference                                    *
-* License   :  https://www.boost.org/LICENSE_1_0.txt                           *
+* License   :  http://www.boost.org/LICENSE_1_0.txt                            *
 *******************************************************************************/
 
 #ifndef CLIPPER_MINKOWSKI_H
 #define CLIPPER_MINKOWSKI_H
 
+#include <cstdlib>
+#include <vector>
+#include <string>
 #include "clipper2/clipper.core.h"
 
 namespace Clipper2Lib
@@ -32,7 +35,7 @@ namespace Clipper2Lib
           Path64 path2(pattern.size());
           std::transform(pattern.cbegin(), pattern.cend(),
             path2.begin(), [p](const Point64& pt2) {return p + pt2; });
-          tmp.emplace_back(std::move(path2));
+          tmp.push_back(path2);
         }
       }
       else
@@ -42,7 +45,7 @@ namespace Clipper2Lib
           Path64 path2(pattern.size());
           std::transform(pattern.cbegin(), pattern.cend(),
             path2.begin(), [p](const Point64& pt2) {return p - pt2; });
-          tmp.emplace_back(std::move(path2));
+          tmp.push_back(path2);
         }
       }
 
@@ -56,14 +59,14 @@ namespace Clipper2Lib
           Path64 quad;
           quad.reserve(4);
           {
-            quad.emplace_back(tmp[g][h]);
-            quad.emplace_back(tmp[i][h]);
-            quad.emplace_back(tmp[i][j]);
-            quad.emplace_back(tmp[g][j]);
+            quad.push_back(tmp[g][h]);
+            quad.push_back(tmp[i][h]);
+            quad.push_back(tmp[i][j]);
+            quad.push_back(tmp[g][j]);
           };
           if (!IsPositive(quad))
             std::reverse(quad.begin(), quad.end());
-          result.emplace_back(std::move(quad));
+          result.push_back(quad);
           h = j;
         }
         g = i;

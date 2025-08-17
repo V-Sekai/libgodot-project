@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef IP_UNIX_H
+#define IP_UNIX_H
 
 #if defined(UNIX_ENABLED) && !defined(UNIX_SOCKET_UNAVAILABLE)
 
@@ -49,3 +50,5 @@ public:
 };
 
 #endif // UNIX_ENABLED
+
+#endif // IP_UNIX_H

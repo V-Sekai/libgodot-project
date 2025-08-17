@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_INPUT_EVENT_MOUSE_H
+#define TEST_INPUT_EVENT_MOUSE_H
 
 #include "core/input/input_event.h"
 #include "tests/test_macros.h"
@@ -76,3 +77,5 @@ TEST_CASE("[InputEventMouse] Setting the global mouse position works correctly")
 	CHECK(mousekey.get_global_position() != Vector2{ 1, 1 });
 }
 } // namespace TestInputEventMouse
+
+#endif // TEST_INPUT_EVENT_MOUSE_H

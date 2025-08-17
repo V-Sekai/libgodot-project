@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef RESOURCE_PRELOADER_H
+#define RESOURCE_PRELOADER_H
 
 #include "scene/main/node.h"
 
@@ -55,3 +56,5 @@ public:
 
 	ResourcePreloader();
 };
+
+#endif // RESOURCE_PRELOADER_H

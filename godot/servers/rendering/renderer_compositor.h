@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef RENDERER_COMPOSITOR_H
+#define RENDERER_COMPOSITOR_H
 
 #include "servers/rendering/environment/renderer_fog.h"
 #include "servers/rendering/environment/renderer_gi.h"
@@ -94,7 +95,6 @@ public:
 
 	virtual void blit_render_targets_to_screen(DisplayServer::WindowID p_screen, const BlitToScreen *p_render_targets, int p_amount) = 0;
 
-	virtual bool is_opengl() = 0;
 	virtual void gl_end_frame(bool p_swap_buffers) = 0;
 	virtual void end_frame(bool p_present) = 0;
 	virtual void finalize() = 0;
@@ -110,3 +110,5 @@ public:
 	RendererCompositor();
 	virtual ~RendererCompositor();
 };
+
+#endif // RENDERER_COMPOSITOR_H

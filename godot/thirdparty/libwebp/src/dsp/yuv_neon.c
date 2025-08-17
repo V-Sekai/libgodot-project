@@ -46,8 +46,7 @@ static uint8x8_t ConvertRGBToY_NEON(const uint8x8_t R,
   return vqmovn_u16(Y2);
 }
 
-static void ConvertRGB24ToY_NEON(const uint8_t* WEBP_RESTRICT rgb,
-                                 uint8_t* WEBP_RESTRICT y, int width) {
+static void ConvertRGB24ToY_NEON(const uint8_t* rgb, uint8_t* y, int width) {
   int i;
   for (i = 0; i + 8 <= width; i += 8, rgb += 3 * 8) {
     const uint8x8x3_t RGB = vld3_u8(rgb);
@@ -59,8 +58,7 @@ static void ConvertRGB24ToY_NEON(const uint8_t* WEBP_RESTRICT rgb,
   }
 }
 
-static void ConvertBGR24ToY_NEON(const uint8_t* WEBP_RESTRICT bgr,
-                                 uint8_t* WEBP_RESTRICT y, int width) {
+static void ConvertBGR24ToY_NEON(const uint8_t* bgr, uint8_t* y, int width) {
   int i;
   for (i = 0; i + 8 <= width; i += 8, bgr += 3 * 8) {
     const uint8x8x3_t BGR = vld3_u8(bgr);
@@ -72,8 +70,7 @@ static void ConvertBGR24ToY_NEON(const uint8_t* WEBP_RESTRICT bgr,
   }
 }
 
-static void ConvertARGBToY_NEON(const uint32_t* WEBP_RESTRICT argb,
-                                uint8_t* WEBP_RESTRICT y, int width) {
+static void ConvertARGBToY_NEON(const uint32_t* argb, uint8_t* y, int width) {
   int i;
   for (i = 0; i + 8 <= width; i += 8) {
     const uint8x8x4_t RGB = vld4_u8((const uint8_t*)&argb[i]);
@@ -117,9 +114,8 @@ static void ConvertARGBToY_NEON(const uint32_t* WEBP_RESTRICT argb,
   MULTIPLY_16b(28800, -24116, -4684, 128 << SHIFT, V_DST);       \
 } while (0)
 
-static void ConvertRGBA32ToUV_NEON(const uint16_t* WEBP_RESTRICT rgb,
-                                   uint8_t* WEBP_RESTRICT u,
-                                   uint8_t* WEBP_RESTRICT v, int width) {
+static void ConvertRGBA32ToUV_NEON(const uint16_t* rgb,
+                                   uint8_t* u, uint8_t* v, int width) {
   int i;
   for (i = 0; i + 8 <= width; i += 8, rgb += 4 * 8) {
     const uint16x8x4_t RGB = vld4q_u16((const uint16_t*)rgb);
@@ -135,9 +131,7 @@ static void ConvertRGBA32ToUV_NEON(const uint16_t* WEBP_RESTRICT rgb,
   }
 }
 
-static void ConvertARGBToUV_NEON(const uint32_t* WEBP_RESTRICT argb,
-                                 uint8_t* WEBP_RESTRICT u,
-                                 uint8_t* WEBP_RESTRICT v,
+static void ConvertARGBToUV_NEON(const uint32_t* argb, uint8_t* u, uint8_t* v,
                                  int src_width, int do_store) {
   int i;
   for (i = 0; i + 16 <= src_width; i += 16, u += 8, v += 8) {

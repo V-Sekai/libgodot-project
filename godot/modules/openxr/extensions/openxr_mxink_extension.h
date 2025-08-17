@@ -28,16 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef OPENXR_MXINK_EXTENSION_H
+#define OPENXR_MXINK_EXTENSION_H
 
 #include "openxr_extension_wrapper.h"
 
 class OpenXRMxInkExtension : public OpenXRExtensionWrapper {
-	GDCLASS(OpenXRMxInkExtension, OpenXRExtensionWrapper);
-
-protected:
-	static void _bind_methods() {}
-
 public:
 	virtual HashMap<String, bool *> get_requested_extensions() override;
 
@@ -48,3 +44,5 @@ public:
 private:
 	bool available = false;
 };
+
+#endif // OPENXR_MXINK_EXTENSION_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GODOT_GENERIC_6DOF_JOINT_3D_H
+#define GODOT_GENERIC_6DOF_JOINT_3D_H
 
 /*
 Adapted to Godot from the Bullet library.
@@ -317,3 +318,5 @@ public:
 	void set_flag(Vector3::Axis p_axis, PhysicsServer3D::G6DOFJointAxisFlag p_flag, bool p_value);
 	bool get_flag(Vector3::Axis p_axis, PhysicsServer3D::G6DOFJointAxisFlag p_flag) const;
 };
+
+#endif // GODOT_GENERIC_6DOF_JOINT_3D_H

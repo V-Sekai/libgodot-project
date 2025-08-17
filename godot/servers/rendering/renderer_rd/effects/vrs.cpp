@@ -33,9 +33,9 @@
 #include "../storage_rd/texture_storage.h"
 #include "../uniform_set_cache_rd.h"
 
-#ifndef XR_DISABLED
+#ifndef _3D_DISABLED
 #include "servers/xr_server.h"
-#endif // XR_DISABLED
+#endif // _3D_DISABLED
 
 using namespace RendererRD;
 
@@ -44,8 +44,6 @@ VRS::VRS() {
 		Vector<String> vrs_modes;
 		vrs_modes.push_back("\n"); // VRS_DEFAULT
 		vrs_modes.push_back("\n#define USE_MULTIVIEW\n"); // VRS_MULTIVIEW
-		vrs_modes.push_back("\n#define SPLIT_RG\n"); // VRS_RG
-		vrs_modes.push_back("\n#define SPLIT_RG\n#define USE_MULTIVIEW\n"); // VRS_RG_MULTIVIEW
 
 		vrs_shader.shader.initialize(vrs_modes);
 
@@ -82,16 +80,14 @@ void VRS::copy_vrs(RID p_source_rd_texture, RID p_dest_framebuffer, bool p_multi
 
 	RD::Uniform u_source_rd_texture(RD::UNIFORM_TYPE_SAMPLER_WITH_TEXTURE, 0, Vector<RID>({ default_sampler, p_source_rd_texture }));
 
-	int mode = 0;
 	VRSPushConstant push_constant = {};
-	bool uses_rg_format = RD::get_singleton()->vrs_get_format() == RD::DATA_FORMAT_R8G8_UNORM;
-	if (uses_rg_format) {
-		mode = p_multiview ? VRS_RG_MULTIVIEW : VRS_RG;
-	} else {
-		mode = p_multiview ? VRS_MULTIVIEW : VRS_DEFAULT;
 
-		// Default to 4x4 as it's not possible to query the max fragment size from RenderingDevice. This can be improved to use the largest size
-		// available if this code is moved over to RenderingDevice at some point.
+	int mode = p_multiview ? VRS_MULTIVIEW : VRS_DEFAULT;
+
+	// Set maximum texel factor based on maximum fragment size, some GPUs do not support 8x8 (fragment shading rate approach).
+	if (MIN(RD::get_singleton()->limit_get(RD::LIMIT_VRS_MAX_FRAGMENT_WIDTH), RD::get_singleton()->limit_get(RD::LIMIT_VRS_MAX_FRAGMENT_HEIGHT)) > 4) {
+		push_constant.max_texel_factor = 3.0;
+	} else {
 		push_constant.max_texel_factor = 2.0;
 	}
 
@@ -107,8 +103,18 @@ void VRS::copy_vrs(RID p_source_rd_texture, RID p_dest_framebuffer, bool p_multi
 }
 
 Size2i VRS::get_vrs_texture_size(const Size2i p_base_size) const {
-	Size2i vrs_texel_size = RD::get_singleton()->vrs_get_texel_size();
-	return Size2i((p_base_size.x + vrs_texel_size.x - 1) / vrs_texel_size.x, (p_base_size.y + vrs_texel_size.y - 1) / vrs_texel_size.y);
+	int32_t texel_width = RD::get_singleton()->limit_get(RD::LIMIT_VRS_TEXEL_WIDTH);
+	int32_t texel_height = RD::get_singleton()->limit_get(RD::LIMIT_VRS_TEXEL_HEIGHT);
+
+	int width = p_base_size.x / texel_width;
+	if (p_base_size.x % texel_width != 0) {
+		width++;
+	}
+	int height = p_base_size.y / texel_height;
+	if (p_base_size.y % texel_height != 0) {
+		height++;
+	}
+	return Size2i(width, height);
 }
 
 void VRS::update_vrs_texture(RID p_vrs_fb, RID p_render_target) {
@@ -129,10 +135,10 @@ void VRS::update_vrs_texture(RID p_vrs_fb, RID p_render_target) {
 					copy_vrs(rd_texture, p_vrs_fb, layers > 1);
 				}
 			}
-#ifndef XR_DISABLED
+#ifndef _3D_DISABLED
 		} else if (vrs_mode == RS::VIEWPORT_VRS_XR) {
 			Ref<XRInterface> interface = XRServer::get_singleton()->get_primary_interface();
-			if (interface.is_valid() && interface->get_vrs_texture_format() == XRInterface::XR_VRS_TEXTURE_FORMAT_UNIFIED) {
+			if (interface.is_valid()) {
 				RID vrs_texture = interface->get_vrs_texture();
 				if (vrs_texture.is_valid()) {
 					RID rd_texture = texture_storage->texture_get_rd_texture(vrs_texture);
@@ -144,7 +150,7 @@ void VRS::update_vrs_texture(RID p_vrs_fb, RID p_render_target) {
 					}
 				}
 			}
-#endif // XR_DISABLED
+#endif // _3D_DISABLED
 		}
 
 		if (vrs_update_mode == RS::VIEWPORT_VRS_UPDATE_ONCE) {

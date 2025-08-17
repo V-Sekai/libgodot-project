@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SKELETON_PROFILE_H
+#define SKELETON_PROFILE_H
 
 #include "texture.h"
 
@@ -136,3 +137,5 @@ public:
 };
 
 VARIANT_ENUM_CAST(SkeletonProfile::TailDirection);
+
+#endif // SKELETON_PROFILE_H

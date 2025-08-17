@@ -153,3 +153,6 @@ void PostImportPluginSkeletonTrackOrganizer::internal_process(InternalImportCate
 		}
 	}
 }
+
+PostImportPluginSkeletonTrackOrganizer::PostImportPluginSkeletonTrackOrganizer() {
+}

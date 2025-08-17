@@ -28,11 +28,9 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
-
 #import <Foundation/Foundation.h>
 
-@interface GDTDeviceMetrics : NSObject
+@interface GodotDeviceMetrics : NSObject
 
 @property(nonatomic, class, readonly, strong) NSDictionary<NSArray *, NSNumber *> *dpiList;
 

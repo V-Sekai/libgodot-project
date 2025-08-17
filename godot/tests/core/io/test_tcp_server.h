@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_TCP_SERVER_H
+#define TEST_TCP_SERVER_H
 
 #include "core/io/stream_peer_tcp.h"
 #include "core/io/tcp_server.h"
@@ -250,3 +251,5 @@ TEST_CASE("[TCPServer] Should disconnect client") {
 }
 
 } // namespace TestTCPServer
+
+#endif // TEST_TCP_SERVER_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef MIDI_DRIVER_ALSAMIDI_H
+#define MIDI_DRIVER_ALSAMIDI_H
 
 #ifdef ALSAMIDI_ENABLED
 
@@ -77,3 +78,5 @@ public:
 };
 
 #endif // ALSAMIDI_ENABLED
+
+#endif // MIDI_DRIVER_ALSAMIDI_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef EDITOR_PERFORMANCE_PROFILER_H
+#define EDITOR_PERFORMANCE_PROFILER_H
 
 #include "core/templates/hash_map.h"
 #include "main/performance.h"
@@ -51,7 +52,7 @@ private:
 		Performance::MonitorType type = Performance::MONITOR_TYPE_QUANTITY;
 		int frame_index = 0;
 
-		Monitor() {}
+		Monitor();
 		Monitor(const String &p_name, const String &p_base, int p_frame_index, Performance::MonitorType p_type, TreeItem *p_item);
 		void update_value(float p_value);
 		void reset();
@@ -87,3 +88,5 @@ public:
 	List<float> *get_monitor_data(const StringName &p_name);
 	EditorPerformanceProfiler();
 };
+
+#endif // EDITOR_PERFORMANCE_PROFILER_H

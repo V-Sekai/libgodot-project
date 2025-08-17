@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SHADER_INCLUDE_DB_H
+#define SHADER_INCLUDE_DB_H
 
 #include "core/object/class_db.h"
 
@@ -48,3 +49,5 @@ public:
 	static String get_built_in_include_file(const String &p_filename);
 	static String parse_include_files(const String &p_code);
 };
+
+#endif // SHADER_INCLUDE_DB_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef PROJECT_TAG_H
+#define PROJECT_TAG_H
 
 #include "scene/gui/box_container.h"
 
@@ -51,3 +52,5 @@ public:
 
 	ProjectTag(const String &p_text, bool p_display_close = false);
 };
+
+#endif // PROJECT_TAG_H

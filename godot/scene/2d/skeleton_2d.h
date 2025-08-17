@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SKELETON_2D_H
+#define SKELETON_2D_H
 
 #include "scene/2d/node_2d.h"
 #include "scene/resources/2d/skeleton/skeleton_modification_2d.h"
@@ -173,3 +174,5 @@ public:
 	Skeleton2D();
 	~Skeleton2D();
 };
+
+#endif // SKELETON_2D_H

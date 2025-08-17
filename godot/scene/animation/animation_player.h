@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef ANIMATION_PLAYER_H
+#define ANIMATION_PLAYER_H
 
 #include "animation_mixer.h"
 #include "scene/resources/animation.h"
@@ -245,3 +246,5 @@ public:
 VARIANT_ENUM_CAST(AnimationPlayer::AnimationProcessCallback);
 VARIANT_ENUM_CAST(AnimationPlayer::AnimationMethodCallMode);
 #endif // DISABLE_DEPRECATED
+
+#endif // ANIMATION_PLAYER_H

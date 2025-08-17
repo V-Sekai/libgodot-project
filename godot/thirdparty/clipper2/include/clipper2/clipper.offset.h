@@ -1,10 +1,10 @@
 /*******************************************************************************
 * Author    :  Angus Johnson                                                   *
-* Date      :  22 January 2025                                                 *
-* Website   :  https://www.angusj.com                                          *
-* Copyright :  Angus Johnson 2010-2025                                         *
+* Date      :  24 March 2024                                                   *
+* Website   :  http://www.angusj.com                                           *
+* Copyright :  Angus Johnson 2010-2024                                         *
 * Purpose   :  Path Offset (Inflate/Shrink)                                    *
-* License   :  https://www.boost.org/LICENSE_1_0.txt                           *
+* License   :  http://www.boost.org/LICENSE_1_0.txt                            *
 *******************************************************************************/
 
 #ifndef CLIPPER_OFFSET_H_
@@ -12,7 +12,6 @@
 
 #include "clipper.core.h"
 #include "clipper.engine.h"
-#include <optional>
 
 namespace Clipper2Lib {
 
@@ -35,7 +34,7 @@ private:
 	class Group {
 	public:
 		Paths64 paths_in;
-    std::optional<size_t> lowest_path_idx{};
+        std::optional<size_t> lowest_path_idx{};
 		bool is_reversed = false;
 		JoinType join_type;
 		EndType end_type;
@@ -97,7 +96,7 @@ public:
 	void AddPaths(const Paths64& paths, JoinType jt_, EndType et_);
 	void Clear() { groups_.clear(); norms.clear(); };
 	
-	void Execute(double delta, Paths64& sols_64);
+	void Execute(double delta, Paths64& paths);
 	void Execute(double delta, PolyTree64& polytree);
 	void Execute(DeltaCallback64 delta_cb, Paths64& paths);
 

@@ -376,7 +376,7 @@ void TaperedCapsuleShape::Draw(DebugRenderer *inRenderer, RMat44Arg inCenterOfMa
 	if (mGeometry == nullptr)
 	{
 		SupportBuffer buffer;
-		const Support *support = GetSupportFunction(ESupportMode::IncludeConvexRadius, buffer, Vec3::sOne());
+		const Support *support = GetSupportFunction(ESupportMode::IncludeConvexRadius, buffer, Vec3::sReplicate(1.0f));
 		mGeometry = inRenderer->CreateTriangleGeometryForConvex([support](Vec3Arg inDirection) { return support->GetSupport(inDirection); });
 	}
 

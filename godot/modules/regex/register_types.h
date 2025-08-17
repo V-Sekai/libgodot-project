@@ -28,9 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef REGEX_REGISTER_TYPES_H
+#define REGEX_REGISTER_TYPES_H
 
 #include "modules/register_module_types.h"
 
 void initialize_regex_module(ModuleInitializationLevel p_level);
 void uninitialize_regex_module(ModuleInitializationLevel p_level);
+
+#endif // REGEX_REGISTER_TYPES_H

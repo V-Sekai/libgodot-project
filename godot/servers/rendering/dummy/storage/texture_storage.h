@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEXTURE_STORAGE_DUMMY_H
+#define TEXTURE_STORAGE_DUMMY_H
 
 #include "servers/rendering/storage/texture_storage.h"
 
@@ -180,8 +181,6 @@ public:
 	virtual void render_target_do_msaa_resolve(RID p_render_target) override {}
 	virtual void render_target_set_use_hdr(RID p_render_target, bool p_use_hdr_2d) override {}
 	virtual bool render_target_is_using_hdr(RID p_render_target) const override { return false; }
-	virtual void render_target_set_use_debanding(RID p_render_target, bool p_use_debanding) override {}
-	virtual bool render_target_is_using_debanding(RID p_render_target) const override { return false; }
 
 	virtual void render_target_request_clear(RID p_render_target, const Color &p_clear_color) override {}
 	virtual bool render_target_is_clear_requested(RID p_render_target) override { return false; }
@@ -216,3 +215,5 @@ public:
 };
 
 } // namespace RendererDummy
+
+#endif // TEXTURE_STORAGE_DUMMY_H

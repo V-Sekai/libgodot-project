@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef IMAGE_LOADER_TINYEXR_H
+#define IMAGE_LOADER_TINYEXR_H
 
 #include "core/io/image_loader.h"
 
@@ -38,3 +39,5 @@ public:
 	virtual void get_recognized_extensions(List<String> *p_extensions) const;
 	ImageLoaderTinyEXR();
 };
+
+#endif // IMAGE_LOADER_TINYEXR_H

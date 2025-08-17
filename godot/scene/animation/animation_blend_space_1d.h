@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef ANIMATION_BLEND_SPACE_1D_H
+#define ANIMATION_BLEND_SPACE_1D_H
 
 #include "scene/animation/animation_tree.h"
 
@@ -122,3 +123,5 @@ public:
 };
 
 VARIANT_ENUM_CAST(AnimationNodeBlendSpace1D::BlendMode)
+
+#endif // ANIMATION_BLEND_SPACE_1D_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GDSCRIPT_WARNING_H
+#define GDSCRIPT_WARNING_H
 
 #ifdef DEBUG_ENABLED
 
@@ -153,10 +154,11 @@ public:
 #endif
 	};
 
-	static_assert(std::size(default_warning_levels) == WARNING_MAX, "Amount of default levels does not match the amount of warnings.");
+	static_assert((sizeof(default_warning_levels) / sizeof(default_warning_levels[0])) == WARNING_MAX, "Amount of default levels does not match the amount of warnings.");
 
 	Code code = WARNING_MAX;
 	int start_line = -1, end_line = -1;
+	int leftmost_column = -1, rightmost_column = -1;
 	Vector<String> symbols;
 
 	String get_name() const;
@@ -169,3 +171,5 @@ public:
 };
 
 #endif // DEBUG_ENABLED
+
+#endif // GDSCRIPT_WARNING_H

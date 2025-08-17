@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef CHECK_BUTTON_H
+#define CHECK_BUTTON_H
 
 #include "scene/gui/button.h"
 
@@ -48,9 +49,6 @@ class CheckButton : public Button {
 		Ref<Texture2D> unchecked_mirrored;
 		Ref<Texture2D> checked_disabled_mirrored;
 		Ref<Texture2D> unchecked_disabled_mirrored;
-
-		Color button_checked_color;
-		Color button_unchecked_color;
 	} theme_cache;
 
 protected:
@@ -64,3 +62,5 @@ public:
 	CheckButton(const String &p_text = String());
 	~CheckButton();
 };
+
+#endif // CHECK_BUTTON_H

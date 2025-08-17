@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef CHECK_BOX_H
+#define CHECK_BOX_H
 
 #include "scene/gui/button.h"
 
@@ -48,9 +49,6 @@ class CheckBox : public Button {
 		Ref<Texture2D> unchecked_disabled;
 		Ref<Texture2D> radio_checked_disabled;
 		Ref<Texture2D> radio_unchecked_disabled;
-
-		Color checkbox_checked_color;
-		Color checkbox_unchecked_color;
 	} theme_cache;
 
 protected:
@@ -60,9 +58,11 @@ protected:
 	void _notification(int p_what);
 	static void _bind_methods();
 
-	bool is_radio() const;
+	bool is_radio();
 
 public:
 	CheckBox(const String &p_text = String());
 	~CheckBox();
 };
+
+#endif // CHECK_BOX_H

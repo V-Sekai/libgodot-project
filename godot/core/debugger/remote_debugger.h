@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef REMOTE_DEBUGGER_H
+#define REMOTE_DEBUGGER_H
 
 #include "core/debugger/debugger_marshalls.h"
 #include "core/debugger/engine_debugger.h"
@@ -121,3 +122,5 @@ public:
 	explicit RemoteDebugger(Ref<RemoteDebuggerPeer> p_peer);
 	~RemoteDebugger();
 };
+
+#endif // REMOTE_DEBUGGER_H

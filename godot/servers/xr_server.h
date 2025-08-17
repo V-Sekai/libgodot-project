@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef XR_SERVER_H
+#define XR_SERVER_H
 
 #include "core/object/ref_counted.h"
 #include "core/os/thread_safe.h"
@@ -251,3 +252,5 @@ public:
 
 VARIANT_ENUM_CAST(XRServer::TrackerType);
 VARIANT_ENUM_CAST(XRServer::RotationMode);
+
+#endif // XR_SERVER_H

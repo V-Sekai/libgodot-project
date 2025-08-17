@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef RENDERER_SCENE_RENDER_H
+#define RENDERER_SCENE_RENDER_H
 
 #include "core/math/projection.h"
 #include "core/templates/paged_array.h"
@@ -346,3 +347,5 @@ public:
 	virtual void update() = 0;
 	virtual ~RendererSceneRender() {}
 };
+
+#endif // RENDERER_SCENE_RENDER_H

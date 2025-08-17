@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef NET_SOCKET_UNIX_H
+#define NET_SOCKET_UNIX_H
 
 #if defined(UNIX_ENABLED) && !defined(UNIX_SOCKET_UNAVAILABLE)
 
@@ -97,3 +98,5 @@ public:
 };
 
 #endif // UNIX_ENABLED && !UNIX_SOCKET_UNAVAILABLE
+
+#endif // NET_SOCKET_UNIX_H

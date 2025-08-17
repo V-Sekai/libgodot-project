@@ -35,20 +35,17 @@
 using namespace RendererRD;
 
 FSR::FSR() {
-	Vector<String> fsr_upscale_modes;
-	fsr_upscale_modes.push_back("\n#define MODE_FSR_UPSCALE_NORMAL\n");
-	fsr_upscale_modes.push_back("\n#define MODE_FSR_UPSCALE_FALLBACK\n");
-	fsr_shader.initialize(fsr_upscale_modes);
-
-	FSRShaderVariant variant;
-	if (RD::get_singleton()->has_feature(RD::SUPPORTS_HALF_FLOAT)) {
-		variant = FSR_SHADER_VARIANT_NORMAL;
+	Vector<String> FSR_upscale_modes;
+	if (RD::get_singleton()->has_feature(RD::SUPPORTS_FSR_HALF_FLOAT)) {
+		FSR_upscale_modes.push_back("\n#define MODE_FSR_UPSCALE_NORMAL\n");
 	} else {
-		variant = FSR_SHADER_VARIANT_FALLBACK;
+		FSR_upscale_modes.push_back("\n#define MODE_FSR_UPSCALE_FALLBACK\n");
 	}
 
+	fsr_shader.initialize(FSR_upscale_modes);
+
 	shader_version = fsr_shader.version_create();
-	pipeline = RD::get_singleton()->compute_pipeline_create(fsr_shader.version_get_shader(shader_version, variant));
+	pipeline = RD::get_singleton()->compute_pipeline_create(fsr_shader.version_get_shader(shader_version, 0));
 }
 
 FSR::~FSR() {

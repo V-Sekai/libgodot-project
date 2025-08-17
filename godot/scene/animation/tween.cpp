@@ -39,18 +39,18 @@
 	ERR_FAIL_COND_V_MSG(started, nullptr, "Can't append to a Tween that has started. Use stop() first.");
 
 Tween::interpolater Tween::interpolaters[Tween::TRANS_MAX][Tween::EASE_MAX] = {
-	{ &Linear::in, &Linear::in, &Linear::in, &Linear::in }, // Linear is the same for each easing.
-	{ &Sine::in, &Sine::out, &Sine::in_out, &Sine::out_in },
-	{ &Quint::in, &Quint::out, &Quint::in_out, &Quint::out_in },
-	{ &Quart::in, &Quart::out, &Quart::in_out, &Quart::out_in },
-	{ &Quad::in, &Quad::out, &Quad::in_out, &Quad::out_in },
-	{ &Expo::in, &Expo::out, &Expo::in_out, &Expo::out_in },
-	{ &Elastic::in, &Elastic::out, &Elastic::in_out, &Elastic::out_in },
-	{ &Cubic::in, &Cubic::out, &Cubic::in_out, &Cubic::out_in },
-	{ &Circ::in, &Circ::out, &Circ::in_out, &Circ::out_in },
-	{ &Bounce::in, &Bounce::out, &Bounce::in_out, &Bounce::out_in },
-	{ &Back::in, &Back::out, &Back::in_out, &Back::out_in },
-	{ &Spring::in, &Spring::out, &Spring::in_out, &Spring::out_in },
+	{ &linear::in, &linear::in, &linear::in, &linear::in }, // Linear is the same for each easing.
+	{ &sine::in, &sine::out, &sine::in_out, &sine::out_in },
+	{ &quint::in, &quint::out, &quint::in_out, &quint::out_in },
+	{ &quart::in, &quart::out, &quart::in_out, &quart::out_in },
+	{ &quad::in, &quad::out, &quad::in_out, &quad::out_in },
+	{ &expo::in, &expo::out, &expo::in_out, &expo::out_in },
+	{ &elastic::in, &elastic::out, &elastic::in_out, &elastic::out_in },
+	{ &cubic::in, &cubic::out, &cubic::in_out, &cubic::out_in },
+	{ &circ::in, &circ::out, &circ::in_out, &circ::out_in },
+	{ &bounce::in, &bounce::out, &bounce::in_out, &bounce::out_in },
+	{ &back::in, &back::out, &back::in_out, &back::out_in },
+	{ &spring::in, &spring::out, &spring::in_out, &spring::out_in },
 };
 
 void Tweener::set_tween(const Ref<Tween> &p_tween) {
@@ -63,7 +63,7 @@ void Tweener::start() {
 }
 
 Ref<Tween> Tweener::_get_tween() {
-	return ObjectDB::get_ref<Tween>(tween_id);
+	return Ref<Tween>(ObjectDB::get_instance(tween_id));
 }
 
 void Tweener::_finish() {
@@ -73,6 +73,20 @@ void Tweener::_finish() {
 
 void Tweener::_bind_methods() {
 	ADD_SIGNAL(MethodInfo("finished"));
+}
+
+bool Tween::_validate_type_match(const Variant &p_from, Variant &r_to) {
+	if (p_from.get_type() != r_to.get_type()) {
+		// Cast r_to between double and int to avoid minor annoyances.
+		if (p_from.get_type() == Variant::FLOAT && r_to.get_type() == Variant::INT) {
+			r_to = double(r_to);
+		} else if (p_from.get_type() == Variant::INT && r_to.get_type() == Variant::FLOAT) {
+			r_to = int(r_to);
+		} else {
+			ERR_FAIL_V_MSG(false, "Type mismatch between initial and final value: " + Variant::get_type_name(p_from.get_type()) + " and " + Variant::get_type_name(r_to.get_type()));
+		}
+	}
+	return true;
 }
 
 void Tween::_start_tweeners() {
@@ -108,7 +122,7 @@ Ref<PropertyTweener> Tween::tween_property(const Object *p_target, const NodePat
 	const Variant &prop_value = p_target->get_indexed(property_subnames);
 #endif
 
-	if (!Animation::validate_type_match(prop_value, p_to)) {
+	if (!_validate_type_match(prop_value, p_to)) {
 		return nullptr;
 	}
 
@@ -139,7 +153,7 @@ Ref<CallbackTweener> Tween::tween_callback(const Callable &p_callback) {
 Ref<MethodTweener> Tween::tween_method(const Callable &p_callback, const Variant p_from, Variant p_to, double p_duration) {
 	CHECK_VALID();
 
-	if (!Animation::validate_type_match(p_from, p_to)) {
+	if (!_validate_type_match(p_from, p_to)) {
 		return nullptr;
 	}
 
@@ -198,7 +212,6 @@ void Tween::play() {
 
 void Tween::kill() {
 	running = false; // For the sake of is_running().
-	valid = false;
 	dead = true;
 }
 
@@ -303,8 +316,6 @@ Ref<Tween> Tween::chain() {
 }
 
 bool Tween::custom_step(double p_delta) {
-	ERR_FAIL_COND_V_MSG(in_step, true, "Can't call custom_step() during another Tween step.");
-
 	bool r = running;
 	running = true;
 	bool ret = step(p_delta);
@@ -331,7 +342,6 @@ bool Tween::step(double p_delta) {
 	if (!running) {
 		return true;
 	}
-	in_step = true;
 
 	if (!started) {
 		if (tweeners.is_empty()) {
@@ -342,7 +352,6 @@ bool Tween::step(double p_delta) {
 			} else {
 				tween_id = to_string();
 			}
-			in_step = false;
 			ERR_FAIL_V_MSG(false, tween_id + ": started with no Tweeners.");
 		}
 		current_step = 0;
@@ -361,7 +370,7 @@ bool Tween::step(double p_delta) {
 	bool potential_infinite = false;
 #endif
 
-	while (running && rem_delta > 0) {
+	while (rem_delta > 0 && running) {
 		double step_delta = rem_delta;
 		step_active = false;
 
@@ -396,7 +405,6 @@ bool Tween::step(double p_delta) {
 							potential_infinite = true;
 						} else {
 							// Looped twice without using any time, this is 100% certain infinite loop.
-							in_step = false;
 							ERR_FAIL_V_MSG(false, "Infinite loop detected. Check set_loops() description for more info.");
 						}
 					}
@@ -407,7 +415,7 @@ bool Tween::step(double p_delta) {
 			}
 		}
 	}
-	in_step = false;
+
 	return true;
 }
 
@@ -424,7 +432,7 @@ bool Tween::can_process(bool p_tree_paused) const {
 
 Node *Tween::get_bound_node() const {
 	if (is_bound) {
-		return ObjectDB::get_instance<Node>(bound_node);
+		return Object::cast_to<Node>(ObjectDB::get_instance(bound_node));
 	} else {
 		return nullptr;
 	}
@@ -534,26 +542,12 @@ Tween::Tween(SceneTree *p_parent_tree) {
 	valid = true;
 }
 
-double PropertyTweener::_get_custom_interpolated_value(const Variant &p_value) {
-	const Variant *argptr = &p_value;
-
-	Variant result;
-	Callable::CallError ce;
-	custom_method.callp(&argptr, 1, result, ce);
-	if (ce.error != Callable::CallError::CALL_OK) {
-		ERR_FAIL_V_MSG(false, "Error calling custom method from PropertyTweener: " + Variant::get_callable_error_text(custom_method, &argptr, 1, ce) + ".");
-	} else if (result.get_type() != Variant::FLOAT) {
-		ERR_FAIL_V_MSG(false, vformat("Wrong return type in PropertyTweener custom method. Expected float, got %s.", Variant::get_type_name(result.get_type())));
-	}
-	return result;
-}
-
 Ref<PropertyTweener> PropertyTweener::from(const Variant &p_value) {
 	Ref<Tween> tween = _get_tween();
 	ERR_FAIL_COND_V(tween.is_null(), nullptr);
 
 	Variant from_value = p_value;
-	if (!Animation::validate_type_match(final_val, from_value)) {
+	if (!tween->_validate_type_match(final_val, from_value)) {
 		return nullptr;
 	}
 
@@ -597,6 +591,7 @@ void PropertyTweener::start() {
 
 	Object *target_instance = ObjectDB::get_instance(target);
 	if (!target_instance) {
+		WARN_PRINT("Target object freed before starting, aborting Tweener.");
 		return;
 	}
 
@@ -643,7 +638,17 @@ bool PropertyTweener::step(double &r_delta) {
 	if (time < duration) {
 		if (custom_method.is_valid()) {
 			const Variant t = tween->interpolate_variant(0.0, 1.0, time, duration, trans_type, ease_type);
-			double result = _get_custom_interpolated_value(t);
+			const Variant *argptr = &t;
+
+			Variant result;
+			Callable::CallError ce;
+			custom_method.callp(&argptr, 1, result, ce);
+			if (ce.error != Callable::CallError::CALL_OK) {
+				ERR_FAIL_V_MSG(false, "Error calling custom method from PropertyTweener: " + Variant::get_callable_error_text(custom_method, &argptr, 1, ce) + ".");
+			} else if (result.get_type() != Variant::FLOAT) {
+				ERR_FAIL_V_MSG(false, vformat("Wrong return type in PropertyTweener custom method. Expected float, got %s.", Variant::get_type_name(result.get_type())));
+			}
+
 			target_instance->set_indexed(property, Animation::interpolate_variant(initial_val, final_val, result));
 		} else {
 			target_instance->set_indexed(property, tween->interpolate_variant(initial_val, delta_val, time, duration, trans_type, ease_type));
@@ -651,12 +656,7 @@ bool PropertyTweener::step(double &r_delta) {
 		r_delta = 0;
 		return true;
 	} else {
-		if (custom_method.is_valid()) {
-			double final_t = _get_custom_interpolated_value(1.0);
-			target_instance->set_indexed(property, Animation::interpolate_variant(initial_val, final_val, final_t));
-		} else {
-			target_instance->set_indexed(property, final_val);
-		}
+		target_instance->set_indexed(property, final_val);
 		r_delta = elapsed_time - delay - duration;
 		_finish();
 		return false;
@@ -874,14 +874,7 @@ void SubtweenTweener::start() {
 
 	// Reset the subtween.
 	subtween->stop();
-
-	// It's possible that a subtween could be killed before it is started;
-	// if so, we just want to skip it entirely.
-	if (subtween->is_valid()) {
-		subtween->play();
-	} else {
-		_finish();
-	}
+	subtween->play();
 }
 
 bool SubtweenTweener::step(double &r_delta) {

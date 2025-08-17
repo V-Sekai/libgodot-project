@@ -150,20 +150,24 @@ internal class FilesystemDirectoryAccess(private val context: Context, private v
 	}
 
 	override fun getDriveCount(): Int {
-		return storageManager.storageVolumes.size
+		return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			storageManager.storageVolumes.size
+		} else {
+			0
+		}
 	}
 
 	override fun getDrive(drive: Int): String {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+			return ""
+		}
+
 		if (drive < 0 || drive >= storageManager.storageVolumes.size) {
 			return ""
 		}
 
 		val storageVolume = storageManager.storageVolumes[drive]
-		return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-			storageVolume.directory?.absolutePath ?: ""
-		} else {
-			""
-		}
+		return storageVolume.getDescription(context)
 	}
 
 	override fun makeDir(dir: String): Boolean {

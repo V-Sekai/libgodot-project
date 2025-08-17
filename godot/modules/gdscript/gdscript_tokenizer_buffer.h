@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GDSCRIPT_TOKENIZER_BUFFER_H
+#define GDSCRIPT_TOKENIZER_BUFFER_H
 
 #include "gdscript_tokenizer.h"
 
@@ -39,10 +40,11 @@ public:
 		COMPRESS_ZSTD,
 	};
 
-	static constexpr uint32_t TOKENIZER_VERSION = 101;
-	static constexpr uint32_t TOKEN_BYTE_MASK = 0x80;
-	static constexpr uint32_t TOKEN_BITS = 8;
-	static constexpr uint32_t TOKEN_MASK = (1 << (TOKEN_BITS - 1)) - 1;
+	enum {
+		TOKEN_BYTE_MASK = 0x80,
+		TOKEN_BITS = 8,
+		TOKEN_MASK = (1 << (TOKEN_BITS - 1)) - 1,
+	};
 
 	Vector<StringName> identifiers;
 	Vector<Variant> constants;
@@ -87,3 +89,5 @@ public:
 
 	virtual Token scan() override;
 };
+
+#endif // GDSCRIPT_TOKENIZER_BUFFER_H

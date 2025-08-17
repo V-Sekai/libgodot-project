@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_VISUAL_SHADER_H
+#define TEST_VISUAL_SHADER_H
 
 #include "scene/resources/visual_shader.h"
 
@@ -146,3 +147,5 @@ TEST_CASE("[SceneTree][VisualShader] Testing Varyings") {
 }
 
 } //namespace TestVisualArray
+
+#endif // TEST_VISUAL_SHADER_H

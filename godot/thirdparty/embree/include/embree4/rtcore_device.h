@@ -9,18 +9,14 @@ RTC_NAMESPACE_BEGIN
 
 /* Opaque device type */
 typedef struct RTCDeviceTy* RTCDevice;
-typedef struct RTCSceneTy* RTCScene;
 
 /* Creates a new Embree device. */
 RTC_API RTCDevice rtcNewDevice(const char* config);
 
 #if defined(EMBREE_SYCL_SUPPORT) && defined(SYCL_LANGUAGE_VERSION)
 
-/*
-  Creates a new Embree SYCL device. It will internally select the first SYCL device of
-  the SYCL context as the default device for memory allocations. You can set a specific
-  SYCL device that's part of the SYCL context by calling rtcSetDeviceSYCLDevice.
-*/
+
+/* Creates a new Embree SYCL device. */
 RTC_API_EXTERN_C RTCDevice rtcNewSYCLDevice(sycl::context context, const char* config);
 
 /* Checks if SYCL device is supported by Embree. */
@@ -31,10 +27,6 @@ RTC_API int rtcSYCLDeviceSelector(const sycl::device sycl_device);
 
 /* Set the SYCL device to be used to allocate data */
 RTC_API void rtcSetDeviceSYCLDevice(RTCDevice device, const sycl::device sycl_device);
-
-/* rtcCommitSceneWithQueue is asynchronous, user has to call queue.wait()
-   for synchronization. rtcCommitScene is blocking. */
-RTC_API_CPP sycl::event rtcCommitSceneWithQueue(RTCScene scene, sycl::queue queue);
 
 #endif
 
@@ -74,10 +66,7 @@ enum RTCDeviceProperty
 
   RTC_DEVICE_PROPERTY_TASKING_SYSTEM        = 128,
   RTC_DEVICE_PROPERTY_JOIN_COMMIT_SUPPORTED = 129,
-  RTC_DEVICE_PROPERTY_PARALLEL_COMMIT_SUPPORTED = 130,
-
-  RTC_DEVICE_PROPERTY_CPU_DEVICE  = 140,
-  RTC_DEVICE_PROPERTY_SYCL_DEVICE = 141
+  RTC_DEVICE_PROPERTY_PARALLEL_COMMIT_SUPPORTED = 130
 };
 
 /* Gets a device property. */
@@ -89,26 +78,17 @@ RTC_API void rtcSetDeviceProperty(RTCDevice device, const enum RTCDeviceProperty
 /* Error codes */
 enum RTCError
 {
-  RTC_ERROR_NONE                                  = 0,
-  RTC_ERROR_UNKNOWN                               = 1,
-  RTC_ERROR_INVALID_ARGUMENT                      = 2,
-  RTC_ERROR_INVALID_OPERATION                     = 3,
-  RTC_ERROR_OUT_OF_MEMORY                         = 4,
-  RTC_ERROR_UNSUPPORTED_CPU                       = 5,
-  RTC_ERROR_CANCELLED                             = 6,
-  RTC_ERROR_LEVEL_ZERO_RAYTRACING_SUPPORT_MISSING = 7,
+  RTC_ERROR_NONE              = 0,
+  RTC_ERROR_UNKNOWN           = 1,
+  RTC_ERROR_INVALID_ARGUMENT  = 2,
+  RTC_ERROR_INVALID_OPERATION = 3,
+  RTC_ERROR_OUT_OF_MEMORY     = 4,
+  RTC_ERROR_UNSUPPORTED_CPU   = 5,
+  RTC_ERROR_CANCELLED         = 6,
 };
-
-/* Returns the string representation for the error code. For example, for RTC_ERROR_UNKNOWN the string "RTC_ERROR_UNKNOWN" will be returned. */
-RTC_API const char* rtcGetErrorString(enum RTCError error);
 
 /* Returns the error code. */
 RTC_API enum RTCError rtcGetDeviceError(RTCDevice device);
-
-/* Returns a message corresponding to the last error code (returned by rtcGetDeviceError) which provides details about the error that happened.
-   The same message will be written to console when verbosity is > 0 or when an error callback function is set for the device.
-   However, when device creation itself fails this is the only way to get additional information about the error. */
-RTC_API const char* rtcGetDeviceLastErrorMessage(RTCDevice device);
 
 /* Error callback function */
 typedef void (*RTCErrorFunction)(void* userPtr, enum RTCError code, const char* str);

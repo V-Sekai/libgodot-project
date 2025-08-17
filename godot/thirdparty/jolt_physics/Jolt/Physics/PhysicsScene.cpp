@@ -42,7 +42,7 @@ void PhysicsScene::AddSoftBody(const SoftBodyCreationSettings &inSoftBody)
 
 bool PhysicsScene::FixInvalidScales()
 {
-	const Vec3 unit_scale = Vec3::sOne();
+	const Vec3 unit_scale = Vec3::sReplicate(1.0f);
 
 	bool success = true;
 	for (BodyCreationSettings &b : mBodies)

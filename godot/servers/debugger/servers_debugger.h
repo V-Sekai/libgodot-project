@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SERVERS_DEBUGGER_H
+#define SERVERS_DEBUGGER_H
 
 #include "servers/rendering_server.h"
 
@@ -117,7 +118,6 @@ private:
 	static Error _capture(void *p_user, const String &p_cmd, const Array &p_data, bool &r_captured);
 
 	void _send_resource_usage();
-	String _get_resource_type_from_path(const String &p_path);
 
 	ServersDebugger();
 
@@ -127,3 +127,5 @@ public:
 
 	~ServersDebugger();
 };
+
+#endif // SERVERS_DEBUGGER_H

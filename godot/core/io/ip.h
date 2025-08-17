@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef IP_H
+#define IP_H
 
 #include "core/io/ip_address.h"
 #include "core/os/os.h"
@@ -67,7 +68,7 @@ private:
 	_IP_ResolverPrivate *resolver = nullptr;
 
 protected:
-	static inline IP *singleton = nullptr;
+	static IP *singleton;
 	static void _bind_methods();
 
 	PackedStringArray _get_local_addresses() const;
@@ -109,3 +110,5 @@ public:
 
 VARIANT_ENUM_CAST(IP::Type);
 VARIANT_ENUM_CAST(IP::ResolverStatus);
+
+#endif // IP_H

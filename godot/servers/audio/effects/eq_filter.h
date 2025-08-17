@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef EQ_FILTER_H
+#define EQ_FILTER_H
 
 #include "core/templates/vector.h"
 
@@ -96,3 +97,5 @@ inline void EQ::BandProcess::process_one(float &p_data) {
 	history.b3 = history.b2;
 	history.b2 = history.b1;
 }
+
+#endif // EQ_FILTER_H

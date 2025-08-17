@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_HEIGHT_MAP_SHAPE_3D_H
+#define TEST_HEIGHT_MAP_SHAPE_3D_H
 
 #include "scene/resources/3d/height_map_shape_3d.h"
 #include "scene/resources/image_texture.h"
@@ -117,3 +118,5 @@ TEST_CASE("[SceneTree][HeightMapShape3D] update_map_data_from_image") {
 }
 
 } // namespace TestHeightMapShape3D
+
+#endif // TEST_HEIGHT_MAP_SHAPE_3D_H

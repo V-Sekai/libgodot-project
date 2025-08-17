@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_TOOLS_H
+#define TEST_TOOLS_H
 
 struct ErrorDetector {
 	ErrorDetector() {
@@ -54,3 +55,5 @@ struct ErrorDetector {
 	ErrorHandlerList eh;
 	bool has_error = false;
 };
+
+#endif // TEST_TOOLS_H

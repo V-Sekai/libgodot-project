@@ -28,7 +28,10 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef ANDROID_EXPORT_H
+#define ANDROID_EXPORT_H
 
 void register_android_exporter_types();
 void register_android_exporter();
+
+#endif // ANDROID_EXPORT_H

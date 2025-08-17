@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef LIGHT_STORAGE_RD_H
+#define LIGHT_STORAGE_RD_H
 
 #include "core/templates/local_vector.h"
 #include "core/templates/paged_array.h"
@@ -1163,3 +1164,5 @@ public:
 };
 
 } // namespace RendererRD
+
+#endif // LIGHT_STORAGE_RD_H

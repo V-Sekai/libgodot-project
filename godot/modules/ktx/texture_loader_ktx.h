@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEXTURE_LOADER_KTX_H
+#define TEXTURE_LOADER_KTX_H
 
 #include "core/io/resource_loader.h"
 #include "scene/resources/texture.h"
@@ -43,3 +44,5 @@ public:
 	virtual ~ResourceFormatKTX() {}
 	ResourceFormatKTX();
 };
+
+#endif // TEXTURE_LOADER_KTX_H

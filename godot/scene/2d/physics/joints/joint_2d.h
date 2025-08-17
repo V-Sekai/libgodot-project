@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef JOINT_2D_H
+#define JOINT_2D_H
 
 #include "scene/2d/node_2d.h"
 
@@ -79,3 +80,5 @@ public:
 	Joint2D();
 	~Joint2D();
 };
+
+#endif // JOINT_2D_H

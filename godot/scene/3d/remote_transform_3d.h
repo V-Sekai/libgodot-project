@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef REMOTE_TRANSFORM_3D_H
+#define REMOTE_TRANSFORM_3D_H
 
 #include "scene/3d/node_3d.h"
 
@@ -73,3 +74,5 @@ public:
 
 	RemoteTransform3D();
 };
+
+#endif // REMOTE_TRANSFORM_3D_H

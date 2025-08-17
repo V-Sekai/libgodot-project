@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef RESOURCE_SAVER_H
+#define RESOURCE_SAVER_H
 
 #include "core/io/resource.h"
 #include "core/object/gdvirtual.gen.inc"
@@ -102,3 +103,5 @@ public:
 	static void add_custom_savers();
 	static void remove_custom_savers();
 };
+
+#endif // RESOURCE_SAVER_H

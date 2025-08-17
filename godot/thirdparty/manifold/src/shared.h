@@ -14,9 +14,10 @@
 
 #pragma once
 
-#include "parallel.h"
-#include "utils.h"
-#include "vec.h"
+#include "./parallel.h"
+#include "./sparse.h"
+#include "./utils.h"
+#include "./vec.h"
 
 namespace manifold {
 
@@ -119,7 +120,6 @@ inline vec3 GetBarycentric(const vec3& v, const mat3& triPos,
 struct Halfedge {
   int startVert, endVert;
   int pairedHalfedge;
-  int propVert;
   bool IsForward() const { return startVert < endVert; }
   bool operator<(const Halfedge& other) const {
     return startVert == other.startVert ? endVert < other.endVert
@@ -142,13 +142,12 @@ struct TriRef {
   int originalID;
   /// Probably the triangle index of the original triangle this was part of:
   /// Mesh.triVerts[tri], but it's an input, so just pass it along unchanged.
+  int tri;
+  /// Triangles with the same face ID are coplanar.
   int faceID;
-  /// Triangles with the same coplanar ID are coplanar.
-  int coplanarID;
 
   bool SameFace(const TriRef& other) const {
-    return meshID == other.meshID && coplanarID == other.coplanarID &&
-           faceID == other.faceID;
+    return meshID == other.meshID && faceID == other.faceID;
   }
 };
 
@@ -189,12 +188,22 @@ Vec<TmpEdge> inline CreateTmpEdges(const Vec<Halfedge>& halfedge) {
   return edges;
 }
 
+template <const bool inverted>
+struct ReindexEdge {
+  VecView<const TmpEdge> edges;
+  SparseIndices& indices;
+
+  void operator()(size_t i) {
+    int& edge = indices.Get(i, inverted);
+    edge = edges[edge].halfedgeIdx;
+  }
+};
+
 #ifdef MANIFOLD_DEBUG
 inline std::ostream& operator<<(std::ostream& stream, const Halfedge& edge) {
   return stream << "startVert = " << edge.startVert
                 << ", endVert = " << edge.endVert
-                << ", pairedHalfedge = " << edge.pairedHalfedge
-                << ", propVert = " << edge.propVert;
+                << ", pairedHalfedge = " << edge.pairedHalfedge;
 }
 
 inline std::ostream& operator<<(std::ostream& stream, const Barycentric& bary) {
@@ -203,9 +212,8 @@ inline std::ostream& operator<<(std::ostream& stream, const Barycentric& bary) {
 
 inline std::ostream& operator<<(std::ostream& stream, const TriRef& ref) {
   return stream << "meshID: " << ref.meshID
-                << ", originalID: " << ref.originalID
-                << ", faceID: " << ref.faceID
-                << ", coplanarID: " << ref.coplanarID;
+                << ", originalID: " << ref.originalID << ", tri: " << ref.tri
+                << ", faceID: " << ref.faceID;
 }
 #endif
 }  // namespace manifold

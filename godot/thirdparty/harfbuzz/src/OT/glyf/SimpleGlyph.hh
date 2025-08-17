@@ -127,20 +127,19 @@ struct SimpleGlyph
 			  hb_array_t<contour_point_t> points_ /* IN/OUT */,
 			  const HBUINT8 *end)
   {
-    auto *points = points_.arrayZ;
     unsigned count = points_.length;
     for (unsigned int i = 0; i < count;)
     {
       if (unlikely (p + 1 > end)) return false;
       uint8_t flag = *p++;
-      points[i++].flag = flag;
+      points_.arrayZ[i++].flag = flag;
       if (flag & FLAG_REPEAT)
       {
 	if (unlikely (p + 1 > end)) return false;
 	unsigned int repeat_count = *p++;
 	unsigned stop = hb_min (i + repeat_count, count);
 	for (; i < stop; i++)
-	  points[i].flag = flag;
+	  points_.arrayZ[i].flag = flag;
       }
     }
     return true;
@@ -161,7 +160,10 @@ struct SimpleGlyph
       if (flag & short_flag)
       {
 	if (unlikely (p + 1 > end)) return false;
-	v += (bool(flag & same_flag) * 2 - 1) * *p++;
+	if (flag & same_flag)
+	  v += *p++;
+	else
+	  v -= *p++;
       }
       else
       {
@@ -188,7 +190,7 @@ struct SimpleGlyph
     unsigned int num_points = endPtsOfContours[num_contours - 1] + 1;
 
     unsigned old_length = points.length;
-    points.alloc (points.length + num_points + 4); // Allocate for phantom points, to avoid a possible copy
+    points.alloc (points.length + num_points + 4, true); // Allocate for phantom points, to avoid a possible copy
     if (unlikely (!points.resize (points.length + num_points, false))) return false;
     auto points_ = points.as_array ().sub_array (old_length);
     if (!phantom_only)
@@ -279,9 +281,9 @@ struct SimpleGlyph
     unsigned num_points = all_points.length - 4;
 
     hb_vector_t<uint8_t> flags, x_coords, y_coords;
-    if (unlikely (!flags.alloc_exact (num_points))) return false;
-    if (unlikely (!x_coords.alloc_exact (2*num_points))) return false;
-    if (unlikely (!y_coords.alloc_exact (2*num_points))) return false;
+    if (unlikely (!flags.alloc (num_points, true))) return false;
+    if (unlikely (!x_coords.alloc (2*num_points, true))) return false;
+    if (unlikely (!y_coords.alloc (2*num_points, true))) return false;
 
     unsigned lastflag = 255, repeat = 0;
     int prev_x = 0, prev_y = 0;

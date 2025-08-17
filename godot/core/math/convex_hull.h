@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef CONVEX_HULL_H
+#define CONVEX_HULL_H
 
 /*
 Copyright (c) 2011 Ole Kniemeyer, MAXON, www.maxon.net
@@ -111,3 +112,5 @@ public:
 
 	static Error convex_hull(const Vector<Vector3> &p_points, Geometry3D::MeshData &r_mesh);
 };
+
+#endif // CONVEX_HULL_H

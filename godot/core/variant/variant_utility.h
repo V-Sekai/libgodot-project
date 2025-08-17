@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef VARIANT_UTILITY_H
+#define VARIANT_UTILITY_H
 
 #include "variant.h"
 
@@ -152,5 +153,6 @@ struct VariantUtilityFunctions {
 	static uint64_t rid_allocate_id();
 	static RID rid_from_int64(uint64_t p_base);
 	static bool is_same(const Variant &p_a, const Variant &p_b);
-	static String join_string(const Variant **p_args, int p_arg_count);
 };
+
+#endif // VARIANT_UTILITY_H

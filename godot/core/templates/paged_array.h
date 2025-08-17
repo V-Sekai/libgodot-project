@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef PAGED_ARRAY_H
+#define PAGED_ARRAY_H
 
 #include "core/os/memory.h"
 #include "core/os/spin_lock.h"
@@ -371,3 +372,5 @@ public:
 		reset();
 	}
 };
+
+#endif // PAGED_ARRAY_H

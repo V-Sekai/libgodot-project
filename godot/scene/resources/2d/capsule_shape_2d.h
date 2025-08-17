@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef CAPSULE_SHAPE_2D_H
+#define CAPSULE_SHAPE_2D_H
 
 #include "scene/resources/2d/shape_2d.h"
 
@@ -53,12 +54,11 @@ public:
 	void set_radius(real_t p_radius);
 	real_t get_radius() const;
 
-	void set_mid_height(real_t p_mid_height);
-	real_t get_mid_height() const;
-
 	virtual void draw(const RID &p_to_rid, const Color &p_color) override;
 	virtual Rect2 get_rect() const override;
 	virtual real_t get_enclosing_radius() const override;
 
 	CapsuleShape2D();
 };
+
+#endif // CAPSULE_SHAPE_2D_H

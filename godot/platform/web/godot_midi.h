@@ -28,14 +28,14 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
-
-#include <cstdint>
+#ifndef GODOT_MIDI_H
+#define GODOT_MIDI_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#include <stdint.h>
 extern int godot_js_webmidi_open_midi_inputs(
 		void (*p_callback)(int p_size, const char **p_connected_input_names),
 		void (*p_on_midi_message)(int p_device_index, int p_status, const uint8_t *p_data, int p_data_len),
@@ -47,3 +47,5 @@ extern void godot_js_webmidi_close_midi_inputs();
 #ifdef __cplusplus
 }
 #endif
+
+#endif // GODOT_MIDI_H

@@ -1,8 +1,8 @@
-class TestClass:
+class B:
 	func to_str(b: int):
 		return str(b)
 
-var a: TestClass
+var a: B
 
 func _ready():
 	a.to_str(10).➡

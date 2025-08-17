@@ -16,12 +16,13 @@
 
 #include <atomic>
 
-#include "utils.h"
-#include "vec.h"
+#include "./utils.h"
+#include "./vec.h"
 
 namespace {
-using hash_fun_t = uint64_t(uint64_t);
-inline constexpr uint64_t kOpen = std::numeric_limits<uint64_t>::max();
+typedef unsigned long long int Uint64;
+typedef Uint64 (*hash_fun_t)(Uint64);
+inline constexpr Uint64 kOpen = std::numeric_limits<Uint64>::max();
 
 template <typename T>
 T AtomicCAS(T& target, T compare, T val) {
@@ -44,6 +45,13 @@ T AtomicLoad(const T& target) {
   return tar.load(std::memory_order_acquire);
 }
 
+// https://stackoverflow.com/questions/664014/what-integer-hash-function-are-good-that-accepts-an-integer-hash-key
+inline Uint64 hash64bit(Uint64 x) {
+  x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9ull;
+  x = (x ^ (x >> 27)) * 0x94d049bb133111ebull;
+  x = x ^ (x >> 31);
+  return x;
+}
 }  // namespace
 
 namespace manifold {
@@ -51,7 +59,7 @@ namespace manifold {
 template <typename V, hash_fun_t H = hash64bit>
 class HashTableD {
  public:
-  HashTableD(Vec<uint64_t>& keys, Vec<V>& values, std::atomic<size_t>& used,
+  HashTableD(Vec<Uint64>& keys, Vec<V>& values, std::atomic<size_t>& used,
              uint32_t step = 1)
       : step_{step}, keys_{keys}, values_{values}, used_{used} {}
 
@@ -62,12 +70,12 @@ class HashTableD {
            static_cast<size_t>(Size());
   }
 
-  void Insert(uint64_t key, const V& val) {
+  void Insert(Uint64 key, const V& val) {
     uint32_t idx = H(key) & (Size() - 1);
     while (1) {
       if (Full()) return;
-      uint64_t& k = keys_[idx];
-      const uint64_t found = AtomicCAS(k, kOpen, key);
+      Uint64& k = keys_[idx];
+      const Uint64 found = AtomicCAS(k, kOpen, key);
       if (found == kOpen) {
         used_.fetch_add(1, std::memory_order_relaxed);
         values_[idx] = val;
@@ -78,10 +86,10 @@ class HashTableD {
     }
   }
 
-  V& operator[](uint64_t key) {
+  V& operator[](Uint64 key) {
     uint32_t idx = H(key) & (Size() - 1);
     while (1) {
-      const uint64_t k = AtomicLoad(keys_[idx]);
+      const Uint64 k = AtomicLoad(keys_[idx]);
       if (k == key || k == kOpen) {
         return values_[idx];
       }
@@ -89,10 +97,10 @@ class HashTableD {
     }
   }
 
-  const V& operator[](uint64_t key) const {
+  const V& operator[](Uint64 key) const {
     uint32_t idx = H(key) & (Size() - 1);
     while (1) {
-      const uint64_t k = AtomicLoad(keys_[idx]);
+      const Uint64 k = AtomicLoad(keys_[idx]);
       if (k == key || k == kOpen) {
         return values_[idx];
       }
@@ -100,13 +108,13 @@ class HashTableD {
     }
   }
 
-  uint64_t KeyAt(int idx) const { return AtomicLoad(keys_[idx]); }
+  Uint64 KeyAt(int idx) const { return AtomicLoad(keys_[idx]); }
   V& At(int idx) { return values_[idx]; }
   const V& At(int idx) const { return values_[idx]; }
 
  private:
   uint32_t step_;
-  VecView<uint64_t> keys_;
+  VecView<Uint64> keys_;
   VecView<V> values_;
   std::atomic<size_t>& used_;
 };
@@ -149,10 +157,10 @@ class HashTable {
 
   Vec<V>& GetValueStore() { return values_; }
 
-  static uint64_t Open() { return kOpen; }
+  static Uint64 Open() { return kOpen; }
 
  private:
-  Vec<uint64_t> keys_;
+  Vec<Uint64> keys_;
   Vec<V> values_;
   std::atomic<size_t> used_ = 0;
   uint32_t step_;

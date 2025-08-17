@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TIMER_H
+#define TIMER_H
 
 #include "scene/main/node.h"
 
@@ -80,6 +81,7 @@ public:
 
 	void set_timer_process_callback(TimerProcessCallback p_callback);
 	TimerProcessCallback get_timer_process_callback() const;
+	Timer();
 
 private:
 	TimerProcessCallback timer_process_callback = TIMER_PROCESS_IDLE;
@@ -87,3 +89,5 @@ private:
 };
 
 VARIANT_ENUM_CAST(Timer::TimerProcessCallback);
+
+#endif // TIMER_H

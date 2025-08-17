@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef PARALLAX_LAYER_H
+#define PARALLAX_LAYER_H
 
 #include "scene/2d/node_2d.h"
 
@@ -61,3 +62,5 @@ public:
 	PackedStringArray get_configuration_warnings() const override;
 	ParallaxLayer();
 };
+
+#endif // PARALLAX_LAYER_H

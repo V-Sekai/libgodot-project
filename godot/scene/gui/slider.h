@@ -28,22 +28,14 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SLIDER_H
+#define SLIDER_H
 
 #include "scene/gui/range.h"
 
 class Slider : public Range {
 	GDCLASS(Slider, Range);
 
-public:
-	enum TickPosition {
-		TICK_POSITION_BOTTOM_RIGHT,
-		TICK_POSITION_TOP_LEFT,
-		TICK_POSITION_BOTH,
-		TICK_POSITION_CENTER,
-	};
-
-private:
 	struct Grab {
 		int pos = 0;
 		double uvalue = 0.0; // Value at `pos`.
@@ -52,8 +44,6 @@ private:
 	} grab;
 
 	int ticks = 0;
-	TickPosition ticks_position = TICK_POSITION_BOTTOM_RIGHT;
-
 	bool mouse_inside = false;
 	Orientation orientation;
 	double custom_step = -1.0;
@@ -76,7 +66,6 @@ private:
 
 		bool center_grabber = false;
 		int grabber_offset = 0;
-		int tick_offset = 0;
 	} theme_cache;
 
 protected:
@@ -84,7 +73,6 @@ protected:
 
 	virtual void gui_input(const Ref<InputEvent> &p_event) override;
 	void _notification(int p_what);
-	void _validate_property(PropertyInfo &p_property) const;
 	static void _bind_methods();
 
 public:
@@ -99,9 +87,6 @@ public:
 	void set_ticks_on_borders(bool);
 	bool get_ticks_on_borders() const;
 
-	void set_ticks_position(TickPosition p_ticks_position);
-	TickPosition get_ticks_position() const;
-
 	void set_editable(bool p_editable);
 	bool is_editable() const;
 
@@ -110,8 +95,6 @@ public:
 
 	Slider(Orientation p_orientation = VERTICAL);
 };
-
-VARIANT_ENUM_CAST(Slider::TickPosition);
 
 class HSlider : public Slider {
 	GDCLASS(HSlider, Slider);
@@ -128,3 +111,5 @@ public:
 	VSlider() :
 			Slider(VERTICAL) { set_h_size_flags(0); }
 };
+
+#endif // SLIDER_H

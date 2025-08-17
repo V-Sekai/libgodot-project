@@ -39,8 +39,6 @@ import java.io.FileNotFoundException
 import java.io.InputStream
 import java.lang.UnsupportedOperationException
 import java.nio.ByteBuffer
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.withLock
 
 /**
  * Handles regular and media store file access and interactions.
@@ -112,11 +110,8 @@ class FileAccessHandler(val context: Context) {
 	internal val storageScopeIdentifier = StorageScope.Identifier(context)
 	private val files = SparseArray<DataAccess>()
 	private var lastFileId = STARTING_FILE_ID
-	private val lock = ReentrantLock()
 
-	private fun hasFileId(fileId: Int): Boolean {
-		return files.indexOfKey(fileId) >= 0
-	}
+	private fun hasFileId(fileId: Int) = files.indexOfKey(fileId) >= 0
 
 	fun canAccess(filePath: String?): Boolean {
 		return storageScopeIdentifier.canAccess(filePath)
@@ -126,7 +121,7 @@ class FileAccessHandler(val context: Context) {
 	 * Returns a positive (> 0) file id when the operation succeeds.
 	 * Otherwise, returns a negative value of [Error].
 	 */
-	fun fileOpen(path: String?, modeFlags: Int): Int = lock.withLock {
+	fun fileOpen(path: String?, modeFlags: Int): Int {
 		val (fileError, fileId) = fileOpen(path, FileAccessFlags.fromNativeModeFlags(modeFlags))
 		return if (fileError == Error.OK) {
 			fileId
@@ -150,6 +145,7 @@ class FileAccessHandler(val context: Context) {
 		return try {
 			path?.let {
 				val dataAccess = DataAccess.generateDataAccess(storageScope, context, it, accessFlag) ?: return FILE_OPEN_FAILED
+
 				files.put(++lastFileId, dataAccess)
 				Pair(Error.OK, lastFileId)
 			} ?: FILE_OPEN_FAILED
@@ -163,7 +159,7 @@ class FileAccessHandler(val context: Context) {
 		}
 	}
 
-	fun fileGetSize(fileId: Int): Long = lock.withLock {
+	fun fileGetSize(fileId: Int): Long {
 		if (!hasFileId(fileId)) {
 			return 0L
 		}
@@ -171,7 +167,7 @@ class FileAccessHandler(val context: Context) {
 		return files[fileId].size()
 	}
 
-	fun fileSeek(fileId: Int, position: Long) = lock.withLock {
+	fun fileSeek(fileId: Int, position: Long) {
 		if (!hasFileId(fileId)) {
 			return
 		}
@@ -179,7 +175,7 @@ class FileAccessHandler(val context: Context) {
 		files[fileId].seek(position)
 	}
 
-	fun fileSeekFromEnd(fileId: Int, position: Long) = lock.withLock {
+	fun fileSeekFromEnd(fileId: Int, position: Long) {
 		if (!hasFileId(fileId)) {
 			return
 		}
@@ -187,7 +183,7 @@ class FileAccessHandler(val context: Context) {
 		files[fileId].seekFromEnd(position)
 	}
 
-	fun fileRead(fileId: Int, byteBuffer: ByteBuffer?): Int = lock.withLock {
+	fun fileRead(fileId: Int, byteBuffer: ByteBuffer?): Int {
 		if (!hasFileId(fileId) || byteBuffer == null) {
 			return 0
 		}
@@ -195,7 +191,7 @@ class FileAccessHandler(val context: Context) {
 		return files[fileId].read(byteBuffer)
 	}
 
-	fun fileWrite(fileId: Int, byteBuffer: ByteBuffer?): Boolean = lock.withLock {
+	fun fileWrite(fileId: Int, byteBuffer: ByteBuffer?): Boolean {
 		if (!hasFileId(fileId) || byteBuffer == null) {
 			return false
 		}
@@ -203,7 +199,7 @@ class FileAccessHandler(val context: Context) {
 		return files[fileId].write(byteBuffer)
 	}
 
-	fun fileFlush(fileId: Int) = lock.withLock {
+	fun fileFlush(fileId: Int) {
 		if (!hasFileId(fileId)) {
 			return
 		}
@@ -232,22 +228,7 @@ class FileAccessHandler(val context: Context) {
 		}
 	}
 
-	fun fileLastAccessed(filepath: String?): Long {
-		val storageScope = storageScopeIdentifier.identifyStorageScope(filepath)
-		if (storageScope == StorageScope.UNKNOWN) {
-			return 0L
-		}
-
-		return try {
-			filepath?.let {
-				DataAccess.fileLastAccessed(storageScope, context, it)
-			} ?: 0L
-		} catch (e: SecurityException) {
-			0L
-		}
-	}
-
-	fun fileResize(fileId: Int, length: Long): Int = lock.withLock {
+	fun fileResize(fileId: Int, length: Long): Int {
 		if (!hasFileId(fileId)) {
 			return Error.FAILED.toNativeValue()
 		}
@@ -255,22 +236,7 @@ class FileAccessHandler(val context: Context) {
 		return files[fileId].resize(length).toNativeValue()
 	}
 
-	fun fileSize(filepath: String?): Long {
-		val storageScope = storageScopeIdentifier.identifyStorageScope(filepath)
-		if (storageScope == StorageScope.UNKNOWN) {
-			return -1L
-		}
-
-		return try {
-			filepath?.let {
-				DataAccess.fileSize(storageScope, context, it)
-			} ?: -1L
-		} catch (e: SecurityException) {
-			-1L
-		}
-	}
-
-	fun fileGetPosition(fileId: Int): Long = lock.withLock {
+	fun fileGetPosition(fileId: Int): Long {
 		if (!hasFileId(fileId)) {
 			return 0L
 		}
@@ -278,7 +244,7 @@ class FileAccessHandler(val context: Context) {
 		return files[fileId].position()
 	}
 
-	fun isFileEof(fileId: Int): Boolean = lock.withLock {
+	fun isFileEof(fileId: Int): Boolean {
 		if (!hasFileId(fileId)) {
 			return false
 		}
@@ -286,12 +252,12 @@ class FileAccessHandler(val context: Context) {
 		return files[fileId].endOfFile
 	}
 
-	fun setFileEof(fileId: Int, eof: Boolean) = lock.withLock {
+	fun setFileEof(fileId: Int, eof: Boolean) {
 		val file = files[fileId] ?: return
 		file.endOfFile = eof
 	}
 
-	fun fileClose(fileId: Int) = lock.withLock {
+	fun fileClose(fileId: Int) {
 		if (hasFileId(fileId)) {
 			files[fileId].close()
 			files.remove(fileId)

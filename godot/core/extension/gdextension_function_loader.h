@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GDEXTENSION_FUNCTION_LOADER_H
+#define GDEXTENSION_FUNCTION_LOADER_H
 
 #include "core/extension/gdextension_loader.h"
 #include "core/os/shared_object.h"
@@ -54,3 +55,5 @@ public:
 
 	void set_initialization_function(GDExtensionInitializationFunction initialization_function);
 };
+
+#endif // GDEXTENSION_FUNCTION_LOADER_H

@@ -30,19 +30,8 @@
 
 #import "rendering_context_driver_metal.h"
 
-#import "drivers/apple/rendering_native_surface_apple.h"
-#import "metal_objects.h"
+#include "drivers/apple/rendering_native_surface_apple.h"
 #import "rendering_device_driver_metal.h"
-
-#include "drivers/apple_embedded/rendering_native_surface_apple_embedded.h"
-
-#include "core/error/error_macros.h"
-#include "core/math/math_defs.h"
-#include "core/os/os.h"
-#include "core/string/ustring.h"
-#include "core/templates/local_vector.h"
-#include "servers/display_server.h"
-#include "servers/rendering/rendering_device_driver.h"
 
 @protocol MTLDeviceEx <MTLDevice>
 #if TARGET_OS_OSX && __MAC_OS_X_VERSION_MAX_ALLOWED < 130300
@@ -56,12 +45,18 @@ RenderingContextDriverMetal::RenderingContextDriverMetal() {
 RenderingContextDriverMetal::~RenderingContextDriverMetal() {
 }
 
-Error RenderingContextDriverMetal::initialize() {
-	if (OS::get_singleton()->get_environment("MTL_CAPTURE_ENABLED") == "1") {
-		capture_available = true;
+void mvkDispatchToMainAndWait(dispatch_block_t block) {
+	if (NSThread.isMainThread) {
+		block();
+	} else {
+		dispatch_sync(dispatch_get_main_queue(), block);
 	}
+}
 
-	metal_device = MTLCreateSystemDefaultDevice();
+Error RenderingContextDriverMetal::initialize() {
+	mvkDispatchToMainAndWait(^{
+		metal_device = MTLCreateSystemDefaultDevice();
+	});
 #if TARGET_OS_OSX
 	if (@available(macOS 13.3, *)) {
 		[id<MTLDeviceEx>(metal_device) setShouldMaximizeConcurrentCompilation:YES];
@@ -111,6 +106,8 @@ public:
 		layer.opaque = OS::get_singleton()->is_layered_allowed() ? NO : YES;
 		layer.pixelFormat = get_pixel_format();
 		layer.device = p_device;
+		layer.minificationFilter = kCAFilterNearest;
+		layer.magnificationFilter = kCAFilterNearest;
 	}
 
 	~SurfaceLayer() override {
@@ -197,24 +194,13 @@ public:
 };
 
 RenderingContextDriver::SurfaceID RenderingContextDriverMetal::surface_create(Ref<RenderingNativeSurface> p_native_surface) {
-	CAMetalLayer *metal_layer = nullptr;
-	
-	// Try casting to RenderingNativeSurfaceApple first (macOS)
 	Ref<RenderingNativeSurfaceApple> apple_native_surface = Object::cast_to<RenderingNativeSurfaceApple>(*p_native_surface);
-	if (apple_native_surface.is_valid()) {
-		// RenderingNativeSurfaceApple::get_layer() returns uint64_t
-		metal_layer = (__bridge CAMetalLayer *)(void *)apple_native_surface->get_layer();
-	} else {
-		// Try casting to RenderingNativeSurfaceAppleEmbedded (iOS/embedded)
-		Ref<RenderingNativeSurfaceAppleEmbedded> apple_embedded_surface = Object::cast_to<RenderingNativeSurfaceAppleEmbedded>(*p_native_surface);
-		ERR_FAIL_COND_V(apple_embedded_surface.is_null(), SurfaceID());
-		// RenderingNativeSurfaceAppleEmbedded::get_layer() returns CALayerPtr
-		CALayerPtr layer_ptr = apple_embedded_surface->get_layer();
-		metal_layer = (CAMetalLayer *)layer_ptr;
-	}
+	ERR_FAIL_COND_V(apple_native_surface.is_null(), SurfaceID());
 
-	ERR_FAIL_COND_V(metal_layer == nullptr, SurfaceID());
-	Surface *surface = memnew(SurfaceLayer(metal_layer, metal_device));
+	__block Surface *surface = nullptr;
+	mvkDispatchToMainAndWait(^{
+		surface = memnew(SurfaceLayer((__bridge CAMetalLayer *)(void *)apple_native_surface->get_layer(), metal_device));
+	});
 
 	return SurfaceID(surface);
 }

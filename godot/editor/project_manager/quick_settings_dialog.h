@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef QUICK_SETTINGS_DIALOG_H
+#define QUICK_SETTINGS_DIALOG_H
 
 #include "scene/gui/dialogs.h"
 
@@ -48,7 +49,6 @@ class QuickSettingsDialog : public AcceptDialog {
 	Vector<String> editor_themes;
 	Vector<String> editor_scales;
 	Vector<String> editor_network_modes;
-	Vector<String> editor_check_for_updates;
 	Vector<String> editor_directory_naming_conventions;
 
 	void _fetch_setting_values();
@@ -67,7 +67,6 @@ class QuickSettingsDialog : public AcceptDialog {
 	OptionButton *theme_option_button = nullptr;
 	OptionButton *scale_option_button = nullptr;
 	OptionButton *network_mode_option_button = nullptr;
-	OptionButton *check_for_update_button = nullptr;
 	OptionButton *directory_naming_convention_button = nullptr;
 
 	Label *custom_theme_label = nullptr;
@@ -78,7 +77,6 @@ class QuickSettingsDialog : public AcceptDialog {
 	void _theme_selected(int p_id);
 	void _scale_selected(int p_id);
 	void _network_mode_selected(int p_id);
-	void _check_for_update_selected(int p_id);
 	void _directory_naming_convention_selected(int p_id);
 	void _set_setting_value(const String &p_setting, const Variant &p_value, bool p_restart_required = false);
 
@@ -96,3 +94,5 @@ public:
 
 	QuickSettingsDialog();
 };
+
+#endif // QUICK_SETTINGS_DIALOG_H

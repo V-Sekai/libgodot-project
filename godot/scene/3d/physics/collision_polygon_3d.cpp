@@ -41,12 +41,12 @@ void CollisionPolygon3D::_build_polygon() {
 
 	collision_object->shape_owner_clear_shapes(owner_id);
 
-	if (polygon.is_empty()) {
+	if (polygon.size() == 0) {
 		return;
 	}
 
 	Vector<Vector<Vector2>> decomp = Geometry2D::decompose_polygon_in_convex(polygon);
-	if (decomp.is_empty()) {
+	if (decomp.size() == 0) {
 		return;
 	}
 

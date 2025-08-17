@@ -28,11 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#import "os_macos.h"
-
-#import "godot_application.h"
+#include "os_macos.h"
 
 #include "main/main.h"
+
+#include <string.h>
+#include <unistd.h>
 
 #if defined(SANITIZERS_ENABLED)
 #include <sys/resource.h>
@@ -50,79 +51,44 @@ int main(int argc, char **argv) {
 	setrlimit(RLIMIT_STACK, &stack_lim);
 #endif
 
-	LocalVector<char *> args;
-	args.resize(argc);
-	uint32_t argsc = 0;
-
-	int wait_for_debugger = 0; // wait 5 second by default
-	bool is_embedded = false;
-	bool is_headless = false;
-
+	int first_arg = 1;
+	const char *dbg_arg = "-NSDocumentRevisionsDebugMode";
 	for (int i = 0; i < argc; i++) {
-		if (strcmp("-NSDocumentRevisionsDebugMode", argv[i]) == 0) {
-			// remove "-NSDocumentRevisionsDebugMode" and the next argument
-			continue;
+		if (strcmp(dbg_arg, argv[i]) == 0) {
+			first_arg = i + 2;
 		}
-
-		if (strcmp("--os-debug", argv[i]) == 0) {
-			i++;
-			wait_for_debugger = 5000; // wait 5 seconds by default
-			if (i < argc && strncmp(argv[i], "--", 2) != 0) {
-				wait_for_debugger = atoi(argv[i]);
-			}
-			continue;
-		}
-
-		if (strcmp("--embedded", argv[i]) == 0) {
-			is_embedded = true;
-		}
-		if (strcmp("--headless", argv[i]) == 0 || strcmp("--doctool", argv[i]) == 0) {
-			is_headless = true;
-		}
-		if (i < argc - 1 && strcmp("--display-driver", argv[i]) == 0 && strcmp("headless", argv[i + 1]) == 0) {
-			is_headless = true;
-		}
-
-		args.ptr()[argsc] = argv[i];
-		argsc++;
 	}
 
-	uint32_t remaining_args = argsc - 1;
-
-	OS_MacOS *os = nullptr;
-	if (is_embedded) {
-		os = memnew(OS_MacOS_Embedded(args[0], remaining_args, remaining_args > 0 ? &args[1] : nullptr));
-	} else if (is_headless) {
-		os = memnew(OS_MacOS_Headless(args[0], remaining_args, remaining_args > 0 ? &args[1] : nullptr));
-	} else {
-		os = memnew(OS_MacOS_NSApp(args[0], remaining_args, remaining_args > 0 ? &args[1] : nullptr));
-	}
-
-#ifdef TOOLS_ENABLED
-	if (wait_for_debugger > 0) {
-		os->wait_for_debugger(wait_for_debugger);
-		print_verbose("Continuing execution.");
-	}
-#else
-	if (wait_for_debugger > 0) {
-		WARN_PRINT("--os-debug is not supported in release builds.");
-	}
-#endif
-
-	if (is_embedded) {
-		// No dock icon for the embedded process, as it is hosted in the Godot editor.
-		ProcessSerialNumber psn = { 0, kCurrentProcess };
-		(void)TransformProcessType(&psn, kProcessTransformToBackgroundApplication);
-	}
+	OS_MacOS os;
+	Error err;
 
 	// We must override main when testing is enabled.
 	TEST_MAIN_OVERRIDE
 
-	os->run();
+	@autoreleasepool {
+		err = Main::setup(argv[0], argc - first_arg, &argv[first_arg]);
+	}
 
-	int exit_code = os->get_exit_code();
+	if (err != OK) {
+		if (err == ERR_HELP) { // Returned by --help and --version, so success.
+			return EXIT_SUCCESS;
+		}
+		return EXIT_FAILURE;
+	}
 
-	memdelete(os);
+	int ret;
+	@autoreleasepool {
+		ret = Main::start();
+	}
+	if (ret == EXIT_SUCCESS) {
+		os.run();
+	} else {
+		os.set_exit_code(EXIT_FAILURE);
+	}
 
-	return exit_code;
+	@autoreleasepool {
+		Main::cleanup();
+	}
+
+	return os.get_exit_code();
 }

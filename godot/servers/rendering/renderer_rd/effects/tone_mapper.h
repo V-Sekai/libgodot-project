@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TONE_MAPPER_RD_H
+#define TONE_MAPPER_RD_H
 
 #include "servers/rendering/renderer_rd/pipeline_cache_rd.h"
 #include "servers/rendering/renderer_rd/shaders/effects/tonemap.glsl.gen.h"
@@ -63,9 +64,8 @@ private:
 		TONEMAP_FLAG_USE_AUTO_EXPOSURE = (1 << 2),
 		TONEMAP_FLAG_USE_COLOR_CORRECTION = (1 << 3),
 		TONEMAP_FLAG_USE_FXAA = (1 << 4),
-		TONEMAP_FLAG_USE_8_BIT_DEBANDING = (1 << 5),
-		TONEMAP_FLAG_USE_10_BIT_DEBANDING = (1 << 6),
-		TONEMAP_FLAG_CONVERT_TO_SRGB = (1 << 7),
+		TONEMAP_FLAG_USE_DEBANDING = (1 << 5),
+		TONEMAP_FLAG_CONVERT_TO_SRGB = (1 << 6),
 	};
 
 	struct TonemapPushConstant {
@@ -142,12 +142,7 @@ public:
 		RID color_correction_texture;
 
 		bool use_fxaa = false;
-		enum DebandingMode {
-			DEBANDING_MODE_DISABLED,
-			DEBANDING_MODE_8_BIT,
-			DEBANDING_MODE_10_BIT,
-		};
-		DebandingMode debanding_mode = DEBANDING_MODE_DISABLED;
+		bool use_debanding = false;
 		Vector2i texture_size;
 		uint32_t view_count = 1;
 
@@ -159,3 +154,5 @@ public:
 };
 
 } // namespace RendererRD
+
+#endif // TONE_MAPPER_RD_H

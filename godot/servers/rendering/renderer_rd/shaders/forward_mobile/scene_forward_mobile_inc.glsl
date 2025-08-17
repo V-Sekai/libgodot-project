@@ -1,10 +1,14 @@
 #define M_PI 3.14159265359
 #define MAX_VIEWS 2
 
+#if defined(USE_MULTIVIEW) && defined(has_VK_KHR_multiview)
+#extension GL_EXT_multiview : enable
+#endif
+
 #include "../decal_data_inc.glsl"
 #include "../scene_data_inc.glsl"
 
-#if !defined(MODE_RENDER_DEPTH) || defined(MODE_RENDER_MATERIAL) || defined(TANGENT_USED) || defined(NORMAL_MAP_USED) || defined(BENT_NORMAL_MAP_USED) || defined(LIGHT_ANISOTROPY_USED)
+#if !defined(MODE_RENDER_DEPTH) || defined(MODE_RENDER_MATERIAL) || defined(TANGENT_USED) || defined(NORMAL_MAP_USED) || defined(LIGHT_ANISOTROPY_USED)
 #ifndef NORMAL_USED
 #define NORMAL_USED
 #endif
@@ -13,15 +17,18 @@
 #define USING_MOBILE_RENDERER
 
 layout(push_constant, std430) uniform DrawCall {
-	uint uv_offset;
+	vec2 uv_offset;
 	uint instance_index;
-	uint multimesh_motion_vectors_current_offset;
-	uint multimesh_motion_vectors_previous_offset;
+	uint pad;
 #ifdef UBERSHADER
 	uint sc_packed_0;
 	uint sc_packed_1;
-	float sc_packed_2;
+	uint sc_packed_2;
+	float sc_packed_3;
 	uint uc_packed_0;
+	uint uc_padding_1;
+	uint uc_padding_2;
+	uint uc_padding_3;
 #endif
 }
 draw_call;
@@ -43,8 +50,12 @@ uint sc_packed_1() {
 	return draw_call.sc_packed_1;
 }
 
-float sc_packed_2() {
+uint sc_packed_2() {
 	return draw_call.sc_packed_2;
+}
+
+float sc_packed_3() {
+	return draw_call.sc_packed_3;
 }
 
 uint uc_cull_mode() {
@@ -56,7 +67,8 @@ uint uc_cull_mode() {
 // Pull the constants from the pipeline's specialization constants.
 layout(constant_id = 0) const uint pso_sc_packed_0 = 0;
 layout(constant_id = 1) const uint pso_sc_packed_1 = 0;
-layout(constant_id = 2) const float pso_sc_packed_2 = 2.0;
+layout(constant_id = 2) const uint pso_sc_packed_2 = 0;
+layout(constant_id = 3) const float pso_sc_packed_3 = 2.0;
 
 uint sc_packed_0() {
 	return pso_sc_packed_0;
@@ -66,8 +78,12 @@ uint sc_packed_1() {
 	return pso_sc_packed_1;
 }
 
-float sc_packed_2() {
+uint sc_packed_2() {
 	return pso_sc_packed_2;
+}
+
+float sc_packed_3() {
+	return pso_sc_packed_3;
 }
 
 #endif
@@ -160,55 +176,32 @@ uint sc_directional_penumbra_shadow_samples() {
 	return (sc_packed_1() >> 6) & 63U;
 }
 
-#define SHADER_COUNT_NONE 0
-#define SHADER_COUNT_SINGLE 1
-#define SHADER_COUNT_MULTIPLE 2
-
-uint option_to_count(uint option, uint bound) {
-	switch (option) {
-		case SHADER_COUNT_NONE:
-			return 0;
-		case SHADER_COUNT_SINGLE:
-			return 1;
-		case SHADER_COUNT_MULTIPLE:
-			return bound;
-	}
+uint sc_omni_lights() {
+	return (sc_packed_1() >> 12) & 15U;
 }
 
-uint sc_omni_lights(uint bound) {
-	uint option = (sc_packed_1() >> 12) & 3U;
-	return option_to_count(option, bound);
+uint sc_spot_lights() {
+	return (sc_packed_1() >> 16) & 15U;
 }
 
-uint sc_spot_lights(uint bound) {
-	uint option = (sc_packed_1() >> 14) & 3U;
-	return option_to_count(option, bound);
+uint sc_reflection_probes() {
+	return (sc_packed_1() >> 20) & 15U;
 }
 
-uint sc_reflection_probes(uint bound) {
-	uint option = (sc_packed_1() >> 16) & 3U;
-	return option_to_count(option, bound);
+uint sc_directional_lights() {
+	return (sc_packed_1() >> 24) & 15U;
 }
 
-uint sc_directional_lights(uint bound) {
-	uint option = (sc_packed_1() >> 18) & 3U;
-	return option_to_count(option, bound);
-}
-
-uint sc_decals(uint bound) {
-	if (((sc_packed_1() >> 20) & 1U) != 0) {
-		return bound;
-	} else {
-		return 0;
-	}
+uint sc_decals() {
+	return (sc_packed_1() >> 28) & 15U;
 }
 
 bool sc_directional_light_blend_split(uint i) {
-	return ((sc_packed_1() >> (21 + i)) & 1U) != 0;
+	return ((sc_packed_2() >> i) & 1U) != 0;
 }
 
-half sc_luminance_multiplier() {
-	return half(sc_packed_2());
+float sc_luminance_multiplier() {
+	return sc_packed_3();
 }
 
 /* Set 0: Base Pass (never changes) */
@@ -259,7 +252,7 @@ directional_lights;
 #define LIGHTMAP_SHADOWMASK_MODE_ONLY 3
 
 struct Lightmap {
-	mat3 normal_xform;
+	mediump mat3 normal_xform;
 	vec2 light_texture_size;
 	float exposure_normalization;
 	uint flags;
@@ -271,7 +264,7 @@ layout(set = 0, binding = 7, std140) restrict readonly buffer Lightmaps {
 lightmaps;
 
 struct LightmapCapture {
-	vec4 sh[9];
+	mediump vec4 sh[9];
 };
 
 layout(set = 0, binding = 8, std140) restrict readonly buffer LightmapCaptures {
@@ -279,8 +272,8 @@ layout(set = 0, binding = 8, std140) restrict readonly buffer LightmapCaptures {
 }
 lightmap_captures;
 
-layout(set = 0, binding = 9) uniform texture2D decal_atlas;
-layout(set = 0, binding = 10) uniform texture2D decal_atlas_srgb;
+layout(set = 0, binding = 9) uniform mediump texture2D decal_atlas;
+layout(set = 0, binding = 10) uniform mediump texture2D decal_atlas_srgb;
 
 layout(set = 0, binding = 11, std430) restrict readonly buffer Decals {
 	DecalData data[];
@@ -288,7 +281,7 @@ layout(set = 0, binding = 11, std430) restrict readonly buffer Decals {
 decals;
 
 layout(set = 0, binding = 12, std430) restrict readonly buffer GlobalShaderUniformData {
-	vec4 data[];
+	highp vec4 data[];
 }
 global_shader_uniforms;
 
@@ -304,12 +297,11 @@ scene_data_block;
 
 struct InstanceData {
 	highp mat4 transform; // 64 - 64
-	highp mat4 prev_transform;
 	uint flags; // 04 - 68
 	uint instance_uniforms_ofs; // Base offset in global buffer for instance variables.	// 04 - 72
 	uint gi_offset; // GI information when using lightmapping (VCT or lightmap index).    // 04 - 76
 	uint layer_mask; // 04 - 80
-	vec4 lightmap_uv_scale; // 16 - 96 Doubles as uv_offset when needed.
+	highp vec4 lightmap_uv_scale; // 16 - 96 Doubles as uv_offset when needed.
 
 	uvec2 reflection_probes; // 08 - 104
 	uvec2 omni_lights; // 08 - 112
@@ -328,30 +320,30 @@ instances;
 
 #ifdef USE_RADIANCE_CUBEMAP_ARRAY
 
-layout(set = 1, binding = 2) uniform textureCubeArray radiance_cubemap;
+layout(set = 1, binding = 2) uniform mediump textureCubeArray radiance_cubemap;
 
 #else
 
-layout(set = 1, binding = 2) uniform textureCube radiance_cubemap;
+layout(set = 1, binding = 2) uniform mediump textureCube radiance_cubemap;
 
 #endif
 
-layout(set = 1, binding = 3) uniform textureCubeArray reflection_atlas;
+layout(set = 1, binding = 3) uniform mediump textureCubeArray reflection_atlas;
 
-layout(set = 1, binding = 4) uniform texture2D shadow_atlas;
+layout(set = 1, binding = 4) uniform highp texture2D shadow_atlas;
 
-layout(set = 1, binding = 5) uniform texture2D directional_shadow_atlas;
+layout(set = 1, binding = 5) uniform highp texture2D directional_shadow_atlas;
 
 // this needs to change to providing just the lightmap we're using..
 layout(set = 1, binding = 6) uniform texture2DArray lightmap_textures[MAX_LIGHTMAP_TEXTURES * 2];
 
 #ifdef USE_MULTIVIEW
-layout(set = 1, binding = 9) uniform texture2DArray depth_buffer;
-layout(set = 1, binding = 10) uniform texture2DArray color_buffer;
+layout(set = 1, binding = 9) uniform highp texture2DArray depth_buffer;
+layout(set = 1, binding = 10) uniform mediump texture2DArray color_buffer;
 #define multiviewSampler sampler2DArray
 #else
-layout(set = 1, binding = 9) uniform texture2D depth_buffer;
-layout(set = 1, binding = 10) uniform texture2D color_buffer;
+layout(set = 1, binding = 9) uniform highp texture2D depth_buffer;
+layout(set = 1, binding = 10) uniform mediump texture2D color_buffer;
 #define multiviewSampler sampler2D
 #endif // USE_MULTIVIEW
 
@@ -375,7 +367,7 @@ layout(set = 1, binding = 13 + 11) uniform sampler SAMPLER_LINEAR_WITH_MIPMAPS_A
 /* Set 2 Skeleton & Instancing (can change per item) */
 
 layout(set = 2, binding = 0, std430) restrict readonly buffer Transforms {
-	vec4 data[];
+	highp vec4 data[];
 }
 transforms;
 

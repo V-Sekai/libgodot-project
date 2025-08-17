@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef STREAM_PEER_GZIP_H
+#define STREAM_PEER_GZIP_H
 
 #include "core/io/stream_peer.h"
 
@@ -71,3 +72,5 @@ public:
 	StreamPeerGZIP();
 	~StreamPeerGZIP();
 };
+
+#endif // STREAM_PEER_GZIP_H

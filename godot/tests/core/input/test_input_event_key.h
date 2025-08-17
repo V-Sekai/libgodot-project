@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_INPUT_EVENT_KEY_H
+#define TEST_INPUT_EVENT_KEY_H
 
 #include "core/input/input_event.h"
 #include "core/os/keyboard.h"
@@ -334,3 +335,5 @@ TEST_CASE("[IsMatch] Keys are correctly matched") {
 	CHECK(key3.is_match(loc_ref, false) == true);
 }
 } // namespace TestInputEventKey
+
+#endif // TEST_INPUT_EVENT_KEY_H

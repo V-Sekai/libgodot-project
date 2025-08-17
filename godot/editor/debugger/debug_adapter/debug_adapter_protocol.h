@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef DEBUG_ADAPTER_PROTOCOL_H
+#define DEBUG_ADAPTER_PROTOCOL_H
 
 #include "core/debugger/debugger_marshalls.h"
 #include "core/io/stream_peer_tcp.h"
@@ -67,7 +68,7 @@ struct DAPeer : RefCounted {
 
 	Error handle_data();
 	Error send_data();
-	Vector<uint8_t> format_output(const Dictionary &p_params) const;
+	String format_output(const Dictionary &p_params) const;
 };
 
 class DebugAdapterProtocol : public Object {
@@ -76,7 +77,6 @@ class DebugAdapterProtocol : public Object {
 	friend class DebugAdapterParser;
 
 	using DAPVarID = int;
-	using DAPStackFrameID = int;
 
 private:
 	static DebugAdapterProtocol *singleton;
@@ -110,9 +110,6 @@ private:
 	bool request_remote_object(const ObjectID &p_object_id);
 	bool request_remote_evaluate(const String &p_eval, int p_stack_frame);
 
-	const DAP::Source &fetch_source(const String &p_path);
-	void update_source(const String &p_path);
-
 	bool _initialized = false;
 	bool _processing_breakpoint = false;
 	bool _stepping = false;
@@ -129,9 +126,7 @@ private:
 	int stackframe_id = 0;
 	DAPVarID variable_id = 0;
 	List<DAP::Breakpoint> breakpoint_list;
-	HashMap<String, DAP::Source> breakpoint_source_list;
-	List<DAP::StackFrame> stackframe_list;
-	HashMap<DAPStackFrameID, Vector<int>> scope_list;
+	HashMap<DAP::StackFrame, List<int>, DAP::StackFrame> stackframe_list;
 	HashMap<DAPVarID, Array> variable_list;
 
 	HashMap<ObjectID, DAPVarID> object_list;
@@ -173,3 +168,5 @@ public:
 	DebugAdapterProtocol();
 	~DebugAdapterProtocol();
 };
+
+#endif // DEBUG_ADAPTER_PROTOCOL_H

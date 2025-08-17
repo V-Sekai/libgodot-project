@@ -35,7 +35,7 @@
 #include "core/config/project_settings.h"
 #include "core/os/os.h"
 
-#include <cerrno>
+#include <errno.h>
 
 #if defined(PULSEAUDIO_ENABLED) && defined(SOWRAP_ENABLED)
 extern "C" {

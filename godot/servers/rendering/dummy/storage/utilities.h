@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef UTILITIES_DUMMY_H
+#define UTILITIES_DUMMY_H
 
 #include "servers/rendering/storage/utilities.h"
 
@@ -98,3 +99,5 @@ public:
 };
 
 } // namespace RendererDummy
+
+#endif // UTILITIES_DUMMY_H

@@ -21,12 +21,6 @@ msgstr ""
 msgid "All Recognized"
 msgstr "Alla Erkända"
 
-msgid "Save"
-msgstr "Spara"
-
-msgid "Clear"
-msgstr "Rensa"
-
 msgid "Add current color as a preset."
 msgstr "Lägg till nuvarande färg som en förinställning."
 
@@ -45,6 +39,9 @@ msgstr "Öppna"
 
 msgid "Select Current Folder"
 msgstr "Välj Nuvarande Mapp"
+
+msgid "Save"
+msgstr "Spara"
 
 msgid "Select This Folder"
 msgstr "Välj denna mapp"
@@ -79,11 +76,11 @@ msgstr "Sökväg:"
 msgid "Refresh files."
 msgstr "Uppdatera filer."
 
-msgid "Directories & Files:"
-msgstr "Kataloger & Filer:"
-
 msgid "Toggle the visibility of hidden files."
 msgstr "Växla synligheten av dolda filer."
+
+msgid "Directories & Files:"
+msgstr "Kataloger & Filer:"
 
 msgid "File:"
 msgstr "Fil:"
@@ -117,6 +114,9 @@ msgstr "Klistra in"
 
 msgid "Select All"
 msgstr "Välj Alla"
+
+msgid "Clear"
+msgstr "Rensa"
 
 msgid "Undo"
 msgstr "Ångra"

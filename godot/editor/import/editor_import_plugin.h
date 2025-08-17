@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef EDITOR_IMPORT_PLUGIN_H
+#define EDITOR_IMPORT_PLUGIN_H
 
 #include "core/io/resource_importer.h"
 #include "core/variant/typed_array.h"
@@ -57,6 +58,7 @@ protected:
 	Error _append_import_external_resource(const String &p_file, const Dictionary &p_custom_options = Dictionary(), const String &p_custom_importer = String(), Variant p_generator_parameters = Variant());
 
 public:
+	EditorImportPlugin();
 	virtual String get_importer_name() const override;
 	virtual String get_visible_name() const override;
 	virtual void get_recognized_extensions(List<String> *p_extensions) const override;
@@ -73,3 +75,5 @@ public:
 	virtual bool can_import_threaded() const override;
 	Error append_import_external_resource(const String &p_file, const HashMap<StringName, Variant> &p_custom_options = HashMap<StringName, Variant>(), const String &p_custom_importer = String(), Variant p_generator_parameters = Variant());
 };
+
+#endif // EDITOR_IMPORT_PLUGIN_H

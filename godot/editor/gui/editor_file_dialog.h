@@ -28,10 +28,11 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef EDITOR_FILE_DIALOG_H
+#define EDITOR_FILE_DIALOG_H
 
 #include "core/io/dir_access.h"
-#include "editor/file_system/file_info.h"
+#include "editor/file_info.h"
 #include "scene/gui/dialogs.h"
 #include "scene/property_list_helper.h"
 
@@ -72,10 +73,10 @@ public:
 	typedef Ref<Texture2D> (*GetIconFunc)(const String &);
 	typedef void (*RegisterFunc)(EditorFileDialog *);
 
-	static inline GetIconFunc get_icon_func = nullptr;
-	static inline GetIconFunc get_thumbnail_func = nullptr;
-	static inline RegisterFunc register_func = nullptr;
-	static inline RegisterFunc unregister_func = nullptr;
+	static GetIconFunc get_icon_func;
+	static GetIconFunc get_thumbnail_func;
+	static RegisterFunc register_func;
+	static RegisterFunc unregister_func;
 
 private:
 	enum ItemMenu {
@@ -159,8 +160,8 @@ private:
 	int preview_wheel_index = 0;
 	float preview_wheel_timeout = 0.0f;
 
-	static inline bool default_show_hidden_files = false;
-	static inline DisplayMode default_display_mode = DISPLAY_THUMBNAILS;
+	static bool default_show_hidden_files;
+	static DisplayMode default_display_mode;
 	bool show_hidden_files;
 	DisplayMode display_mode;
 
@@ -301,6 +302,8 @@ protected:
 	static void _bind_methods();
 
 public:
+	Color get_dir_icon_color(const String &p_dir_path);
+
 	virtual void set_visible(bool p_visible) override;
 	virtual void popup(const Rect2i &p_rect = Rect2i()) override;
 
@@ -375,3 +378,5 @@ public:
 VARIANT_ENUM_CAST(EditorFileDialog::FileMode);
 VARIANT_ENUM_CAST(EditorFileDialog::Access);
 VARIANT_ENUM_CAST(EditorFileDialog::DisplayMode);
+
+#endif // EDITOR_FILE_DIALOG_H

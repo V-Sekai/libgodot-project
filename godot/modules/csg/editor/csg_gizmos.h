@@ -28,12 +28,15 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef CSG_GIZMOS_H
+#define CSG_GIZMOS_H
+
+#ifdef TOOLS_ENABLED
 
 #include "../csg_shape.h"
 
 #include "editor/plugins/editor_plugin.h"
-#include "editor/scene/3d/node_3d_editor_gizmos.h"
+#include "editor/plugins/node_3d_editor_gizmos.h"
 #include "scene/gui/control.h"
 
 class AcceptDialog;
@@ -59,6 +62,7 @@ public:
 	virtual void commit_handle(const EditorNode3DGizmo *p_gizmo, int p_id, bool p_secondary, const Variant &p_restore, bool p_cancel) override;
 
 	CSGShape3DGizmoPlugin();
+	~CSGShape3DGizmoPlugin();
 };
 
 class CSGShapeEditor : public Control {
@@ -100,3 +104,7 @@ public:
 
 	EditorPluginCSG();
 };
+
+#endif // TOOLS_ENABLED
+
+#endif // CSG_GIZMOS_H

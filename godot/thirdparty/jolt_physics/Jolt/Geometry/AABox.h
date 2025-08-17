@@ -34,11 +34,10 @@ public:
 		return box;
 	}
 
-	/// Get bounding box of size FLT_MAX
+	/// Get bounding box of size 2 * FLT_MAX
 	static AABox	sBiggest()
 	{
-		/// Max half extent of AABox is 0.5 * FLT_MAX so that GetSize() remains finite
-		return AABox(Vec3::sReplicate(-0.5f * FLT_MAX), Vec3::sReplicate(0.5f * FLT_MAX));
+		return AABox(Vec3::sReplicate(-FLT_MAX), Vec3::sReplicate(FLT_MAX));
 	}
 
 	/// Comparison operators

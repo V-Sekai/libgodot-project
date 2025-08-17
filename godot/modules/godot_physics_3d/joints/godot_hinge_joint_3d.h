@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GODOT_HINGE_JOINT_3D_H
+#define GODOT_HINGE_JOINT_3D_H
 
 /*
 Adapted to Godot from the Bullet library.
@@ -75,8 +76,8 @@ class GodotHingeJoint3D : public GodotJoint3D {
 	real_t m_biasFactor = 0.3;
 	real_t m_relaxationFactor = 1.0;
 
-	real_t m_lowerLimit = Math::PI;
-	real_t m_upperLimit = -Math::PI;
+	real_t m_lowerLimit = Math_PI;
+	real_t m_upperLimit = -Math_PI;
 
 	real_t m_kHinge = 0.0;
 
@@ -111,3 +112,5 @@ public:
 	GodotHingeJoint3D(GodotBody3D *rbA, GodotBody3D *rbB, const Transform3D &frameA, const Transform3D &frameB);
 	GodotHingeJoint3D(GodotBody3D *rbA, GodotBody3D *rbB, const Vector3 &pivotInA, const Vector3 &pivotInB, const Vector3 &axisInA, const Vector3 &axisInB);
 };
+
+#endif // GODOT_HINGE_JOINT_3D_H

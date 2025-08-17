@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SKIN_H
+#define SKIN_H
 
 #include "core/io/resource.h"
 
@@ -84,3 +85,5 @@ public:
 
 	Skin();
 };
+
+#endif // SKIN_H

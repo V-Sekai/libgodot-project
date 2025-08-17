@@ -36,8 +36,6 @@
 #include "core/io/missing_resource.h"
 #include "core/object/script_language.h"
 #include "core/version.h"
-#include "scene/property_utils.h"
-#include "scene/resources/packed_scene.h"
 
 //#define print_bl(m_what) print_line(m_what)
 #define print_bl(m_what) (void)(m_what)
@@ -164,7 +162,9 @@ StringName ResourceLoaderBinary::_get_string() {
 			return StringName();
 		}
 		f->get_buffer((uint8_t *)&str_buf[0], len);
-		return String::utf8(&str_buf[0], len);
+		String s;
+		s.parse_utf8(&str_buf[0], len);
+		return s;
 	}
 
 	return string_map[id];
@@ -918,7 +918,9 @@ static String get_ustring(Ref<FileAccess> f) {
 	Vector<char> str_buf;
 	str_buf.resize(len);
 	f->get_buffer((uint8_t *)&str_buf[0], len);
-	return String::utf8(&str_buf[0], len);
+	String s;
+	s.parse_utf8(&str_buf[0], len);
+	return s;
 }
 
 String ResourceLoaderBinary::get_unicode_string() {
@@ -930,7 +932,9 @@ String ResourceLoaderBinary::get_unicode_string() {
 		return String();
 	}
 	f->get_buffer((uint8_t *)&str_buf[0], len);
-	return String::utf8(&str_buf[0], len);
+	String s;
+	s.parse_utf8(&str_buf[0], len);
+	return s;
 }
 
 void ResourceLoaderBinary::get_classes_used(Ref<FileAccess> p_f, HashSet<StringName> *p_classes) {
@@ -939,10 +943,11 @@ void ResourceLoaderBinary::get_classes_used(Ref<FileAccess> p_f, HashSet<StringN
 		return;
 	}
 
-	for (const IntResource &res : internal_resources) {
-		p_f->seek(res.offset);
+	for (int i = 0; i < internal_resources.size(); i++) {
+		p_f->seek(internal_resources[i].offset);
 		String t = get_unicode_string();
-		if (!p_f->get_error() && t != String() && ClassDB::class_exists(t)) {
+		ERR_FAIL_COND(p_f->get_error() != OK);
+		if (t != String()) {
 			p_classes->insert(t);
 		}
 	}
@@ -1023,10 +1028,10 @@ void ResourceLoaderBinary::open(Ref<FileAccess> p_f, bool p_no_resources, bool p
 	print_bl("minor: " + itos(ver_minor));
 	print_bl("format: " + itos(ver_format));
 
-	if (ver_format > FORMAT_VERSION || ver_major > GODOT_VERSION_MAJOR) {
+	if (ver_format > FORMAT_VERSION || ver_major > VERSION_MAJOR) {
 		f.unref();
 		ERR_FAIL_MSG(vformat("File '%s' can't be loaded, as it uses a format version (%d) or engine version (%d.%d) which are not supported by your engine version (%s).",
-				local_path, ver_format, ver_major, ver_minor, GODOT_VERSION_BRANCH));
+				local_path, ver_format, ver_major, ver_minor, VERSION_BRANCH));
 	}
 
 	type = get_unicode_string();
@@ -1150,7 +1155,7 @@ String ResourceLoaderBinary::recognize(Ref<FileAccess> p_f) {
 	f->get_32(); // ver_minor
 	uint32_t ver_fmt = f->get_32();
 
-	if (ver_fmt > FORMAT_VERSION || ver_major > GODOT_VERSION_MAJOR) {
+	if (ver_fmt > FORMAT_VERSION || ver_major > VERSION_MAJOR) {
 		f.unref();
 		return "";
 	}
@@ -1191,12 +1196,12 @@ String ResourceLoaderBinary::recognize_script_class(Ref<FileAccess> p_f) {
 	f->get_32(); // ver_minor
 	uint32_t ver_fmt = f->get_32();
 
-	if (ver_fmt > FORMAT_VERSION || ver_major > GODOT_VERSION_MAJOR) {
+	if (ver_fmt > FORMAT_VERSION || ver_major > VERSION_MAJOR) {
 		f.unref();
 		return "";
 	}
 
-	_ALLOW_DISCARD_ get_unicode_string(); // type
+	get_unicode_string(); // type
 
 	f->get_64(); // Metadata offset
 	uint32_t flags = f->get_32();
@@ -1343,10 +1348,13 @@ Error ResourceFormatLoaderBinary::rename_dependencies(const String &p_path, cons
 	bool use_real64 = f->get_32();
 
 	f->set_big_endian(big_endian != 0); //read big endian if saved as big endian
-
+#ifdef BIG_ENDIAN_ENABLED
+	fw->store_32(!big_endian);
+#else
 	fw->store_32(big_endian);
-	fw->store_32(use_real64); //use real64
+#endif
 	fw->set_big_endian(big_endian != 0);
+	fw->store_32(use_real64); //use real64
 
 	uint32_t ver_major = f->get_32();
 	uint32_t ver_minor = f->get_32();
@@ -1384,10 +1392,10 @@ Error ResourceFormatLoaderBinary::rename_dependencies(const String &p_path, cons
 		return ResourceFormatSaverBinary::singleton->save(res, p_path);
 	}
 
-	if (ver_format > FORMAT_VERSION || ver_major > GODOT_VERSION_MAJOR) {
+	if (ver_format > FORMAT_VERSION || ver_major > VERSION_MAJOR) {
 		ERR_FAIL_V_MSG(ERR_FILE_UNRECOGNIZED,
 				vformat("File '%s' can't be loaded, as it uses a format version (%d) or engine version (%d.%d) which are not supported by your engine version (%s).",
-						local_path, ver_format, ver_major, ver_minor, GODOT_VERSION_BRANCH));
+						local_path, ver_format, ver_major, ver_minor, VERSION_BRANCH));
 	}
 
 	// Since we're not actually converting the file contents, leave the version
@@ -1519,37 +1527,6 @@ void ResourceFormatLoaderBinary::get_classes_used(const String &p_path, HashSet<
 	loader.local_path = ProjectSettings::get_singleton()->localize_path(p_path);
 	loader.res_path = loader.local_path;
 	loader.get_classes_used(f, r_classes);
-
-	// Fetch the nodes inside scene files.
-	if (loader.type == "PackedScene") {
-		ERR_FAIL_COND(loader.load() != OK);
-
-		Ref<SceneState> state = Ref<PackedScene>(loader.get_resource())->get_state();
-		for (int i = 0; i < state->get_node_count(); i++) {
-			const StringName node_name = state->get_node_type(i);
-			if (ClassDB::class_exists(node_name)) {
-				r_classes->insert(node_name);
-			}
-
-			// Fetch the values of properties in the node.
-			for (int j = 0; j < state->get_node_property_count(i); j++) {
-				const Variant var = state->get_node_property_value(i, j);
-				if (var.get_type() != Variant::OBJECT) {
-					continue;
-				}
-
-				const Object *obj = var.get_validated_object();
-				if (obj == nullptr) {
-					continue;
-				}
-
-				const StringName obj_name = obj->get_class_name();
-				if (ClassDB::class_exists(obj_name)) {
-					r_classes->insert(obj_name);
-				}
-			}
-		}
-	}
 }
 
 String ResourceFormatLoaderBinary::get_resource_type(const String &p_path) const {
@@ -1899,9 +1876,12 @@ void ResourceFormatSaverBinaryInstance::write_variant(Ref<FileAccess> f, const V
 			Dictionary d = p_property;
 			f->store_32(uint32_t(d.size()));
 
-			for (const KeyValue<Variant, Variant> &kv : d) {
-				write_variant(f, kv.key, resource_map, external_resources, string_map);
-				write_variant(f, kv.value, resource_map, external_resources, string_map);
+			List<Variant> keys;
+			d.get_key_list(&keys);
+
+			for (const Variant &E : keys) {
+				write_variant(f, E, resource_map, external_resources, string_map);
+				write_variant(f, d[E], resource_map, external_resources, string_map);
 			}
 
 		} break;
@@ -2106,9 +2086,12 @@ void ResourceFormatSaverBinaryInstance::_find_resources(const Variant &p_variant
 			Dictionary d = p_variant;
 			_find_resources(d.get_typed_key_script());
 			_find_resources(d.get_typed_value_script());
-			for (const KeyValue<Variant, Variant> &kv : d) {
-				_find_resources(kv.key);
-				_find_resources(kv.value);
+			List<Variant> keys;
+			d.get_key_list(&keys);
+			for (const Variant &E : keys) {
+				_find_resources(E);
+				Variant v = d[E];
+				_find_resources(v);
 			}
 		} break;
 		case Variant::NODE_PATH: {
@@ -2197,14 +2180,14 @@ Error ResourceFormatSaverBinaryInstance::save(const String &p_path, const Ref<Re
 
 	if (big_endian) {
 		f->store_32(1);
+		f->set_big_endian(true);
 	} else {
 		f->store_32(0);
 	}
-	f->store_32(0); //64 bits file, false for now
-	f->set_big_endian(big_endian);
 
-	f->store_32(GODOT_VERSION_MAJOR);
-	f->store_32(GODOT_VERSION_MINOR);
+	f->store_32(0); //64 bits file, false for now
+	f->store_32(VERSION_MAJOR);
+	f->store_32(VERSION_MINOR);
 	f->store_32(FORMAT_VERSION);
 
 	if (f->get_error() != OK && f->get_error() != ERR_FILE_EOF) {
@@ -2285,8 +2268,7 @@ Error ResourceFormatSaverBinaryInstance::save(const String &p_path, const Ref<Re
 						}
 					}
 
-					bool is_script = F.name == CoreStringName(script);
-					Variant default_value = is_script ? Variant() : PropertyUtils::get_property_default_value(E.ptr(), F.name);
+					Variant default_value = ClassDB::class_get_default_property_value(E->get_class(), F.name);
 
 					if (default_value.get_type() != Variant::NIL && bool(Variant::evaluate(Variant::OP_EQUAL, p.value, default_value))) {
 						continue;
@@ -2442,10 +2424,13 @@ Error ResourceFormatSaverBinaryInstance::set_uid(const String &p_path, ResourceU
 	big_endian = f->get_32();
 	bool use_real64 = f->get_32();
 	f->set_big_endian(big_endian != 0); //read big endian if saved as big endian
-
+#ifdef BIG_ENDIAN_ENABLED
+	fw->store_32(!big_endian);
+#else
 	fw->store_32(big_endian);
-	fw->store_32(use_real64); //use real64
+#endif
 	fw->set_big_endian(big_endian != 0);
+	fw->store_32(use_real64); //use real64
 
 	uint32_t ver_major = f->get_32();
 	uint32_t ver_minor = f->get_32();
@@ -2465,10 +2450,10 @@ Error ResourceFormatSaverBinaryInstance::set_uid(const String &p_path, ResourceU
 		return ERR_UNAVAILABLE;
 	}
 
-	if (ver_format > FORMAT_VERSION || ver_major > GODOT_VERSION_MAJOR) {
+	if (ver_format > FORMAT_VERSION || ver_major > VERSION_MAJOR) {
 		ERR_FAIL_V_MSG(ERR_FILE_UNRECOGNIZED,
 				vformat("File '%s' can't be loaded, as it uses a format version (%d) or engine version (%d.%d) which are not supported by your engine version (%s).",
-						local_path, ver_format, ver_major, ver_minor, GODOT_VERSION_BRANCH));
+						local_path, ver_format, ver_major, ver_minor, VERSION_BRANCH));
 	}
 
 	// Since we're not actually converting the file contents, leave the version
@@ -2538,6 +2523,8 @@ void ResourceFormatSaverBinary::get_recognized_extensions(const Ref<Resource> &p
 		p_extensions->push_back("res");
 	}
 }
+
+ResourceFormatSaverBinary *ResourceFormatSaverBinary::singleton = nullptr;
 
 ResourceFormatSaverBinary::ResourceFormatSaverBinary() {
 	singleton = this;

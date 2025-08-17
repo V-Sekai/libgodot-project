@@ -183,7 +183,7 @@ namespace Godot.SourceGenerators
 
         public static string NameWithTypeParameters(this INamedTypeSymbol symbol)
         {
-            return symbol.IsGenericType && symbol.TypeParameters.Length > 0 ?
+            return symbol.IsGenericType ?
                 string.Concat(symbol.Name, "<", string.Join(", ", symbol.TypeParameters), ">") :
                 symbol.Name;
         }

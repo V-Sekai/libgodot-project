@@ -282,23 +282,11 @@ void SkinTool::_recurse_children(
 	}
 }
 
-void SkinTool::_check_if_parent_needs_to_become_joint(const Vector<Ref<GLTFNode>> &p_all_nodes, const Vector<GLTFNodeIndex> &p_skeleton_node_indices, const Ref<GLTFNode> &p_gltf_node, Vector<GLTFNodeIndex> &r_non_joint_indices) {
-	const GLTFNodeIndex parent_index = p_gltf_node->parent;
-	if (parent_index >= 0) {
-		const Ref<GLTFNode> &parent = p_all_nodes[parent_index];
-		if (!parent->joint && p_skeleton_node_indices.has(parent_index) && !r_non_joint_indices.has(parent_index)) {
-			_check_if_parent_needs_to_become_joint(p_all_nodes, p_skeleton_node_indices, parent, r_non_joint_indices);
-			r_non_joint_indices.push_back(parent_index);
-		}
-	}
-}
-
 Error SkinTool::_determine_skeletons(
 		Vector<Ref<GLTFSkin>> &skins,
 		Vector<Ref<GLTFNode>> &nodes,
 		Vector<Ref<GLTFSkeleton>> &skeletons,
-		const Vector<GLTFNodeIndex> &p_single_skeleton_roots,
-		bool p_turn_non_joint_descendants_into_bones) {
+		const Vector<GLTFNodeIndex> &p_single_skeleton_roots) {
 	if (!p_single_skeleton_roots.is_empty()) {
 		Ref<GLTFSkin> skin;
 		skin.instantiate();
@@ -402,7 +390,7 @@ Error SkinTool::_determine_skeletons(
 		for (GLTFSkinIndex skin_i = 0; skin_i < skins.size(); ++skin_i) {
 			Ref<GLTFSkin> skin = skins.write[skin_i];
 
-			// If any of the skeletons nodes exist in a skin, that skin now maps to the skeleton
+			// If any of the the skeletons nodes exist in a skin, that skin now maps to the skeleton
 			for (int i = 0; i < skeleton_nodes.size(); ++i) {
 				SkinNodeIndex skel_node_i = skeleton_nodes[i];
 				if (skin->joints.has(skel_node_i) || skin->non_joints.has(skel_node_i)) {
@@ -411,22 +399,14 @@ Error SkinTool::_determine_skeletons(
 				}
 			}
 		}
-		// The nodes placed into `non_joints` will be passed to `_reparent_non_joint_skeleton_subtrees`
-		// which will add them to the skeleton and set `node->joint` to true.
+
 		Vector<SkinNodeIndex> non_joints;
 		for (int i = 0; i < skeleton_nodes.size(); ++i) {
 			const SkinNodeIndex node_i = skeleton_nodes[i];
-			Ref<GLTFNode> node = nodes[node_i];
-			if (node->joint) {
-				if (!p_turn_non_joint_descendants_into_bones) {
-					// If a joint node has non-joint parents, we need to make them joints as well.
-					// For example, if A/B/C/D, and A/B and D are joints, then we need to make C a joint as well.
-					// This is required to handle the "skinD" example in `Animation_Skin_09.gltf` from the glTF-Asset-Generator:
-					// https://github.com/KhronosGroup/glTF-Asset-Generator/blob/master/Output/Positive/Animation_Skin
-					_check_if_parent_needs_to_become_joint(nodes, skeleton_nodes, node, non_joints);
-				}
+
+			if (nodes[node_i]->joint) {
 				skeleton->joints.push_back(node_i);
-			} else if (p_turn_non_joint_descendants_into_bones) {
+			} else {
 				non_joints.push_back(node_i);
 			}
 		}
@@ -540,7 +520,7 @@ Error SkinTool::_determine_skeleton_roots(
 
 	skeleton->roots = roots;
 
-	if (roots.is_empty()) {
+	if (roots.size() == 0) {
 		return FAILED;
 	} else if (roots.size() == 1) {
 		return OK;
@@ -563,13 +543,9 @@ Error SkinTool::_create_skeletons(
 		Vector<Ref<GLTFNode>> &nodes,
 		HashMap<ObjectID, GLTFSkeletonIndex> &skeleton3d_to_gltf_skeleton,
 		Vector<Ref<GLTFSkeleton>> &skeletons,
-		HashMap<GLTFNodeIndex, Node *> &scene_nodes,
-		int p_naming_version) {
-	// This is the syntax to duplicate a Godot HashSet.
-	HashSet<String> unique_node_names(unique_names);
+		HashMap<GLTFNodeIndex, Node *> &scene_nodes) {
 	for (SkinSkeletonIndex skel_i = 0; skel_i < skeletons.size(); ++skel_i) {
 		Ref<GLTFSkeleton> gltf_skeleton = skeletons.write[skel_i];
-		HashSet<String> skel_unique_names(unique_node_names);
 
 		Skeleton3D *skeleton = memnew(Skeleton3D);
 		gltf_skeleton->godot_skeleton = skeleton;
@@ -617,16 +593,7 @@ Error SkinTool::_create_skeletons(
 				node->set_name("bone");
 			}
 
-			if (p_naming_version < 2) {
-				node->set_name(_gen_unique_bone_name(unique_names, node->get_name()));
-			} else {
-				// Make sure the bone name is unique in the skeleton and unique compared
-				// to scene nodes, but bone names may be duplicated between skeletons.
-				// Example: Two skeletons with a "Head" bone should not have one become "Head_2".
-				const String unique_bone_name = _gen_unique_bone_name(skel_unique_names, node->get_name());
-				unique_names.insert(unique_bone_name);
-				node->set_name(unique_bone_name);
-			}
+			node->set_name(_gen_unique_bone_name(unique_names, node->get_name()));
 
 			skeleton->add_bone(node->get_name());
 			Transform3D rest_transform = node->get_additional_data("GODOT_rest_transform");
@@ -843,6 +810,7 @@ Error SkinTool::_asset_parse_skins(
 
 String SkinTool::_sanitize_bone_name(const String &p_name) {
 	String bone_name = p_name;
-	bone_name = bone_name.replace_chars(":/", '_');
+	bone_name = bone_name.replace(":", "_");
+	bone_name = bone_name.replace("/", "_");
 	return bone_name;
 }

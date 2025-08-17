@@ -42,21 +42,10 @@ namespace embree
 
   Scene::Scene (Device* device)
     : device(device),
-      scene_device(nullptr),
       flags_modified(true), enabled_geometry_types(0),
       scene_flags(RTC_SCENE_FLAG_NONE),
       quality_flags(RTC_BUILD_QUALITY_MEDIUM),
       modified(true),
-      maxTimeSegments(0),
-#if defined(EMBREE_SYCL_SUPPORT)
-      geometries_device(nullptr),
-      geometry_data_device(nullptr),
-      num_geometries(0),
-      geometry_data_byte_size(0),
-      offsets(nullptr),
-      geometries_host(nullptr),
-      geometry_data_host(nullptr),
-#endif
       taskGroup(new TaskGroup()),
       progressInterface(this), progress_monitor_function(nullptr), progress_monitor_ptr(nullptr), progress_monitor_counter(0)
   {
@@ -66,8 +55,8 @@ namespace embree
 
     /* use proper device and context for SYCL allocations */
 #if defined(EMBREE_SYCL_SUPPORT)
-    if (dynamic_cast<DeviceGPU*>(device))
-      accelBuffer = AccelBuffer(device);
+    if (DeviceGPU* gpu_device = dynamic_cast<DeviceGPU*>(device))
+      hwaccel = AccelBuffer(AccelAllocator<char>(device,gpu_device->getGPUDevice(),gpu_device->getGPUContext()),0);
 #endif
        
     /* one can overwrite flags through device for debugging */
@@ -79,27 +68,6 @@ namespace embree
 
   Scene::~Scene() noexcept
   {
-#if defined(EMBREE_SYCL_SUPPORT)
-    if (geometry_data_device) {
-      device->free(geometry_data_device);
-    }
-    if (geometries_device) {
-      device->free(geometries_device);
-    }
-    if (scene_device) {
-      device->free(scene_device);
-    }
-    if (offsets) {
-      device->free(offsets);
-    }
-    if (geometries_host) {
-      device->free(geometries_host);
-    }
-    if (geometry_data_host) {
-      device->free(geometry_data_host);
-    }
-#endif
-
     device->refDec();
   }
   
@@ -820,8 +788,9 @@ namespace embree
   void Scene::build_gpu_accels()
   {
 #if defined(EMBREE_SYCL_SUPPORT)
-    accelBuffer.build(this);
-    bounds = LBBox<embree::Vec3fa>(accelBuffer.getBounds());
+    const BBox3f aabb = rthwifBuild(this,hwaccel);
+    bounds = LBBox<embree::Vec3fa>(aabb);
+    hwaccel_bounds = aabb;
 #endif
   }
 
@@ -830,7 +799,6 @@ namespace embree
     checkIfModifiedAndSet();
     if (!isModified()) return;
     
-
     /* print scene statistics */
     if (device->verbosity(2))
       printStatistics();
@@ -857,18 +825,8 @@ namespace embree
       std::plus<GeometryCounts>()
     );
 
-    /* calculate maximal number of motion blur time segments in scene */
-    maxTimeSegments = 1;
-    for (size_t geomID=0; geomID<size(); geomID++)
-    {
-      Geometry* geom = get(geomID);
-      if (geom == nullptr) continue;
-      maxTimeSegments = std::max(maxTimeSegments, geom->numTimeSegments());
-    }
-
 #if defined(EMBREE_SYCL_SUPPORT)
-    DeviceGPU* gpu_device = dynamic_cast<DeviceGPU*>(device);
-    if (gpu_device)
+    if (DeviceGPU* gpu_device = dynamic_cast<DeviceGPU*>(device))
       build_gpu_accels();
     else
 #endif
@@ -907,36 +865,10 @@ namespace embree
   RTCSceneFlags Scene::getSceneFlags() const {
     return scene_flags;
   }
-
-#if defined(EMBREE_SYCL_SUPPORT)
-  sycl::event Scene::commit (bool join, sycl::queue queue)
-  {
-    commit_internal(join);
-    return syncWithDevice(queue);
-  }
-#endif
-
-  void Scene::commit (bool join)
-  {
-    commit_internal(join);
-
-#if defined(EMBREE_SYCL_SUPPORT)
-    syncWithDevice();
-#endif
-  }
-
-  Scene* Scene::getTraversable() {
-#if defined(EMBREE_SYCL_SUPPORT)
-    if(device->is_gpu()) {
-      return scene_device;
-    }
-#endif
-    return this;
-  }
-
+                   
 #if defined(TASKING_INTERNAL)
 
-  void Scene::commit_internal (bool join)
+  void Scene::commit (bool join) 
   {
     Lock<MutexSys> buildLock(buildMutex,false);
 
@@ -978,7 +910,7 @@ namespace embree
 
 #if defined(TASKING_TBB)
 
-  void Scene::commit_internal (bool join) 
+  void Scene::commit (bool join) 
   {    
 #if defined(TASKING_TBB) && (TBB_INTERFACE_VERSION_MAJOR < 8)
     if (join)
@@ -1042,7 +974,7 @@ namespace embree
 
 #if defined(TASKING_PPL)
 
-  void Scene::commit_internal (bool join)
+  void Scene::commit (bool join) 
   {
 #if defined(TASKING_PPL)
     if (join)
@@ -1079,7 +1011,6 @@ namespace embree
       accels_clear();
       throw;
     }
-
   }
 #endif
 
@@ -1098,5 +1029,4 @@ namespace embree
       }
     }
   }
-  
 }

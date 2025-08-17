@@ -29,20 +29,20 @@
 /**************************************************************************/
 
 #include "rendering_context_driver_vulkan_moltenvk.h"
-#include "drivers/apple_embedded/rendering_native_surface_apple_embedded.h"
-#include "rendering_native_surface_apple.h"
+#include "drivers/apple/rendering_native_surface_apple.h"
 
 #ifdef __APPLE__
 #ifdef VULKAN_ENABLED
 
-#include "drivers/vulkan/godot_vulkan.h"
 #include "drivers/vulkan/rendering_native_surface_vulkan.h"
 
-const char *RenderingContextDriverVulkanMoltenVK::_get_platform_surface_extension() const {
+#include "drivers/vulkan/godot_vulkan.h"
+
+const char *RenderingContextDriverVulkanMoltenVk::_get_platform_surface_extension() const {
 	return VK_EXT_METAL_SURFACE_EXTENSION_NAME;
 }
 
-RenderingContextDriver::SurfaceID RenderingContextDriverVulkanMoltenVK::surface_create(Ref<RenderingNativeSurface> p_native_surface) {
+RenderingContextDriver::SurfaceID RenderingContextDriverVulkanMoltenVk::surface_create(Ref<RenderingNativeSurface> p_native_surface) {
 	Ref<RenderingNativeSurfaceApple> apple_native_surface = Object::cast_to<RenderingNativeSurfaceApple>(*p_native_surface);
 	ERR_FAIL_COND_V(apple_native_surface.is_null(), SurfaceID());
 
@@ -60,11 +60,11 @@ RenderingContextDriver::SurfaceID RenderingContextDriverVulkanMoltenVK::surface_
 	return result;
 }
 
-RenderingContextDriverVulkanMoltenVK::RenderingContextDriverVulkanMoltenVK() {
+RenderingContextDriverVulkanMoltenVk::RenderingContextDriverVulkanMoltenVk() {
 	// Does nothing.
 }
 
-RenderingContextDriverVulkanMoltenVK::~RenderingContextDriverVulkanMoltenVK() {
+RenderingContextDriverVulkanMoltenVk::~RenderingContextDriverVulkanMoltenVk() {
 	// Does nothing.
 }
 

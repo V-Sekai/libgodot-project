@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_PRIMITIVES_H
+#define TEST_PRIMITIVES_H
 
 #include "scene/resources/3d/primitive_meshes.h"
 
@@ -863,3 +864,5 @@ TEST_CASE("[SceneTree][Primitive][Text] Text Primitive") {
 }
 
 } // namespace TestPrimitives
+
+#endif // TEST_PRIMITIVES_H

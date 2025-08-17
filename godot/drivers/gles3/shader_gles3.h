@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SHADER_GLES3_H
+#define SHADER_GLES3_H
 
 #include "core/math/projection.h"
 #include "core/os/mutex.h"
@@ -102,7 +103,7 @@ private:
 			}
 		};
 
-		LocalVector<AHashMap<uint64_t, Specialization>> variants;
+		LocalVector<OAHashMap<uint64_t, Specialization>> variants;
 	};
 
 	Mutex variant_set_mutex;
@@ -188,29 +189,29 @@ protected:
 		Version *version = version_owner.get_or_null(p_version);
 		ERR_FAIL_NULL_V(version, false);
 
-		if (version->variants.is_empty()) {
+		if (version->variants.size() == 0) {
 			_initialize_version(version); //may lack initialization
 		}
 
-		Version::Specialization *spec = version->variants[p_variant].getptr(p_specialization);
+		Version::Specialization *spec = version->variants[p_variant].lookup_ptr(p_specialization);
 		if (!spec) {
 			if (false) {
 				// Queue load this specialization and use defaults in the meantime (TODO)
 
-				spec = version->variants[p_variant].getptr(specialization_default_mask);
+				spec = version->variants[p_variant].lookup_ptr(specialization_default_mask);
 			} else {
 				// Compile on the spot
 				Version::Specialization s;
 				_compile_specialization(s, p_variant, version, p_specialization);
 				version->variants[p_variant].insert(p_specialization, s);
-				spec = version->variants[p_variant].getptr(p_specialization);
+				spec = version->variants[p_variant].lookup_ptr(p_specialization);
 				if (shader_cache_dir_valid) {
 					_save_to_cache(version);
 				}
 			}
 		} else if (spec->build_queued) {
 			// Still queued, wait
-			spec = version->variants[p_variant].getptr(specialization_default_mask);
+			spec = version->variants[p_variant].lookup_ptr(specialization_default_mask);
 		}
 
 		if (!spec || !spec->ok) {
@@ -228,7 +229,7 @@ protected:
 		Version *version = version_owner.get_or_null(p_version);
 		ERR_FAIL_NULL_V(version, -1);
 		ERR_FAIL_INDEX_V(p_variant, int(version->variants.size()), -1);
-		Version::Specialization *spec = version->variants[p_variant].getptr(p_specialization);
+		Version::Specialization *spec = version->variants[p_variant].lookup_ptr(p_specialization);
 		ERR_FAIL_NULL_V(spec, -1);
 		ERR_FAIL_INDEX_V(p_which, int(spec->uniform_location.size()), -1);
 		return spec->uniform_location[p_which];
@@ -257,3 +258,5 @@ public:
 };
 
 #endif // GLES3_ENABLED
+
+#endif // SHADER_GLES3_H

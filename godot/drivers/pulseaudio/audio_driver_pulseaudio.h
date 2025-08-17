@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef AUDIO_DRIVER_PULSEAUDIO_H
+#define AUDIO_DRIVER_PULSEAUDIO_H
 
 #ifdef PULSEAUDIO_ENABLED
 
@@ -127,3 +128,5 @@ public:
 };
 
 #endif // PULSEAUDIO_ENABLED
+
+#endif // AUDIO_DRIVER_PULSEAUDIO_H

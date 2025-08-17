@@ -31,8 +31,6 @@
 #include "openxr_fb_foveation_extension.h"
 #include "core/config/project_settings.h"
 
-#include "../openxr_platform_inc.h"
-
 OpenXRFBFoveationExtension *OpenXRFBFoveationExtension::singleton = nullptr;
 
 OpenXRFBFoveationExtension *OpenXRFBFoveationExtension::get_singleton() {
@@ -53,12 +51,6 @@ OpenXRFBFoveationExtension::OpenXRFBFoveationExtension(const String &p_rendering
 	swapchain_create_info_foveation_fb.type = XR_TYPE_SWAPCHAIN_CREATE_INFO_FOVEATION_FB;
 	swapchain_create_info_foveation_fb.next = nullptr;
 	swapchain_create_info_foveation_fb.flags = 0;
-
-	if (rendering_driver == "opengl3") {
-		swapchain_create_info_foveation_fb.flags = XR_SWAPCHAIN_CREATE_FOVEATION_SCALED_BIN_BIT_FB;
-	} else if (rendering_driver == "vulkan") {
-		swapchain_create_info_foveation_fb.flags = XR_SWAPCHAIN_CREATE_FOVEATION_FRAGMENT_DENSITY_MAP_BIT_FB;
-	}
 }
 
 OpenXRFBFoveationExtension::~OpenXRFBFoveationExtension() {
@@ -69,14 +61,13 @@ OpenXRFBFoveationExtension::~OpenXRFBFoveationExtension() {
 HashMap<String, bool *> OpenXRFBFoveationExtension::get_requested_extensions() {
 	HashMap<String, bool *> request_extensions;
 
-	request_extensions[XR_FB_FOVEATION_EXTENSION_NAME] = &fb_foveation_ext;
-	request_extensions[XR_FB_FOVEATION_CONFIGURATION_EXTENSION_NAME] = &fb_foveation_configuration_ext;
-
-#ifdef XR_USE_GRAPHICS_API_VULKAN
 	if (rendering_driver == "vulkan") {
-		request_extensions[XR_FB_FOVEATION_VULKAN_EXTENSION_NAME] = &fb_foveation_vulkan_ext;
+		// This is currently only supported on OpenGL, but we may add Vulkan support in the future...
+
+	} else if (rendering_driver == "opengl3") {
+		request_extensions[XR_FB_FOVEATION_EXTENSION_NAME] = &fb_foveation_ext;
+		request_extensions[XR_FB_FOVEATION_CONFIGURATION_EXTENSION_NAME] = &fb_foveation_configuration_ext;
 	}
-#endif // XR_USE_GRAPHICS_API_VULKAN
 
 	return request_extensions;
 }
@@ -98,13 +89,7 @@ void OpenXRFBFoveationExtension::on_instance_destroyed() {
 }
 
 bool OpenXRFBFoveationExtension::is_enabled() const {
-	bool enabled = swapchain_update_state_ext != nullptr && swapchain_update_state_ext->is_enabled() && fb_foveation_ext && fb_foveation_configuration_ext;
-#ifdef XR_USE_GRAPHICS_API_VULKAN
-	if (rendering_driver == "vulkan") {
-		enabled = enabled && fb_foveation_vulkan_ext;
-	}
-#endif // XR_USE_GRAPHICS_API_VULKAN
-	return enabled;
+	return swapchain_update_state_ext != nullptr && swapchain_update_state_ext->is_enabled() && fb_foveation_ext && fb_foveation_configuration_ext;
 }
 
 void *OpenXRFBFoveationExtension::set_swapchain_create_info_and_get_next_pointer(void *p_next_pointer) {

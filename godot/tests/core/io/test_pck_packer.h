@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_PCK_PACKER_H
+#define TEST_PCK_PACKER_H
 
 #include "core/io/file_access_pack.h"
 #include "core/io/pck_packer.h"
@@ -117,3 +118,5 @@ TEST_CASE("[PCKPacker] Pack a PCK file with some files and directories") {
 			"The generated non-empty PCK file shouldn't be too large.");
 }
 } // namespace TestPCKPacker
+
+#endif // TEST_PCK_PACKER_H

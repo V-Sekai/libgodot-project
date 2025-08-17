@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_PATH_3D_H
+#define TEST_PATH_3D_H
 
 #include "scene/3d/path_3d.h"
 
@@ -79,3 +80,5 @@ TEST_CASE("[Path3D] Curve setter and getter") {
 }
 
 } // namespace TestPath3D
+
+#endif // TEST_PATH_3D_H

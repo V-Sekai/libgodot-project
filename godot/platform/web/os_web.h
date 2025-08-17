@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef OS_WEB_H
+#define OS_WEB_H
 
 #include "audio_driver_web.h"
 #include "webmidi_driver.h"
@@ -91,7 +92,7 @@ public:
 	int get_process_exit_code(const ProcessID &p_pid) const override;
 	int get_processor_count() const override;
 	String get_unique_id() const override;
-	int get_default_thread_pool_size() const override;
+	int get_default_thread_pool_size() const override { return 1; }
 
 	String get_executable_path() const override;
 	Error shell_open(const String &p_uri) override;
@@ -99,7 +100,7 @@ public:
 
 	// Override default OS implementation which would block the main thread with delay_usec.
 	// Implemented in web_main.cpp loop callback instead.
-	void add_frame_delay(bool p_can_draw, bool p_wake_for_events) override;
+	void add_frame_delay(bool p_can_draw) override;
 
 	void vibrate_handheld(int p_duration_ms, float p_amplitude) override;
 
@@ -118,3 +119,5 @@ public:
 
 	OS_Web();
 };
+
+#endif // OS_WEB_H

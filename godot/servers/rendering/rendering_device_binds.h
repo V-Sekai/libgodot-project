@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef RENDERING_DEVICE_BINDS_H
+#define RENDERING_DEVICE_BINDS_H
 
 #include "servers/rendering/rendering_device.h"
 
@@ -425,9 +426,11 @@ protected:
 	}
 	void _set_versions(const Dictionary &p_versions) {
 		versions.clear();
-		for (const KeyValue<Variant, Variant> &kv : p_versions) {
-			StringName vname = kv.key;
-			Ref<RDShaderSPIRV> bc = kv.value;
+		List<Variant> keys;
+		p_versions.get_key_list(&keys);
+		for (const Variant &E : keys) {
+			StringName vname = E;
+			Ref<RDShaderSPIRV> bc = p_versions[E];
 			ERR_CONTINUE(bc.is_null());
 			versions[vname] = bc;
 		}
@@ -726,3 +729,5 @@ protected:
 		ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "attachments", PROPERTY_HINT_ARRAY_TYPE, "RDPipelineColorBlendStateAttachment"), "set_attachments", "get_attachments");
 	}
 };
+
+#endif // RENDERING_DEVICE_BINDS_H

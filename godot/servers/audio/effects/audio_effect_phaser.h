@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef AUDIO_EFFECT_PHASER_H
+#define AUDIO_EFFECT_PHASER_H
 
 #include "servers/audio/audio_effect.h"
 
@@ -101,3 +102,5 @@ public:
 
 	AudioEffectPhaser();
 };
+
+#endif // AUDIO_EFFECT_PHASER_H

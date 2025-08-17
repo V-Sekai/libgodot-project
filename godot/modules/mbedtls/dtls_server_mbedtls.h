@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef DTLS_SERVER_MBEDTLS_H
+#define DTLS_SERVER_MBEDTLS_H
 
 #include "tls_context_mbedtls.h"
 
@@ -44,10 +45,12 @@ public:
 	static void initialize();
 	static void finalize();
 
-	Error setup(Ref<TLSOptions> p_options) override;
-	void stop() override;
-	Ref<PacketPeerDTLS> take_connection(Ref<PacketPeerUDP> p_peer) override;
+	virtual Error setup(Ref<TLSOptions> p_options);
+	virtual void stop();
+	virtual Ref<PacketPeerDTLS> take_connection(Ref<PacketPeerUDP> p_peer);
 
 	DTLSServerMbedTLS();
-	~DTLSServerMbedTLS() override;
+	~DTLSServerMbedTLS();
 };
+
+#endif // DTLS_SERVER_MBEDTLS_H

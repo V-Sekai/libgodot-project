@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef WEBRTC_DATA_CHANNEL_EXTENSION_H
+#define WEBRTC_DATA_CHANNEL_EXTENSION_H
 
 #include "webrtc_data_channel.h"
 
@@ -73,3 +74,5 @@ public:
 
 	WebRTCDataChannelExtension() {}
 };
+
+#endif // WEBRTC_DATA_CHANNEL_EXTENSION_H

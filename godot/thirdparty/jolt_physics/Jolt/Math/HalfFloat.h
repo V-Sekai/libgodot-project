@@ -5,7 +5,6 @@
 #pragma once
 
 #include <Jolt/Math/Vec4.h>
-#include <Jolt/Core/FPException.h>
 
 JPH_NAMESPACE_BEGIN
 
@@ -133,9 +132,6 @@ template <int RoundingMode>
 JPH_INLINE HalfFloat FromFloat(float inV)
 {
 #ifdef JPH_USE_F16C
-	FPExceptionDisableOverflow disable_overflow;
-	JPH_UNUSED(disable_overflow);
-
 	union
 	{
 		__m128i		u128;

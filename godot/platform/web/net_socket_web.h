@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef NET_SOCKET_WEB_H
+#define NET_SOCKET_WEB_H
 
 #include "core/io/net_socket.h"
 
@@ -67,3 +68,5 @@ public:
 
 	NetSocketWeb() {}
 };
+
+#endif // NET_SOCKET_WEB_H

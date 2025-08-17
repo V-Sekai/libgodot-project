@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef AUDIO_EFFECT_REVERB_H
+#define AUDIO_EFFECT_REVERB_H
 
 #include "servers/audio/audio_effect.h"
 #include "servers/audio/effects/reverb_filter.h"
@@ -92,3 +93,5 @@ public:
 
 	AudioEffectReverb();
 };
+
+#endif // AUDIO_EFFECT_REVERB_H

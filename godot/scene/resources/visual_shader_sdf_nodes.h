@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef VISUAL_SHADER_SDF_NODES_H
+#define VISUAL_SHADER_SDF_NODES_H
 
 #include "scene/resources/visual_shader.h"
 
@@ -137,3 +138,5 @@ public:
 
 	VisualShaderNodeSDFRaymarch();
 };
+
+#endif // VISUAL_SHADER_SDF_NODES_H

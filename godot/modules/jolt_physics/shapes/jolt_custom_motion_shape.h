@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef JOLT_CUSTOM_MOTION_SHAPE_H
+#define JOLT_CUSTOM_MOTION_SHAPE_H
 
 #include "jolt_custom_shape_type.h"
 
@@ -112,3 +113,5 @@ public:
 
 	void set_motion(JPH::Vec3Arg p_motion) { motion = p_motion; }
 };
+
+#endif // JOLT_CUSTOM_MOTION_SHAPE_H

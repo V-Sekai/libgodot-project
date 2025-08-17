@@ -836,12 +836,10 @@ void decodeISETritBlock (ISEDecodedResult* dst, int numValues, BitAccessStream& 
     m[4]            = data.getNext(numBits);
     deUint32 T7     = data.getNext(1);
 
-#ifndef __EMSCRIPTEN__
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough="            
 #endif  
-#endif
     switch (numValues)
     {
         // \note Fall-throughs.
@@ -853,11 +851,9 @@ void decodeISETritBlock (ISEDecodedResult* dst, int numValues, BitAccessStream& 
         default:
             DE_ASSERT(false);
     }
-#ifndef __EMSCRIPTEN__
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif 
-#endif
 
     const deUint32 T = (T7 << 7) | (T56 << 5) | (T4 << 4) | (T23 << 2) | (T01 << 0);
 
@@ -902,12 +898,10 @@ void decodeISEQuintBlock (ISEDecodedResult* dst, int numValues, BitAccessStream&
     m[2]            = data.getNext(numBits);
     deUint32 Q56    = data.getNext(2);
 
-#ifndef __EMSCRIPTEN__
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough="            
 #endif  
-#endif
     switch (numValues)
     {
         // \note Fall-throughs.
@@ -917,11 +911,9 @@ void decodeISEQuintBlock (ISEDecodedResult* dst, int numValues, BitAccessStream&
         default:
             DE_ASSERT(false);
     }
-#ifndef __EMSCRIPTEN__
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif 
-#endif
 
     const deUint32 Q = (Q56 << 5) | (Q34 << 3) | (Q012 << 0);
 

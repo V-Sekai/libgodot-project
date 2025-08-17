@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef VOXELIZER_H
+#define VOXELIZER_H
 
 #include "scene/resources/multimesh.h"
 
@@ -137,3 +138,5 @@ public:
 	Transform3D get_to_cell_space_xform() const;
 	Voxelizer();
 };
+
+#endif // VOXELIZER_H

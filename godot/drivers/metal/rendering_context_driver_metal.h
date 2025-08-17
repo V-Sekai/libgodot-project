@@ -28,12 +28,13 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef RENDERING_CONTEXT_DRIVER_METAL_H
+#define RENDERING_CONTEXT_DRIVER_METAL_H
 
 #ifdef METAL_ENABLED
 
-#include "servers/rendering/rendering_context_driver.h"
-#include "servers/rendering/rendering_device_driver.h"
+#import "servers/rendering/rendering_context_driver.h"
+#import "servers/rendering/rendering_device_driver.h"
 
 #import <CoreGraphics/CGGeometry.h>
 
@@ -56,8 +57,6 @@ class PixelFormats;
 class MDResourceCache;
 
 class API_AVAILABLE(macos(11.0), ios(14.0), tvos(14.0)) RenderingContextDriverMetal : public RenderingContextDriver {
-	bool capture_available = false;
-
 protected:
 #ifdef __OBJC__
 	id<MTLDevice> metal_device = nullptr;
@@ -82,7 +81,7 @@ public:
 	void surface_set_needs_resize(SurfaceID p_surface, bool p_needs_resize) final override;
 	bool surface_get_needs_resize(SurfaceID p_surface) const final override;
 	void surface_destroy(SurfaceID p_surface) final override;
-	bool is_debug_utils_enabled() const final override { return capture_available; }
+	bool is_debug_utils_enabled() const final override { return true; }
 
 #pragma mark - Metal-specific methods
 
@@ -135,3 +134,5 @@ public:
 };
 
 #endif // METAL_ENABLED
+
+#endif // RENDERING_CONTEXT_DRIVER_METAL_H

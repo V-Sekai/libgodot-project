@@ -9,14 +9,6 @@ namespace embree
 {
   /* mutex to make printing to cout thread safe */
   extern MutexSys g_printMutex;
-  struct RTCErrorMessage
-  {
-    RTCErrorMessage(RTCError error, std::string const& msg)
-      : error(error), msg(msg) {}
-
-    RTCError error;
-    std::string msg;
-  };
 
   struct State : public RefCount
   {
@@ -117,7 +109,6 @@ namespace embree
     float max_spatial_split_replications;  //!< maximally replications*N many primitives in accel for spatial splits
     bool useSpatialPreSplits;              //!< use spatial pre-splits instead of the full spatial split builder
     size_t tessellation_cache_size;        //!< size of the shared tessellation cache 
-    size_t max_triangles_per_leaf;
 
   public:
     size_t instancing_open_min;            //!< instancing opens tree to minimally that number of subtrees
@@ -172,11 +163,11 @@ namespace embree
     public:
       ErrorHandler();
       ~ErrorHandler();
-      RTCErrorMessage* error();
+      RTCError* error();
 
     public:
       tls_t thread_error;
-      std::vector<RTCErrorMessage*> thread_errors;
+      std::vector<RTCError*> thread_errors;
       MutexSys errors_mutex;
     };
     ErrorHandler errorHandler;

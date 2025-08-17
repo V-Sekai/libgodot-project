@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef UCAPS_H
+#define UCAPS_H
 
 // This file was generated using the `misc/scripts/ucaps_fetch.py` script.
 
@@ -3017,3 +3018,5 @@ static int _find_lower(int ch) {
 
 	return ch;
 }
+
+#endif // UCAPS_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef RETARGET_MODIFIER_3D_H
+#define RETARGET_MODIFIER_3D_H
 
 #include "scene/3d/skeleton_modifier_3d.h"
 #include "scene/resources/skeleton_profile.h"
@@ -96,7 +97,7 @@ protected:
 	virtual void remove_child_notify(Node *p_child) override;
 
 	virtual void _set_active(bool p_active) override;
-	virtual void _process_modification(double p_delta) override;
+	virtual void _process_modification() override;
 
 public:
 	virtual PackedStringArray get_configuration_warnings() const override;
@@ -125,3 +126,5 @@ public:
 };
 
 VARIANT_BITFIELD_CAST(RetargetModifier3D::TransformFlag);
+
+#endif // RETARGET_MODIFIER_3D_H

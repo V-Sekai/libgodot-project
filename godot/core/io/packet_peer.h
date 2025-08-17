@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef PACKET_PEER_H
+#define PACKET_PEER_H
 
 #include "core/io/stream_peer.h"
 #include "core/object/class_db.h"
@@ -123,3 +124,5 @@ public:
 	int get_output_buffer_max_size() const;
 	PacketPeerStream();
 };
+
+#endif // PACKET_PEER_H

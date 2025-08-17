@@ -28,12 +28,15 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef MATH_FIELDWISE_H
+#define MATH_FIELDWISE_H
 
-#ifdef DEBUG_ENABLED
+#ifdef TOOLS_ENABLED
 
 #include "core/variant/variant.h"
 
 Variant fieldwise_assign(const Variant &p_target, const Variant &p_source, const String &p_field);
 
-#endif // DEBUG_ENABLED
+#endif // TOOLS_ENABLED
+
+#endif // MATH_FIELDWISE_H

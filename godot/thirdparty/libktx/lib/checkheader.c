@@ -10,7 +10,7 @@
 
 /**
  * @internal
- * @file
+ * @file checkheader.c
  * @~English
  *
  * @brief Function to verify a KTX file header

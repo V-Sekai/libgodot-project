@@ -19,17 +19,14 @@ msgstr ""
 msgid "All Recognized"
 msgstr "Ĉiaj rekonaj dosiertipoj"
 
-msgid "Save"
-msgstr "Konservi"
-
-msgid "Clear"
-msgstr "Vakigi"
-
 msgid "Open"
 msgstr "Malfermi"
 
 msgid "Select Current Folder"
 msgstr "Elekti kurantan dosierujon"
+
+msgid "Save"
+msgstr "Konservi"
 
 msgid "Select This Folder"
 msgstr "Elekti ĉi tiun dosierujon"
@@ -64,11 +61,11 @@ msgstr "Vojo:"
 msgid "Refresh files."
 msgstr "Aktualigi dosieroj."
 
-msgid "Directories & Files:"
-msgstr "Dosierujoj kaj dosieroj:"
-
 msgid "Toggle the visibility of hidden files."
 msgstr "Baskuli videblo de kaŝitaj dosieroj."
+
+msgid "Directories & Files:"
+msgstr "Dosierujoj kaj dosieroj:"
 
 msgid "File:"
 msgstr "Dosiero:"
@@ -102,6 +99,9 @@ msgstr "Alglui"
 
 msgid "Select All"
 msgstr "Elekti tutan"
+
+msgid "Clear"
+msgstr "Vakigi"
 
 msgid "Undo"
 msgstr "Malfari"

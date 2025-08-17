@@ -34,10 +34,10 @@
 #include "core/templates/pair.h"
 #include "scene/resources/surface_tool.h"
 
-#ifndef PHYSICS_3D_DISABLED
+#ifndef _3D_DISABLED
 #include "scene/resources/3d/concave_polygon_shape_3d.h"
 #include "scene/resources/3d/convex_polygon_shape_3d.h"
-#endif // PHYSICS_3D_DISABLED
+#endif // _3D_DISABLED
 
 void MeshConvexDecompositionSettings::set_max_concavity(real_t p_max_concavity) {
 	max_concavity = CLAMP(p_max_concavity, 0.001, 1.0);
@@ -201,9 +201,7 @@ void MeshConvexDecompositionSettings::_bind_methods() {
 	BIND_ENUM_CONSTANT(CONVEX_DECOMPOSITION_MODE_TETRAHEDRON);
 }
 
-#ifndef PHYSICS_3D_DISABLED
 Mesh::ConvexDecompositionFunc Mesh::convex_decomposition_function = nullptr;
-#endif // PHYSICS_3D_DISABLED
 
 int Mesh::get_surface_count() const {
 	int ret = 0;
@@ -360,15 +358,9 @@ Ref<TriangleMesh> Mesh::generate_triangle_mesh() const {
 				}
 			} else { // PRIMITIVE_TRIANGLE_STRIP
 				for (int j = 2; j < ic; j++) {
-					if (j % 2 == 0) {
-						facesw[widx++] = vr[ir[j - 2]];
-						facesw[widx++] = vr[ir[j - 1]];
-						facesw[widx++] = vr[ir[j]];
-					} else {
-						facesw[widx++] = vr[ir[j - 2]];
-						facesw[widx++] = vr[ir[j]];
-						facesw[widx++] = vr[ir[j - 1]];
-					}
+					facesw[widx++] = vr[ir[j - 2]];
+					facesw[widx++] = vr[ir[j - 1]];
+					facesw[widx++] = vr[ir[j]];
 				}
 			}
 
@@ -379,15 +371,9 @@ Ref<TriangleMesh> Mesh::generate_triangle_mesh() const {
 				}
 			} else { // PRIMITIVE_TRIANGLE_STRIP
 				for (int j = 2; j < vc; j++) {
-					if (j % 2 == 0) {
-						facesw[widx++] = vr[j - 2];
-						facesw[widx++] = vr[j - 1];
-						facesw[widx++] = vr[j];
-					} else {
-						facesw[widx++] = vr[j - 2];
-						facesw[widx++] = vr[j];
-						facesw[widx++] = vr[j - 1];
-					}
+					facesw[widx++] = vr[j - 2];
+					facesw[widx++] = vr[j - 1];
+					facesw[widx++] = vr[j];
 				}
 			}
 		}
@@ -535,7 +521,7 @@ Vector<Face3> Mesh::get_surface_faces(int p_surface) const {
 	return Vector<Face3>();
 }
 
-#ifndef PHYSICS_3D_DISABLED
+#ifndef _3D_DISABLED
 Ref<ConvexPolygonShape3D> Mesh::create_convex_shape(bool p_clean, bool p_simplify) const {
 	if (p_simplify) {
 		Ref<MeshConvexDecompositionSettings> settings = Ref<MeshConvexDecompositionSettings>();
@@ -577,7 +563,7 @@ Ref<ConvexPolygonShape3D> Mesh::create_convex_shape(bool p_clean, bool p_simplif
 
 Ref<ConcavePolygonShape3D> Mesh::create_trimesh_shape() const {
 	Vector<Face3> faces = get_faces();
-	if (faces.is_empty()) {
+	if (faces.size() == 0) {
 		return Ref<ConcavePolygonShape3D>();
 	}
 
@@ -595,7 +581,7 @@ Ref<ConcavePolygonShape3D> Mesh::create_trimesh_shape() const {
 	shape->set_faces(face_points);
 	return shape;
 }
-#endif // PHYSICS_3D_DISABLED
+#endif // _3D_DISABLED
 
 Ref<Mesh> Mesh::create_outline(float p_margin) const {
 	Array arrays;
@@ -629,7 +615,7 @@ Ref<Mesh> Mesh::create_outline(float p_margin) const {
 						if (j == ARRAY_VERTEX) {
 							vcount = src.size();
 						}
-						if (dst.is_empty() || src.is_empty()) {
+						if (dst.size() == 0 || src.size() == 0) {
 							arrays[j] = Variant();
 							continue;
 						}
@@ -641,7 +627,7 @@ Ref<Mesh> Mesh::create_outline(float p_margin) const {
 					case ARRAY_WEIGHTS: {
 						Vector<real_t> dst = arrays[j];
 						Vector<real_t> src = a[j];
-						if (dst.is_empty() || src.is_empty()) {
+						if (dst.size() == 0 || src.size() == 0) {
 							arrays[j] = Variant();
 							continue;
 						}
@@ -652,7 +638,7 @@ Ref<Mesh> Mesh::create_outline(float p_margin) const {
 					case ARRAY_COLOR: {
 						Vector<Color> dst = arrays[j];
 						Vector<Color> src = a[j];
-						if (dst.is_empty() || src.is_empty()) {
+						if (dst.size() == 0 || src.size() == 0) {
 							arrays[j] = Variant();
 							continue;
 						}
@@ -664,7 +650,7 @@ Ref<Mesh> Mesh::create_outline(float p_margin) const {
 					case ARRAY_TEX_UV2: {
 						Vector<Vector2> dst = arrays[j];
 						Vector<Vector2> src = a[j];
-						if (dst.is_empty() || src.is_empty()) {
+						if (dst.size() == 0 || src.size() == 0) {
 							arrays[j] = Variant();
 							continue;
 						}
@@ -675,7 +661,7 @@ Ref<Mesh> Mesh::create_outline(float p_margin) const {
 					case ARRAY_INDEX: {
 						Vector<int> dst = arrays[j];
 						Vector<int> src = a[j];
-						if (dst.is_empty() || src.is_empty()) {
+						if (dst.size() == 0 || src.size() == 0) {
 							arrays[j] = Variant();
 							continue;
 						}
@@ -914,7 +900,7 @@ void Mesh::clear_cache() const {
 	debug_lines.clear();
 }
 
-#ifndef PHYSICS_3D_DISABLED
+#ifndef _3D_DISABLED
 Vector<Ref<Shape3D>> Mesh::convex_decompose(const Ref<MeshConvexDecompositionSettings> &p_settings) const {
 	ERR_FAIL_NULL_V(convex_decomposition_function, Vector<Ref<Shape3D>>());
 
@@ -951,7 +937,7 @@ Vector<Ref<Shape3D>> Mesh::convex_decompose(const Ref<MeshConvexDecompositionSet
 
 	return ret;
 }
-#endif // PHYSICS_3D_DISABLED
+#endif // _3D_DISABLED
 
 int Mesh::get_builtin_bind_pose_count() const {
 	return 0;
@@ -990,15 +976,15 @@ enum OldArrayFormat {
 	OLD_ARRAY_FORMAT_INDEX = 1 << OLD_ARRAY_INDEX,
 
 	OLD_ARRAY_COMPRESS_BASE = (OLD_ARRAY_INDEX + 1),
-	OLD_ARRAY_COMPRESS_VERTEX = 1 << (OLD_ARRAY_VERTEX + (int32_t)OLD_ARRAY_COMPRESS_BASE), // mandatory
-	OLD_ARRAY_COMPRESS_NORMAL = 1 << (OLD_ARRAY_NORMAL + (int32_t)OLD_ARRAY_COMPRESS_BASE),
-	OLD_ARRAY_COMPRESS_TANGENT = 1 << (OLD_ARRAY_TANGENT + (int32_t)OLD_ARRAY_COMPRESS_BASE),
-	OLD_ARRAY_COMPRESS_COLOR = 1 << (OLD_ARRAY_COLOR + (int32_t)OLD_ARRAY_COMPRESS_BASE),
-	OLD_ARRAY_COMPRESS_TEX_UV = 1 << (OLD_ARRAY_TEX_UV + (int32_t)OLD_ARRAY_COMPRESS_BASE),
-	OLD_ARRAY_COMPRESS_TEX_UV2 = 1 << (OLD_ARRAY_TEX_UV2 + (int32_t)OLD_ARRAY_COMPRESS_BASE),
-	OLD_ARRAY_COMPRESS_BONES = 1 << (OLD_ARRAY_BONES + (int32_t)OLD_ARRAY_COMPRESS_BASE),
-	OLD_ARRAY_COMPRESS_WEIGHTS = 1 << (OLD_ARRAY_WEIGHTS + (int32_t)OLD_ARRAY_COMPRESS_BASE),
-	OLD_ARRAY_COMPRESS_INDEX = 1 << (OLD_ARRAY_INDEX + (int32_t)OLD_ARRAY_COMPRESS_BASE),
+	OLD_ARRAY_COMPRESS_VERTEX = 1 << (OLD_ARRAY_VERTEX + OLD_ARRAY_COMPRESS_BASE), // mandatory
+	OLD_ARRAY_COMPRESS_NORMAL = 1 << (OLD_ARRAY_NORMAL + OLD_ARRAY_COMPRESS_BASE),
+	OLD_ARRAY_COMPRESS_TANGENT = 1 << (OLD_ARRAY_TANGENT + OLD_ARRAY_COMPRESS_BASE),
+	OLD_ARRAY_COMPRESS_COLOR = 1 << (OLD_ARRAY_COLOR + OLD_ARRAY_COMPRESS_BASE),
+	OLD_ARRAY_COMPRESS_TEX_UV = 1 << (OLD_ARRAY_TEX_UV + OLD_ARRAY_COMPRESS_BASE),
+	OLD_ARRAY_COMPRESS_TEX_UV2 = 1 << (OLD_ARRAY_TEX_UV2 + OLD_ARRAY_COMPRESS_BASE),
+	OLD_ARRAY_COMPRESS_BONES = 1 << (OLD_ARRAY_BONES + OLD_ARRAY_COMPRESS_BASE),
+	OLD_ARRAY_COMPRESS_WEIGHTS = 1 << (OLD_ARRAY_WEIGHTS + OLD_ARRAY_COMPRESS_BASE),
+	OLD_ARRAY_COMPRESS_INDEX = 1 << (OLD_ARRAY_INDEX + OLD_ARRAY_COMPRESS_BASE),
 
 	OLD_ARRAY_FLAG_USE_2D_VERTICES = OLD_ARRAY_COMPRESS_INDEX << 1,
 	OLD_ARRAY_FLAG_USE_16_BIT_BONES = OLD_ARRAY_COMPRESS_INDEX << 2,
@@ -1691,7 +1677,6 @@ void ArrayMesh::_set_surfaces(const Array &p_surfaces) {
 	}
 
 	surfaces.clear();
-	clear_cache();
 
 	aabb = AABB();
 	for (int i = 0; i < surface_data.size(); i++) {
@@ -2045,7 +2030,7 @@ AABB ArrayMesh::get_custom_aabb() const {
 }
 
 void ArrayMesh::regen_normal_maps() {
-	if (surfaces.is_empty()) {
+	if (surfaces.size() == 0) {
 		return;
 	}
 	Vector<Ref<SurfaceTool>> surfs;
@@ -2312,15 +2297,15 @@ void ArrayMesh::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("surface_find_by_name", "name"), &ArrayMesh::surface_find_by_name);
 	ClassDB::bind_method(D_METHOD("surface_set_name", "surf_idx", "name"), &ArrayMesh::surface_set_name);
 	ClassDB::bind_method(D_METHOD("surface_get_name", "surf_idx"), &ArrayMesh::surface_get_name);
-#ifndef PHYSICS_3D_DISABLED
+#ifndef _3D_DISABLED
 	ClassDB::bind_method(D_METHOD("create_trimesh_shape"), &ArrayMesh::create_trimesh_shape);
 	ClassDB::bind_method(D_METHOD("create_convex_shape", "clean", "simplify"), &ArrayMesh::create_convex_shape, DEFVAL(true), DEFVAL(false));
-#endif // PHYSICS_3D_DISABLED
+#endif // _3D_DISABLED
 	ClassDB::bind_method(D_METHOD("create_outline", "margin"), &ArrayMesh::create_outline);
 	ClassDB::bind_method(D_METHOD("regen_normal_maps"), &ArrayMesh::regen_normal_maps);
-	ClassDB::set_method_flags(get_class_static(), StringName("regen_normal_maps"), METHOD_FLAGS_DEFAULT | METHOD_FLAG_EDITOR);
+	ClassDB::set_method_flags(get_class_static(), _scs_create("regen_normal_maps"), METHOD_FLAGS_DEFAULT | METHOD_FLAG_EDITOR);
 	ClassDB::bind_method(D_METHOD("lightmap_unwrap", "transform", "texel_size"), &ArrayMesh::lightmap_unwrap);
-	ClassDB::set_method_flags(get_class_static(), StringName("lightmap_unwrap"), METHOD_FLAGS_DEFAULT | METHOD_FLAG_EDITOR);
+	ClassDB::set_method_flags(get_class_static(), _scs_create("lightmap_unwrap"), METHOD_FLAGS_DEFAULT | METHOD_FLAG_EDITOR);
 	ClassDB::bind_method(D_METHOD("generate_triangle_mesh"), &ArrayMesh::generate_triangle_mesh);
 
 	ClassDB::bind_method(D_METHOD("set_custom_aabb", "aabb"), &ArrayMesh::set_custom_aabb);

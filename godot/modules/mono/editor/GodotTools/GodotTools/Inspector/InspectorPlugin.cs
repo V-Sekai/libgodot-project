@@ -10,11 +10,6 @@ namespace GodotTools.Inspector
     {
         public override bool _CanHandle(GodotObject godotObject)
         {
-            if (godotObject == null)
-            {
-                return false;
-            }
-
             foreach (var script in EnumerateScripts(godotObject))
             {
                 if (script is CSharpScript)

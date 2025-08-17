@@ -24,7 +24,6 @@
 #define _TVG_TEXT_H
 
 #include <cstring>
-#include "tvgMath.h"
 #include "tvgShape.h"
 #include "tvgFill.h"
 #include "tvgLoader.h"
@@ -34,7 +33,6 @@ struct Text::Impl
     FontLoader* loader = nullptr;
     Text* paint;
     Shape* shape;
-    FontMetrics metrics;
     char* utf8 = nullptr;
     float fontSize;
     bool italic = false;
@@ -42,7 +40,6 @@ struct Text::Impl
 
     Impl(Text* p) : paint(p), shape(Shape::gen().release())
     {
-        shape->fill(FillRule::EvenOdd);
     }
 
     ~Impl()
@@ -97,26 +94,27 @@ struct Text::Impl
         return PP(shape)->render(renderer);
     }
 
-    float load()
+    bool load()
     {
-        if (!loader) return 0.0f;
+        if (!loader) return false;
 
+        loader->request(shape, utf8);
         //reload
         if (changed) {
-            loader->read(shape, utf8, metrics);
+            loader->read();
             changed = false;
         }
-        return loader->transform(shape, metrics, fontSize, italic);
+        return loader->transform(shape, fontSize, italic);
     }
 
     RenderData update(RenderMethod* renderer, const Matrix& transform, Array<RenderData>& clips, uint8_t opacity, RenderUpdateFlag pFlag, TVG_UNUSED bool clipper)
     {
-        auto scale = 1.0f / load();
-        if (tvg::zero(scale)) return nullptr;
+        if (!load()) return nullptr;
 
         //transform the gradient coordinates based on the final scaled font.
         auto fill = P(shape)->rs.fill;
         if (fill && P(shape)->rFlag & RenderUpdateFlag::Gradient) {
+            auto scale = 1.0f / loader->scale;
             if (fill->type() == Type::LinearGradient) {
                 P(static_cast<LinearGradient*>(fill))->x1 *= scale;
                 P(static_cast<LinearGradient*>(fill))->y1 *= scale;
@@ -136,7 +134,7 @@ struct Text::Impl
 
     bool bounds(float* x, float* y, float* w, float* h, TVG_UNUSED bool stroking)
     {
-        if (load() == 0.0f) return false;
+        if (!load()) return false;
         PP(shape)->bounds(x, y, w, h, true, true, false);
         return true;
     }

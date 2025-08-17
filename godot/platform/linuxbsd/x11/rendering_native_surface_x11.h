@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef RENDERING_NATIVE_SURFACE_X11_H
+#define RENDERING_NATIVE_SURFACE_X11_H
 
 #include "core/variant/native_ptr.h"
 #include "servers/rendering/rendering_native_surface.h"
@@ -61,3 +62,5 @@ public:
 	RenderingNativeSurfaceX11();
 	~RenderingNativeSurfaceX11();
 };
+
+#endif // RENDERING_NATIVE_SURFACE_X11_H

@@ -767,24 +767,15 @@ void RBBIRuleScanner::findSetFor(const UnicodeString &s, RBBINode *node, Unicode
             c = s.char32At(0);
             setToAdopt = new UnicodeSet(c, c);
         }
-        if (setToAdopt == nullptr) {
-            error(U_MEMORY_ALLOCATION_ERROR);
-            return;
-        }
     }
 
     //
     // Make a new uset node to refer to this UnicodeSet
     // This new uset node becomes the child of the caller's setReference node.
     //
-    UErrorCode localStatus = U_ZERO_ERROR;
-    RBBINode *usetNode    = new RBBINode(RBBINode::uset, localStatus);
+    RBBINode *usetNode    = new RBBINode(RBBINode::uset);
     if (usetNode == nullptr) {
-        localStatus = U_MEMORY_ALLOCATION_ERROR;
-    }
-    if (U_FAILURE(localStatus)) {
-        delete usetNode;
-        error(localStatus);
+        error(U_MEMORY_ALLOCATION_ERROR);
         delete setToAdopt;
         return;
     }
@@ -1200,7 +1191,7 @@ RBBINode  *RBBIRuleScanner::pushNewNode(RBBINode::NodeType  t) {
         return nullptr;
     }
     fNodeStackPtr++;
-    fNodeStack[fNodeStackPtr] = new RBBINode(t, *fRB->fStatus);
+    fNodeStack[fNodeStackPtr] = new RBBINode(t);
     if (fNodeStack[fNodeStackPtr] == nullptr) {
         *fRB->fStatus = U_MEMORY_ALLOCATION_ERROR;
     }

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef JOLT_QUERY_FILTER_3D_H
+#define JOLT_QUERY_FILTER_3D_H
 
 #include "core/templates/hash_set.h"
 #include "core/templates/rid.h"
@@ -62,3 +63,5 @@ public:
 	virtual bool ShouldCollide(const JPH::BodyID &p_body_id) const override;
 	virtual bool ShouldCollideLocked(const JPH::Body &p_body) const override;
 };
+
+#endif // JOLT_QUERY_FILTER_3D_H

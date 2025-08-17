@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef AUDIO_STREAM_H
+#define AUDIO_STREAM_H
 
 #include "core/io/resource.h"
 #include "scene/property_list_helper.h"
@@ -178,7 +179,6 @@ protected:
 	GDVIRTUAL0RC(bool, _has_loop)
 	GDVIRTUAL0RC(int, _get_bar_beats)
 	GDVIRTUAL0RC(int, _get_beat_count)
-	GDVIRTUAL0RC(Dictionary, _get_tags);
 	GDVIRTUAL0RC(TypedArray<Dictionary>, _get_parameter_list)
 
 public:
@@ -189,7 +189,6 @@ public:
 	virtual bool has_loop() const;
 	virtual int get_bar_beats() const;
 	virtual int get_beat_count() const;
-	virtual Dictionary get_tags() const;
 
 	virtual double get_length() const;
 	virtual bool is_monophonic() const;
@@ -374,3 +373,5 @@ public:
 };
 
 VARIANT_ENUM_CAST(AudioStreamRandomizer::PlaybackMode);
+
+#endif // AUDIO_STREAM_H

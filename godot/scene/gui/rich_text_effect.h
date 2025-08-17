@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef RICH_TEXT_EFFECT_H
+#define RICH_TEXT_EFFECT_H
 
 #include "core/io/resource.h"
 #include "core/object/gdvirtual.gen.inc"
@@ -112,3 +113,5 @@ public:
 
 	RichTextEffect();
 };
+
+#endif // RICH_TEXT_EFFECT_H

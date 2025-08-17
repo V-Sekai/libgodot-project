@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef OPENXR_INTERACTION_PROFILE_EDITOR_H
+#define OPENXR_INTERACTION_PROFILE_EDITOR_H
 
 #include "../action_map/openxr_action_map.h"
 #include "../action_map/openxr_interaction_profile.h"
@@ -105,3 +106,5 @@ public:
 
 	OpenXRInteractionProfileEditor();
 };
+
+#endif // OPENXR_INTERACTION_PROFILE_EDITOR_H

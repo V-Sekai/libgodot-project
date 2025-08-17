@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_UDP_SERVER_H
+#define TEST_UDP_SERVER_H
 
 #include "core/io/packet_peer_udp.h"
 #include "core/io/udp_server.h"
@@ -214,3 +215,5 @@ TEST_CASE("[UDPServer] Should not accept new connections after stop") {
 }
 
 } // namespace TestUDPServer
+
+#endif // TEST_UDP_SERVER_H

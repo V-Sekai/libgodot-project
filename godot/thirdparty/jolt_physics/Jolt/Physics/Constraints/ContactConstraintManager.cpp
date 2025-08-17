@@ -249,14 +249,9 @@ void ContactConstraintManager::CachedBodyPair::RestoreState(StateRecorder &inStr
 
 void ContactConstraintManager::ManifoldCache::Init(uint inMaxBodyPairs, uint inMaxContactConstraints, uint inCachedManifoldsSize)
 {
-	uint max_body_pairs = min(inMaxBodyPairs, cMaxBodyPairsLimit);
-	JPH_ASSERT(max_body_pairs == inMaxBodyPairs, "Cannot support this many body pairs!");
-	JPH_ASSERT(inMaxContactConstraints <= cMaxContactConstraintsLimit); // Should have been enforced by caller
-
-	mAllocator.Init(uint(min(uint64(max_body_pairs) * sizeof(BodyPairMap::KeyValue) + inCachedManifoldsSize, uint64(~uint(0)))));
-
+	mAllocator.Init(inMaxBodyPairs * sizeof(BodyPairMap::KeyValue) + inCachedManifoldsSize);
 	mCachedManifolds.Init(GetNextPowerOf2(inMaxContactConstraints));
-	mCachedBodyPairs.Init(GetNextPowerOf2(max_body_pairs));
+	mCachedBodyPairs.Init(GetNextPowerOf2(inMaxBodyPairs));
 }
 
 void ContactConstraintManager::ManifoldCache::Clear()
@@ -681,18 +676,14 @@ ContactConstraintManager::~ContactConstraintManager()
 
 void ContactConstraintManager::Init(uint inMaxBodyPairs, uint inMaxContactConstraints)
 {
-	// Limit the number of constraints so that the allocation size fits in an unsigned integer
-	mMaxConstraints = min(inMaxContactConstraints, cMaxContactConstraintsLimit);
-	JPH_ASSERT(mMaxConstraints == inMaxContactConstraints, "Cannot support this many contact constraints!");
+	mMaxConstraints = inMaxContactConstraints;
 
 	// Calculate worst case cache usage
-	constexpr uint cMaxManifoldSizePerConstraint = sizeof(CachedManifold) + (MaxContactPoints - 1) * sizeof(CachedContactPoint);
-	static_assert(cMaxManifoldSizePerConstraint < sizeof(ContactConstraint)); // If not true, then the next line can overflow
-	uint cached_manifolds_size = mMaxConstraints * cMaxManifoldSizePerConstraint;
+	uint cached_manifolds_size = inMaxContactConstraints * (sizeof(CachedManifold) + (MaxContactPoints - 1) * sizeof(CachedContactPoint));
 
 	// Init the caches
-	mCache[0].Init(inMaxBodyPairs, mMaxConstraints, cached_manifolds_size);
-	mCache[1].Init(inMaxBodyPairs, mMaxConstraints, cached_manifolds_size);
+	mCache[0].Init(inMaxBodyPairs, inMaxContactConstraints, cached_manifolds_size);
+	mCache[1].Init(inMaxBodyPairs, inMaxContactConstraints, cached_manifolds_size);
 }
 
 void ContactConstraintManager::PrepareConstraintBuffer(PhysicsUpdateContext *inContext)

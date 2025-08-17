@@ -225,8 +225,8 @@ RTC_FORCEINLINE RTCRayN* RTCRayHitN_RayN(RTCRayHitN* rayhit, unsigned int N) { r
 RTC_FORCEINLINE RTCHitN* RTCRayHitN_HitN(RTCRayHitN* rayhit, unsigned int N) { return (RTCHitN*)&((float*)rayhit)[12*N]; }
 
 /* Helper structure for a ray packet of compile-time size N */
-template<unsigned int N>
-struct RTC_ALIGN((N && !(N & (N - 1)) ? (N * 4 > 16 ? N * 4 : 16) : 16)) RTCRayNt
+template<int N>
+struct RTCRayNt
 {
   float org_x[N];
   float org_y[N];
@@ -245,8 +245,8 @@ struct RTC_ALIGN((N && !(N & (N - 1)) ? (N * 4 > 16 ? N * 4 : 16) : 16)) RTCRayN
 };
 
 /* Helper structure for a hit packet of compile-time size N */
-template<unsigned int N>
-struct RTC_ALIGN((N && !(N & (N - 1)) ? (N * 4 > 16 ? N * 4 : 16) : 16)) RTCHitNt
+template<int N>
+struct RTCHitNt
 {
   float Ng_x[N];
   float Ng_y[N];

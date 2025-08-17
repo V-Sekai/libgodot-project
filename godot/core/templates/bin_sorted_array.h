@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef BIN_SORTED_ARRAY_H
+#define BIN_SORTED_ARRAY_H
 
 #include "core/templates/local_vector.h"
 #include "core/templates/paged_array.h"
@@ -176,3 +177,5 @@ public:
 		reset();
 	}
 };
+
+#endif // BIN_SORTED_ARRAY_H

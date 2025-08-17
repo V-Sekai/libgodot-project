@@ -38,10 +38,6 @@
 #include "rendering_server_globals.h"
 #include "storage/texture_storage.h"
 
-#ifndef XR_DISABLED
-#include "servers/xr/xr_interface.h"
-#endif // XR_DISABLED
-
 static Transform2D _canvas_get_transform(RendererViewport::Viewport *p_viewport, RendererCanvasCull::Canvas *p_canvas, RendererViewport::Viewport::CanvasData *p_canvas_data, const Vector2 &p_vp_size) {
 	Transform2D xf = p_viewport->global_transform;
 
@@ -247,7 +243,7 @@ void RendererViewport::_configure_3d_render_buffers(Viewport *p_viewport) {
 			if (scaling_type == RS::VIEWPORT_SCALING_3D_TYPE_TEMPORAL) {
 				// Implementation has been copied from ffxFsr2GetJitterPhaseCount.
 				// Also used for MetalFX Temporal scaling.
-				jitter_phase_count = uint32_t(8.0f * std::pow(float(target_width) / render_width, 2.0f));
+				jitter_phase_count = uint32_t(8.0f * pow(float(target_width) / render_width, 2.0f));
 			} else if (use_taa) {
 				// Default jitter count for TAA.
 				jitter_phase_count = 16;
@@ -258,7 +254,7 @@ void RendererViewport::_configure_3d_render_buffers(Viewport *p_viewport) {
 
 			// At resolution scales lower than 1.0, use negative texture mipmap bias
 			// to compensate for the loss of sharpness.
-			const float texture_mipmap_bias = std::log2(MIN(scaling_3d_scale, 1.0)) + p_viewport->texture_mipmap_bias;
+			const float texture_mipmap_bias = log2f(MIN(scaling_3d_scale, 1.0)) + p_viewport->texture_mipmap_bias;
 
 			RenderSceneBuffersConfiguration rb_config;
 			rb_config.set_render_target(p_viewport->render_target);
@@ -284,11 +280,9 @@ void RendererViewport::_draw_3d(Viewport *p_viewport) {
 	RENDER_TIMESTAMP("> Render 3D Scene");
 
 	Ref<XRInterface> xr_interface;
-#ifndef XR_DISABLED
 	if (p_viewport->use_xr && XRServer::get_singleton() != nullptr) {
 		xr_interface = XRServer::get_singleton()->get_primary_interface();
 	}
-#endif // XR_DISABLED
 
 	if (p_viewport->use_occlusion_culling) {
 		if (p_viewport->occlusion_buffer_dirty) {
@@ -559,8 +553,8 @@ void RendererViewport::_draw_viewport(Viewport *p_viewport) {
 				float cull_distance = light->directional_distance;
 
 				Vector2 light_dir_sign;
-				light_dir_sign.x = (Math::abs(light_dir.x) < CMP_EPSILON) ? 0.0 : ((light_dir.x > 0.0) ? 1.0 : -1.0);
-				light_dir_sign.y = (Math::abs(light_dir.y) < CMP_EPSILON) ? 0.0 : ((light_dir.y > 0.0) ? 1.0 : -1.0);
+				light_dir_sign.x = (ABS(light_dir.x) < CMP_EPSILON) ? 0.0 : ((light_dir.x > 0.0) ? 1.0 : -1.0);
+				light_dir_sign.y = (ABS(light_dir.y) < CMP_EPSILON) ? 0.0 : ((light_dir.y > 0.0) ? 1.0 : -1.0);
 
 				Vector2 points[6];
 				int point_count = 0;
@@ -727,18 +721,21 @@ void RendererViewport::_draw_viewport(Viewport *p_viewport) {
 void RendererViewport::draw_viewports(bool p_swap_buffers) {
 	timestamp_vp_map.clear();
 
-#ifndef XR_DISABLED
+#ifndef _3D_DISABLED
 	// get our xr interface in case we need it
 	Ref<XRInterface> xr_interface;
 	XRServer *xr_server = XRServer::get_singleton();
 	if (xr_server != nullptr) {
+		// let our XR server know we're about to render our frames so we can get our frame timing
+		xr_server->pre_render();
+
 		// retrieve the interface responsible for rendering
 		xr_interface = xr_server->get_primary_interface();
 	}
-#endif // XR_DISABLED
+#endif // _3D_DISABLED
 
 	if (Engine::get_singleton()->is_editor_hint()) {
-		RSG::texture_storage->set_default_clear_color(GLOBAL_GET_CACHED(Color, "rendering/environment/defaults/default_clear_color"));
+		RSG::texture_storage->set_default_clear_color(GLOBAL_GET("rendering/environment/defaults/default_clear_color"));
 	}
 
 	if (sorted_active_viewports_dirty) {
@@ -768,7 +765,7 @@ void RendererViewport::draw_viewports(bool p_swap_buffers) {
 
 		bool visible = vp->viewport_to_screen_rect != Rect2();
 
-#ifndef XR_DISABLED
+#ifndef _3D_DISABLED
 		if (vp->use_xr) {
 			if (xr_interface.is_valid()) {
 				// Ignore update mode we have to commit frames to our XR interface
@@ -783,7 +780,7 @@ void RendererViewport::draw_viewports(bool p_swap_buffers) {
 				vp->size = Size2();
 			}
 		} else
-#endif // XR_DISABLED
+#endif // _3D_DISABLED
 		{
 			if (vp->update_mode == RS::VIEWPORT_UPDATE_ALWAYS || vp->update_mode == RS::VIEWPORT_UPDATE_ONCE) {
 				visible = true;
@@ -822,7 +819,7 @@ void RendererViewport::draw_viewports(bool p_swap_buffers) {
 		RENDER_TIMESTAMP("> Render Viewport " + itos(i));
 
 		RSG::texture_storage->render_target_set_as_unused(vp->render_target);
-#ifndef XR_DISABLED
+#ifndef _3D_DISABLED
 		if (vp->use_xr && xr_interface.is_valid()) {
 			// Inform XR interface we're about to render its viewport,
 			// if this returns false we don't render.
@@ -838,9 +835,9 @@ void RendererViewport::draw_viewports(bool p_swap_buffers) {
 				RSG::texture_storage->render_target_set_velocity_target_size(vp->render_target, xr_interface->get_velocity_target_size());
 
 				if (xr_interface->get_velocity_texture().is_valid()) {
-					_viewport_set_force_motion_vectors(vp, true);
+					viewport_set_force_motion_vectors(vp->self, true);
 				} else {
-					_viewport_set_force_motion_vectors(vp, false);
+					viewport_set_force_motion_vectors(vp->self, false);
 				}
 
 				RSG::texture_storage->render_target_set_render_region(vp->render_target, xr_interface->get_render_region());
@@ -854,7 +851,7 @@ void RendererViewport::draw_viewports(bool p_swap_buffers) {
 				// commit our eyes
 				Vector<BlitToScreen> blits = xr_interface->post_draw_viewport(vp->render_target, vp->viewport_to_screen_rect);
 				if (vp->viewport_to_screen != DisplayServer::INVALID_WINDOW_ID) {
-					if (RSG::rasterizer->is_opengl()) {
+					if (OS::get_singleton()->get_current_rendering_driver_name().begins_with("opengl3")) {
 						if (blits.size() > 0) {
 							RSG::rasterizer->blit_render_targets_to_screen(vp->viewport_to_screen, blits.ptr(), blits.size());
 							RSG::rasterizer->gl_end_frame(p_swap_buffers);
@@ -871,7 +868,7 @@ void RendererViewport::draw_viewports(bool p_swap_buffers) {
 				}
 			}
 		} else
-#endif // XR_DISABLED
+#endif // _3D_DISABLED
 		{
 			RSG::scene->set_debug_draw_mode(vp->debug_draw);
 
@@ -889,8 +886,10 @@ void RendererViewport::draw_viewports(bool p_swap_buffers) {
 					blit.dst_rect.size = vp->size;
 				}
 
-				if (RSG::rasterizer->is_opengl()) {
-					RSG::rasterizer->blit_render_targets_to_screen(vp->viewport_to_screen, &blit, 1);
+				if (OS::get_singleton()->get_current_rendering_driver_name().begins_with("opengl3")) {
+					Vector<BlitToScreen> blit_to_screen_vec;
+					blit_to_screen_vec.push_back(blit);
+					RSG::rasterizer->blit_render_targets_to_screen(vp->viewport_to_screen, blit_to_screen_vec.ptr(), 1);
 					RSG::rasterizer->gl_end_frame(p_swap_buffers);
 				} else {
 					Vector<BlitToScreen> *blits = blit_to_screen_list.getptr(vp->viewport_to_screen);
@@ -968,12 +967,8 @@ void RendererViewport::viewport_set_use_xr(RID p_viewport, bool p_use_xr) {
 void RendererViewport::viewport_set_scaling_3d_mode(RID p_viewport, RS::ViewportScaling3DMode p_mode) {
 	Viewport *viewport = viewport_owner.get_or_null(p_viewport);
 	ERR_FAIL_NULL(viewport);
-	const String rendering_method = OS::get_singleton()->get_current_rendering_method();
-	if (rendering_method != "forward_plus") {
-		ERR_FAIL_COND_EDMSG(p_mode == RS::VIEWPORT_SCALING_3D_MODE_FSR, "FSR1 is only available when using the Forward+ renderer.");
-		ERR_FAIL_COND_EDMSG(p_mode == RS::VIEWPORT_SCALING_3D_MODE_FSR2, "FSR2 is only available when using the Forward+ renderer.");
-		ERR_FAIL_COND_EDMSG(p_mode == RS::VIEWPORT_SCALING_3D_MODE_METALFX_TEMPORAL, "MetalFX Temporal is only available when using the Forward+ renderer.");
-	}
+	ERR_FAIL_COND_EDMSG(p_mode == RS::VIEWPORT_SCALING_3D_MODE_FSR && OS::get_singleton()->get_current_rendering_method() != "forward_plus", "FSR1 is only available when using the Forward+ renderer.");
+	ERR_FAIL_COND_EDMSG(p_mode == RS::VIEWPORT_SCALING_3D_MODE_FSR2 && OS::get_singleton()->get_current_rendering_method() != "forward_plus", "FSR2 is only available when using the Forward+ renderer.");
 
 	if (viewport->scaling_3d_mode == p_mode) {
 		return;
@@ -1352,7 +1347,6 @@ void RendererViewport::viewport_set_use_hdr_2d(RID p_viewport, bool p_use_hdr_2d
 	}
 	viewport->use_hdr_2d = p_use_hdr_2d;
 	RSG::texture_storage->render_target_set_use_hdr(viewport->render_target, p_use_hdr_2d);
-	_configure_3d_render_buffers(viewport);
 }
 
 bool RendererViewport::viewport_is_using_hdr_2d(RID p_viewport) const {
@@ -1365,7 +1359,6 @@ bool RendererViewport::viewport_is_using_hdr_2d(RID p_viewport) const {
 void RendererViewport::viewport_set_screen_space_aa(RID p_viewport, RS::ViewportScreenSpaceAA p_mode) {
 	Viewport *viewport = viewport_owner.get_or_null(p_viewport);
 	ERR_FAIL_NULL(viewport);
-	ERR_FAIL_COND_EDMSG(p_mode != RS::VIEWPORT_SCREEN_SPACE_AA_DISABLED && OS::get_singleton()->get_current_rendering_method() == "gl_compatibility", "Screen space AA is currently unavailable on the Compatibility renderer.");
 
 	if (viewport->screen_space_aa == p_mode) {
 		return;
@@ -1402,7 +1395,6 @@ void RendererViewport::viewport_set_use_debanding(RID p_viewport, bool p_use_deb
 		return;
 	}
 	viewport->use_debanding = p_use_debanding;
-	RSG::texture_storage->render_target_set_use_debanding(viewport->render_target, p_use_debanding);
 	_configure_3d_render_buffers(viewport);
 }
 
@@ -1410,23 +1402,19 @@ void RendererViewport::viewport_set_force_motion_vectors(RID p_viewport, bool p_
 	Viewport *viewport = viewport_owner.get_or_null(p_viewport);
 	ERR_FAIL_NULL(viewport);
 
-	_viewport_set_force_motion_vectors(viewport, p_force_motion_vectors);
-}
-
-void RendererViewport::_viewport_set_force_motion_vectors(RendererViewport::Viewport *p_viewport, bool p_force_motion_vectors) {
-	if (p_viewport->force_motion_vectors == p_force_motion_vectors) {
+	if (viewport->force_motion_vectors == p_force_motion_vectors) {
 		return;
 	}
 
-	bool motion_vectors_before = _viewport_requires_motion_vectors(p_viewport);
-	p_viewport->force_motion_vectors = p_force_motion_vectors;
+	bool motion_vectors_before = _viewport_requires_motion_vectors(viewport);
+	viewport->force_motion_vectors = p_force_motion_vectors;
 
-	bool motion_vectors_after = _viewport_requires_motion_vectors(p_viewport);
+	bool motion_vectors_after = _viewport_requires_motion_vectors(viewport);
 	if (motion_vectors_before != motion_vectors_after) {
 		num_viewports_with_motion_vectors += motion_vectors_after ? 1 : -1;
 	}
 
-	_configure_3d_render_buffers(p_viewport);
+	_configure_3d_render_buffers(viewport);
 }
 
 void RendererViewport::viewport_set_use_occlusion_culling(RID p_viewport, bool p_use_occlusion_culling) {

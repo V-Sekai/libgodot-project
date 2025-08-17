@@ -28,7 +28,10 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef EDITOR_SCENE_EXPORTER_GLTF_SETTINGS_H
+#define EDITOR_SCENE_EXPORTER_GLTF_SETTINGS_H
+
+#ifdef TOOLS_ENABLED
 
 #include "../gltf_document.h"
 
@@ -60,3 +63,7 @@ public:
 	double get_bake_fps() const;
 	void set_bake_fps(const double p_bake_fps);
 };
+
+#endif // TOOLS_ENABLED
+
+#endif // EDITOR_SCENE_EXPORTER_GLTF_SETTINGS_H

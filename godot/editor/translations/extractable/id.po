@@ -21,11 +21,12 @@ msgstr ""
 msgid "All Recognized"
 msgstr "Semua diakui"
 
-msgid "Save"
-msgstr "Simpan"
-
-msgid "Clear"
-msgstr "Bersihkan"
+msgid ""
+"Color: #%s\n"
+"LMB: Apply color"
+msgstr ""
+"Warna: #%s\n"
+"LMB: Terapkan warna"
 
 msgid "Add current color as a preset."
 msgstr "Tambahkan warna yang sekarang sebagai preset."
@@ -45,6 +46,9 @@ msgstr "Buka"
 
 msgid "Select Current Folder"
 msgstr "Pilih Folder Saat Ini"
+
+msgid "Save"
+msgstr "Simpan"
 
 msgid "Select This Folder"
 msgstr "Pilih Folder Ini"
@@ -79,11 +83,11 @@ msgstr "Jalur:"
 msgid "Refresh files."
 msgstr "Segarkan berkas."
 
-msgid "Directories & Files:"
-msgstr "Direktori-direktori & File-file:"
-
 msgid "Toggle the visibility of hidden files."
 msgstr "Beralih visibilitas berkas yang tersembunyi."
+
+msgid "Directories & Files:"
+msgstr "Direktori-direktori & File-file:"
 
 msgid "File:"
 msgstr "File:"
@@ -117,6 +121,9 @@ msgstr "Tempel"
 
 msgid "Select All"
 msgstr "Pilih Semua"
+
+msgid "Clear"
+msgstr "Bersihkan"
 
 msgid "Undo"
 msgstr "Batal"

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef VARIANT_CONSTRUCT_H
+#define VARIANT_CONSTRUCT_H
 
 #include "variant.h"
 
@@ -37,8 +38,8 @@
 #include "core/io/compression.h"
 #include "core/object/class_db.h"
 #include "core/os/os.h"
-#include "core/templates/a_hash_map.h"
 #include "core/templates/local_vector.h"
+#include "core/templates/oa_hash_map.h"
 
 template <typename T>
 struct PtrConstruct {};
@@ -104,11 +105,11 @@ class VariantConstructor {
 	static _FORCE_INLINE_ void construct_helper(T &base, const Variant **p_args, Callable::CallError &r_error, IndexSequence<Is...>) {
 		r_error.error = Callable::CallError::CALL_OK;
 
-#ifdef DEBUG_ENABLED
+#ifdef DEBUG_METHODS_ENABLED
 		base = T(VariantCasterAndValidate<P>::cast(p_args, Is, r_error)...);
 #else
 		base = T(VariantCaster<P>::cast(*p_args[Is])...);
-#endif // DEBUG_ENABLED
+#endif
 	}
 
 	template <size_t... Is>
@@ -812,3 +813,5 @@ public:
 		return Variant::OBJECT;
 	}
 };
+
+#endif // VARIANT_CONSTRUCT_H

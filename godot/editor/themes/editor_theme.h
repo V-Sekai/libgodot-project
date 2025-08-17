@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef EDITOR_THEME_H
+#define EDITOR_THEME_H
 
 #include "scene/resources/theme.h"
 
@@ -61,3 +62,5 @@ public:
 	static void initialize();
 	static void finalize();
 };
+
+#endif // EDITOR_THEME_H

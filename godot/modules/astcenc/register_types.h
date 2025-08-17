@@ -28,9 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef ASTCENC_REGISTER_TYPES_H
+#define ASTCENC_REGISTER_TYPES_H
 
 #include "modules/register_module_types.h"
 
 void initialize_astcenc_module(ModuleInitializationLevel p_level);
 void uninitialize_astcenc_module(ModuleInitializationLevel p_level);
+
+#endif // ASTCENC_REGISTER_TYPES_H

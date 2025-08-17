@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GODOT_STEP_3D_H
+#define GODOT_STEP_3D_H
 
 #include "godot_space_3d.h"
 
@@ -56,3 +57,5 @@ public:
 	GodotStep3D();
 	~GodotStep3D();
 };
+
+#endif // GODOT_STEP_3D_H

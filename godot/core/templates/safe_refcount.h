@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SAFE_REFCOUNT_H
+#define SAFE_REFCOUNT_H
 
 #include "core/typedefs.h"
 
@@ -37,7 +38,7 @@
 #endif
 
 #include <atomic>
-#include <type_traits> // IWYU pragma: keep // Used in macro.
+#include <type_traits>
 
 // Design goals for these classes:
 // - No automatic conversions or arithmetic operators,
@@ -221,3 +222,5 @@ public:
 		count.set(p_value);
 	}
 };
+
+#endif // SAFE_REFCOUNT_H

@@ -56,21 +56,15 @@ import java.util.Set;
  * </ul>
  */
 @Keep
-public class GodotTTS extends UtteranceProgressListener implements TextToSpeech.OnInitListener {
+public class GodotTTS extends UtteranceProgressListener {
 	// Note: These constants must be in sync with DisplayServer::TTSUtteranceEvent enum from "servers/display_server.h".
 	final private static int EVENT_START = 0;
 	final private static int EVENT_END = 1;
 	final private static int EVENT_CANCEL = 2;
 	final private static int EVENT_BOUNDARY = 3;
 
-	// Note: These constants must be in sync with TTS_Android constants from "platform/android/tts_android.h".
-	final private static int INIT_STATE_UNKNOWN = 0;
-	final private static int INIT_STATE_SUCCESS = 1;
-	final private static int INIT_STATE_FAIL = -1;
-
 	private final Context context;
 	private TextToSpeech synth;
-	private int state;
 	private LinkedList<GodotUtterance> queue;
 	final private Object lock = new Object();
 	private GodotUtterance lastUtterance;
@@ -88,9 +82,6 @@ public class GodotTTS extends UtteranceProgressListener implements TextToSpeech.
 			GodotUtterance message = queue.pollFirst();
 
 			Set<Voice> voices = synth.getVoices();
-			if (voices == null) {
-				return;
-			}
 			for (Voice v : voices) {
 				if (v.getName().equals(message.voice)) {
 					synth.setVoice(v);
@@ -198,25 +189,10 @@ public class GodotTTS extends UtteranceProgressListener implements TextToSpeech.
 	 * Initialize synth and query.
 	 */
 	public void init() {
-		state = INIT_STATE_UNKNOWN;
-		synth = new TextToSpeech(context, this);
+		synth = new TextToSpeech(context, null);
 		queue = new LinkedList<GodotUtterance>();
 
 		synth.setOnUtteranceProgressListener(this);
-	}
-
-	/**
-	 * Called by TTS engine when initialization is finished.
-	 */
-	@Override
-	public void onInit(int status) {
-		synchronized (lock) {
-			if (status == TextToSpeech.SUCCESS) {
-				state = INIT_STATE_SUCCESS;
-			} else {
-				state = INIT_STATE_FAIL;
-			}
-		}
 	}
 
 	/**
@@ -224,9 +200,6 @@ public class GodotTTS extends UtteranceProgressListener implements TextToSpeech.
 	 */
 	public void speak(String text, String voice, int volume, float pitch, float rate, int utterance_id, boolean interrupt) {
 		synchronized (lock) {
-			if (state != INIT_STATE_SUCCESS) {
-				return;
-			}
 			GodotUtterance message = new GodotUtterance(text, voice, volume, pitch, rate, utterance_id);
 			queue.addLast(message);
 
@@ -243,9 +216,6 @@ public class GodotTTS extends UtteranceProgressListener implements TextToSpeech.
 	 */
 	public void pauseSpeaking() {
 		synchronized (lock) {
-			if (state != INIT_STATE_SUCCESS) {
-				return;
-			}
 			if (!paused) {
 				paused = true;
 				synth.stop();
@@ -258,16 +228,10 @@ public class GodotTTS extends UtteranceProgressListener implements TextToSpeech.
 	 */
 	public void resumeSpeaking() {
 		synchronized (lock) {
-			if (state != INIT_STATE_SUCCESS) {
-				return;
-			}
 			if (lastUtterance != null && paused) {
 				int mode = TextToSpeech.QUEUE_FLUSH;
 
 				Set<Voice> voices = synth.getVoices();
-				if (voices == null) {
-					return;
-				}
 				for (Voice v : voices) {
 					if (v.getName().equals(lastUtterance.voice)) {
 						synth.setVoice(v);
@@ -297,9 +261,6 @@ public class GodotTTS extends UtteranceProgressListener implements TextToSpeech.
 	 */
 	public void stopSpeaking() {
 		synchronized (lock) {
-			if (state != INIT_STATE_SUCCESS) {
-				return;
-			}
 			for (GodotUtterance u : queue) {
 				GodotLib.ttsCallback(EVENT_CANCEL, u.id, 0);
 			}
@@ -321,21 +282,13 @@ public class GodotTTS extends UtteranceProgressListener implements TextToSpeech.
 	 * Returns voice information.
 	 */
 	public String[] getVoices() {
-		synchronized (lock) {
-			if (state != INIT_STATE_SUCCESS) {
-				return new String[0];
-			}
-			Set<Voice> voices = synth.getVoices();
-			if (voices == null) {
-				return new String[0];
-			}
-			String[] list = new String[voices.size()];
-			int i = 0;
-			for (Voice v : voices) {
-				list[i++] = v.getLocale().toString() + ";" + v.getName();
-			}
-			return list;
+		Set<Voice> voices = synth.getVoices();
+		String[] list = new String[voices.size()];
+		int i = 0;
+		for (Voice v : voices) {
+			list[i++] = v.getLocale().toString() + ";" + v.getName();
 		}
+		return list;
 	}
 
 	/**
@@ -350,14 +303,5 @@ public class GodotTTS extends UtteranceProgressListener implements TextToSpeech.
 	 */
 	public boolean isPaused() {
 		return paused;
-	}
-
-	/**
-	 * Returns INIT_STATE_SUCCESS if the synthesizer initialization finished successfully, INIT_STATE_FAIL if initialization failed, and INIT_STATE_UNKNOWN otherwise.
-	 */
-	public int getState() {
-		synchronized (lock) {
-			return state;
-		}
 	}
 }

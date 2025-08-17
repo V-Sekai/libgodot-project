@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef OPENXR_VISIBILITY_MASK_H
+#define OPENXR_VISIBILITY_MASK_H
 
 #include "scene/3d/visual_instance_3d.h"
 
@@ -51,3 +52,5 @@ public:
 	OpenXRVisibilityMask();
 	~OpenXRVisibilityMask();
 };
+
+#endif // OPENXR_VISIBILITY_MASK_H

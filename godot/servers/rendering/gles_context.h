@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GLES_CONTEXT_H
+#define GLES_CONTEXT_H
 
 #include "core/object/class_db.h"
 #include "core/object/ref_counted.h"
@@ -48,3 +49,5 @@ public:
 
 	virtual ~GLESContext() {}
 };
+
+#endif // GLES_CONTEXT_H

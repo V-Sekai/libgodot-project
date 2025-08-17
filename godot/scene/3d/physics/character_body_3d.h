@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef CHARACTER_BODY_3D_H
+#define CHARACTER_BODY_3D_H
 
 #include "scene/3d/physics/kinematic_collision_3d.h"
 #include "scene/3d/physics/physics_body_3d.h"
@@ -184,3 +185,5 @@ protected:
 
 VARIANT_ENUM_CAST(CharacterBody3D::MotionMode);
 VARIANT_ENUM_CAST(CharacterBody3D::PlatformOnLeave);
+
+#endif // CHARACTER_BODY_3D_H

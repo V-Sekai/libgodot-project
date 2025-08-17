@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef AUDIO_DRIVER_COREAUDIO_H
+#define AUDIO_DRIVER_COREAUDIO_H
 
 #ifdef COREAUDIO_ENABLED
 
@@ -59,7 +60,7 @@ class AudioDriverCoreAudio : public AudioDriver {
 	unsigned int capture_buffer_frames = 0;
 
 	Vector<int32_t> samples_in;
-	unsigned int buffer_size = 0;
+	Vector<int16_t> input_buf;
 
 #ifdef MACOS_ENABLED
 	PackedStringArray _get_device_list(bool capture = false);
@@ -125,3 +126,5 @@ public:
 };
 
 #endif // COREAUDIO_ENABLED
+
+#endif // AUDIO_DRIVER_COREAUDIO_H

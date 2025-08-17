@@ -28,9 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef BETSY_REGISTER_TYPES_H
+#define BETSY_REGISTER_TYPES_H
 
 #include "modules/register_module_types.h"
 
 void initialize_betsy_module(ModuleInitializationLevel p_level);
 void uninitialize_betsy_module(ModuleInitializationLevel p_level);
+
+#endif // BETSY_REGISTER_TYPES_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_A_HASH_MAP_H
+#define TEST_A_HASH_MAP_H
 
 #include "core/templates/a_hash_map.h"
 
@@ -207,7 +208,7 @@ TEST_CASE("[AHashMap] Insert, iterate and remove many elements") {
 
 	//insert order should have been kept
 	int idx = 0;
-	for (const KeyValue<int, int> &K : map) {
+	for (auto &K : map) {
 		CHECK(idx == K.key);
 		CHECK(idx == K.value);
 		CHECK(map.has(idx));
@@ -312,3 +313,5 @@ TEST_CASE("[AHashMap] Array methods") {
 }
 
 } // namespace TestAHashMap
+
+#endif // TEST_A_HASH_MAP_H

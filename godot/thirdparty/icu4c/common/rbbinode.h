@@ -91,14 +91,14 @@ class RBBINode : public UMemory {
         UVector       *fFollowPos;
 
 
-        RBBINode(NodeType t, UErrorCode& status);
-        RBBINode(const RBBINode &other, UErrorCode& status);
+        RBBINode(NodeType t);
+        RBBINode(const RBBINode &other);
         ~RBBINode();
         static void  NRDeleteNode(RBBINode *node);
         
-        RBBINode    *cloneTree(UErrorCode &status, int depth=0);
+        RBBINode    *cloneTree();
         RBBINode    *flattenVariables(UErrorCode &status, int depth=0);
-        void         flattenSets(UErrorCode &status, int depth=0);
+        void         flattenSets();
         void         findNodes(UVector *dest, RBBINode::NodeType kind, UErrorCode &status);
 
 #ifdef RBBI_DEBUG

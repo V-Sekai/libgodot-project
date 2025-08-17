@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_RECT2I_H
+#define TEST_RECT2I_H
 
 #include "core/math/rect2.h"
 #include "core/math/rect2i.h"
@@ -37,15 +38,15 @@
 
 namespace TestRect2i {
 TEST_CASE("[Rect2i] Constructor methods") {
-	constexpr Rect2i recti = Rect2i(0, 100, 1280, 720);
-	constexpr Rect2i recti_vector = Rect2i(Vector2i(0, 100), Vector2i(1280, 720));
-	constexpr Rect2i recti_copy_recti = Rect2i(recti);
-	const Rect2i recti_copy_rect = Rect2i(Rect2(0, 100, 1280, 720));
+	Rect2i recti = Rect2i(0, 100, 1280, 720);
+	Rect2i recti_vector = Rect2i(Vector2i(0, 100), Vector2i(1280, 720));
+	Rect2i recti_copy_recti = Rect2i(recti);
+	Rect2i recti_copy_rect = Rect2i(Rect2(0, 100, 1280, 720));
 
-	static_assert(
+	CHECK_MESSAGE(
 			recti == recti_vector,
 			"Rect2is created with the same dimensions but by different methods should be equal.");
-	static_assert(
+	CHECK_MESSAGE(
 			recti == recti_copy_recti,
 			"Rect2is created with the same dimensions but by different methods should be equal.");
 	CHECK_MESSAGE(
@@ -61,7 +62,7 @@ TEST_CASE("[Rect2i] String conversion") {
 }
 
 TEST_CASE("[Rect2i] Basic getters") {
-	constexpr Rect2i rect = Rect2i(0, 100, 1280, 720);
+	const Rect2i rect = Rect2i(0, 100, 1280, 720);
 	CHECK_MESSAGE(
 			rect.get_position() == Vector2i(0, 100),
 			"get_position() should return the expected value.");
@@ -306,3 +307,5 @@ TEST_CASE("[Rect2i] Merging") {
 			"merge() with non-enclosed Rect2i should return the expected result.");
 }
 } // namespace TestRect2i
+
+#endif // TEST_RECT2I_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SKELETON_MODIFICATION_2D_CCDIK_H
+#define SKELETON_MODIFICATION_2D_CCDIK_H
 
 #include "scene/2d/skeleton_2d.h"
 #include "scene/resources/2d/skeleton/skeleton_modification_2d.h"
@@ -49,7 +50,7 @@ private:
 
 		bool enable_constraint = false;
 		float constraint_angle_min = 0;
-		float constraint_angle_max = (2.0 * Math::PI);
+		float constraint_angle_max = (2.0 * Math_PI);
 		bool constraint_angle_invert = false;
 		bool constraint_in_localspace = true;
 
@@ -111,3 +112,5 @@ public:
 	SkeletonModification2DCCDIK();
 	~SkeletonModification2DCCDIK();
 };
+
+#endif // SKELETON_MODIFICATION_2D_CCDIK_H

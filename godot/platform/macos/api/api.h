@@ -28,9 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef MACOS_API_H
+#define MACOS_API_H
 
 void register_core_macos_api();
 void unregister_core_macos_api();
 void register_macos_api();
 void unregister_macos_api();
+
+#endif // MACOS_API_H

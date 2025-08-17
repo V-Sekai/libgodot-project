@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef EXTERNAL_TEXTURE_H
+#define EXTERNAL_TEXTURE_H
 
 #include "scene/resources/texture.h"
 
@@ -64,3 +65,5 @@ public:
 	ExternalTexture();
 	~ExternalTexture();
 };
+
+#endif // EXTERNAL_TEXTURE_H

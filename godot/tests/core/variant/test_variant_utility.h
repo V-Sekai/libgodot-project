@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_VARIANT_UTILITY_H
+#define TEST_VARIANT_UTILITY_H
 
 #include "core/variant/variant_utility.h"
 
@@ -92,8 +93,15 @@ TEST_CASE("[VariantUtility] Type conversion") {
 	}
 
 	{
-		Array arr = { 1.2, 3.4, 5.6 };
-		PackedFloat64Array packed = { 1.2, 3.4, 5.6 };
+		Array arr;
+		arr.push_back(1.2);
+		arr.push_back(3.4);
+		arr.push_back(5.6);
+
+		PackedFloat64Array packed;
+		packed.push_back(1.2);
+		packed.push_back(3.4);
+		packed.push_back(5.6);
 
 		converted = VariantUtilityFunctions::type_convert(arr, Variant::Type::PACKED_FLOAT64_ARRAY);
 		CHECK(converted.get_type() == Variant::Type::PACKED_FLOAT64_ARRAY);
@@ -129,3 +137,5 @@ TEST_CASE("[VariantUtility] Type conversion") {
 }
 
 } // namespace TestVariantUtility
+
+#endif // TEST_VARIANT_UTILITY_H

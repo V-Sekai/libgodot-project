@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SPRITE_FRAMES_H
+#define SPRITE_FRAMES_H
 
 #include "scene/resources/texture.h"
 
@@ -109,3 +110,5 @@ public:
 
 	SpriteFrames();
 };
+
+#endif // SPRITE_FRAMES_H

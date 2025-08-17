@@ -28,8 +28,6 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
-
 /**************************************************************************/
 /*                                                                        */
 /* Portions of this code were derived from MoltenVK.                      */
@@ -50,14 +48,16 @@
 /* permissions and limitations under the License.                         */
 /**************************************************************************/
 
-#include "core/typedefs.h"
+#ifndef PIXEL_FORMATS_H
+#define PIXEL_FORMATS_H
 
-GODOT_CLANG_WARNING_PUSH_AND_IGNORE("-Wdeprecated-declarations")
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 
 #import "inflection_map.h"
 #import "metal_device_properties.h"
 
-#include "servers/rendering/rendering_device.h"
+#import "servers/rendering/rendering_device.h"
 
 #import <Metal/Metal.h>
 
@@ -408,4 +408,6 @@ protected:
 	TightLocalVector<MTLFormatDesc> _mtl_vertex_format_descs;
 };
 
-GODOT_CLANG_WARNING_POP
+#pragma clang diagnostic pop
+
+#endif // PIXEL_FORMATS_H

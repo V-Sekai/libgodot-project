@@ -6,11 +6,12 @@
  * IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.       *
  *                                                                  *
  * THE Theora SOURCE CODE IS COPYRIGHT (C) 2002-2009                *
- * by the Xiph.Org Foundation https://www.xiph.org/                 *
+ * by the Xiph.Org Foundation http://www.xiph.org/                  *
  *                                                                  *
  ********************************************************************
 
   function:
+  last mod: $Id$
 
  ********************************************************************/
 #include <stdlib.h>
@@ -511,7 +512,7 @@ static unsigned oc_enc_partial_sb_flags_pack(oc_enc_ctx *_enc){
 
 /*Writes the coded/not coded flags for each super block that is not partially
    coded.
-  These flags are run-length encoded, with the flag value alternating between
+  These flags are run-length encoded, with the flag value altenating between
    each run.*/
 static void oc_enc_coded_sb_flags_pack(oc_enc_ctx *_enc){
   const oc_sb_flags *sb_flags;
@@ -937,7 +938,7 @@ static void oc_enc_frame_pack(oc_enc_ctx *_enc){
 
 void oc_enc_accel_init_c(oc_enc_ctx *_enc){
   /*The implementations prefixed with oc_enc_ are encoder-specific.
-    The rest we reuse from the decoder.*/
+    The rest we re-use from the decoder.*/
 # if defined(OC_ENC_USE_VTABLE)
   _enc->opt_vtable.frag_sub=oc_enc_frag_sub_c;
   _enc->opt_vtable.frag_sub_128=oc_enc_frag_sub_128_c;

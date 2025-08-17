@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GODOT_STATUS_ITEM_H
+#define GODOT_STATUS_ITEM_H
 
 #include "core/input/input_enums.h"
 #include "core/variant/callable.h"
@@ -45,3 +46,5 @@
 - (void)setCallback:(const Callable &)callback;
 
 @end
+
+#endif // GODOT_STATUS_ITEM_H

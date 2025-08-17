@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef PLANE_H
+#define PLANE_H
 
 #include "core/math/vector3.h"
 
@@ -70,22 +71,21 @@ struct [[nodiscard]] Plane {
 
 	/* misc */
 
-	constexpr Plane operator-() const { return Plane(-normal, -d); }
+	Plane operator-() const { return Plane(-normal, -d); }
 	bool is_equal_approx(const Plane &p_plane) const;
-	bool is_same(const Plane &p_plane) const;
 	bool is_equal_approx_any_side(const Plane &p_plane) const;
 	bool is_finite() const;
 
-	constexpr bool operator==(const Plane &p_plane) const;
-	constexpr bool operator!=(const Plane &p_plane) const;
-	explicit operator String() const;
+	_FORCE_INLINE_ bool operator==(const Plane &p_plane) const;
+	_FORCE_INLINE_ bool operator!=(const Plane &p_plane) const;
+	operator String() const;
 
-	Plane() = default;
-	constexpr Plane(real_t p_a, real_t p_b, real_t p_c, real_t p_d) :
+	_FORCE_INLINE_ Plane() {}
+	_FORCE_INLINE_ Plane(real_t p_a, real_t p_b, real_t p_c, real_t p_d) :
 			normal(p_a, p_b, p_c),
 			d(p_d) {}
 
-	constexpr Plane(const Vector3 &p_normal, real_t p_d = 0.0);
+	_FORCE_INLINE_ Plane(const Vector3 &p_normal, real_t p_d = 0.0);
 	_FORCE_INLINE_ Plane(const Vector3 &p_normal, const Vector3 &p_point);
 	_FORCE_INLINE_ Plane(const Vector3 &p_point1, const Vector3 &p_point2, const Vector3 &p_point3, ClockDirection p_dir = CLOCKWISE);
 };
@@ -100,11 +100,11 @@ real_t Plane::distance_to(const Vector3 &p_point) const {
 
 bool Plane::has_point(const Vector3 &p_point, real_t p_tolerance) const {
 	real_t dist = normal.dot(p_point) - d;
-	dist = Math::abs(dist);
+	dist = ABS(dist);
 	return (dist <= p_tolerance);
 }
 
-constexpr Plane::Plane(const Vector3 &p_normal, real_t p_d) :
+Plane::Plane(const Vector3 &p_normal, real_t p_d) :
 		normal(p_normal),
 		d(p_d) {
 }
@@ -125,13 +125,12 @@ Plane::Plane(const Vector3 &p_point1, const Vector3 &p_point2, const Vector3 &p_
 	d = normal.dot(p_point1);
 }
 
-constexpr bool Plane::operator==(const Plane &p_plane) const {
+bool Plane::operator==(const Plane &p_plane) const {
 	return normal == p_plane.normal && d == p_plane.d;
 }
 
-constexpr bool Plane::operator!=(const Plane &p_plane) const {
+bool Plane::operator!=(const Plane &p_plane) const {
 	return normal != p_plane.normal || d != p_plane.d;
 }
 
-template <>
-struct is_zero_constructible<Plane> : std::true_type {};
+#endif // PLANE_H

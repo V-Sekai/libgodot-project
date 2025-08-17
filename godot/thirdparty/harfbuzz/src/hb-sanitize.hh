@@ -72,8 +72,8 @@
  *
  * === The sanitize() contract ===
  *
- * The sanitize() method of each object type shall return `true` if it's safe to
- * call other methods of the object, and `false` otherwise.
+ * The sanitize() method of each object type shall return true if it's safe to
+ * call other methods of the object, and %false otherwise.
  *
  * Note that what sanitize() checks for might align with what the specification
  * describes as valid table data, but does not have to be.  In particular, we
@@ -120,8 +120,8 @@
 struct hb_sanitize_context_t :
        hb_dispatch_context_t<hb_sanitize_context_t, bool, HB_DEBUG_SANITIZE>
 {
-  hb_sanitize_context_t (const char *start_ = nullptr, const char *end_ = nullptr) :
-	start (start_), end (end_),
+  hb_sanitize_context_t () :
+	start (nullptr), end (nullptr),
 	length (0),
 	max_ops (0), max_subtables (0),
         recursion_depth (0),
@@ -212,22 +212,14 @@ struct hb_sanitize_context_t :
 
   void reset_object ()
   {
-    if (this->blob)
-    {
-      this->start = this->blob->data;
-      this->end = this->start + this->blob->length;
-    }
+    this->start = this->blob->data;
+    this->end = this->start + this->blob->length;
     this->length = this->end - this->start;
     assert (this->start <= this->end); /* Must not overflow. */
   }
 
-  void start_processing (const char *start_ = nullptr, const char *end_ = nullptr)
+  void start_processing ()
   {
-    if (start_)
-    {
-      this->start = start_;
-      this->end = end_;
-    }
     reset_object ();
     unsigned m;
     if (unlikely (hb_unsigned_mul_overflows (this->end - this->start, HB_SANITIZE_MAX_OPS_FACTOR, &m)))
@@ -471,11 +463,9 @@ struct hb_sanitize_context_t :
     }
     else
     {
-      if (edit_count && !writable)
-      {
-        unsigned length;
-	start = hb_blob_get_data_writable (blob, &length);
-	end = start + length;
+      if (edit_count && !writable) {
+	start = hb_blob_get_data_writable (blob, nullptr);
+	end = start + blob->length;
 
 	if (start)
 	{

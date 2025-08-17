@@ -28,9 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef MONO_REGISTER_TYPES_H
+#define MONO_REGISTER_TYPES_H
 
 #include "modules/register_module_types.h"
 
 void initialize_mono_module(ModuleInitializationLevel p_level);
 void uninitialize_mono_module(ModuleInitializationLevel p_level);
+
+#endif // MONO_REGISTER_TYPES_H

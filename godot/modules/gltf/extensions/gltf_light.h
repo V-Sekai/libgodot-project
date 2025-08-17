@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GLTF_LIGHT_H
+#define GLTF_LIGHT_H
 
 #include "core/io/resource.h"
 
@@ -48,9 +49,9 @@ private:
 	Color color = Color(1.0f, 1.0f, 1.0f);
 	float intensity = 1.0f;
 	String light_type;
-	float range = Math::INF;
+	float range = INFINITY;
 	float inner_cone_angle = 0.0f;
-	float outer_cone_angle = Math::TAU / 8.0f;
+	float outer_cone_angle = Math_TAU / 8.0f;
 	Dictionary additional_data;
 
 public:
@@ -83,3 +84,5 @@ public:
 	Variant get_additional_data(const StringName &p_extension_name);
 	void set_additional_data(const StringName &p_extension_name, Variant p_additional_data);
 };
+
+#endif // GLTF_LIGHT_H

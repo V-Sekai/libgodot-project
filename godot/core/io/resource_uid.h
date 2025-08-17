@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef RESOURCE_UID_H
+#define RESOURCE_UID_H
 
 #include "core/object/ref_counted.h"
 #include "core/string/string_name.h"
@@ -70,7 +71,6 @@ public:
 	ID text_to_id(const String &p_text) const;
 
 	ID create_id();
-	ID create_id_for_path(const String &p_path);
 	bool has_id(ID p_id) const;
 	void add_id(ID p_id, const String &p_path);
 	void set_id(ID p_id, const String &p_path);
@@ -93,3 +93,5 @@ public:
 	ResourceUID();
 	~ResourceUID();
 };
+
+#endif // RESOURCE_UID_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef JOLT_JOB_SYSTEM_H
+#define JOLT_JOB_SYSTEM_H
 
 #include "core/os/spin_lock.h"
 #include "core/templates/hash_map.h"
@@ -38,6 +39,7 @@
 #include "Jolt/Core/FixedSizeFreeList.h"
 #include "Jolt/Core/JobSystemWithBarrier.h"
 
+#include <stdint.h>
 #include <atomic>
 
 class JoltJobSystem final : public JPH::JobSystemWithBarrier {
@@ -101,3 +103,5 @@ public:
 	void flush_timings();
 #endif
 };
+
+#endif // JOLT_JOB_SYSTEM_H

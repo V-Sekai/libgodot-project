@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_ASTAR_H
+#define TEST_ASTAR_H
 
 #include "core/math/a_star.h"
 
@@ -214,7 +215,7 @@ TEST_CASE("[AStar3D] Add/Remove") {
 
 TEST_CASE("[Stress][AStar3D] Find paths") {
 	// Random stress tests with Floyd-Warshall.
-	constexpr int N = 30;
+	const int N = 30;
 	Math::seed(0);
 
 	for (int test = 0; test < 1000; test++) {
@@ -280,7 +281,7 @@ TEST_CASE("[Stress][AStar3D] Find paths") {
 		float d[N][N];
 		for (int u = 0; u < N; u++) {
 			for (int v = 0; v < N; v++) {
-				d[u][v] = (u == v || adj[u][v]) ? p[u].distance_to(p[v]) : Math::INF;
+				d[u][v] = (u == v || adj[u][v]) ? p[u].distance_to(p[v]) : INFINITY;
 			}
 		}
 		for (int w = 0; w < N; w++) {
@@ -357,3 +358,5 @@ TEST_CASE("[Stress][AStar3D] Find paths") {
 	}
 }
 } // namespace TestAStar
+
+#endif // TEST_ASTAR_H

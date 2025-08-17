@@ -32,8 +32,8 @@
 
 #include "main/main.h"
 
-#include <clocale>
-#include <cstdio>
+#include <locale.h>
+#include <stdio.h>
 
 // For export templates, add a section; the exporter will patch it to enclose
 // the data appended to the executable (bundled PCK).

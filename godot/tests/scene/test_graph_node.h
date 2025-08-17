@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_GRAPH_NODE_H
+#define TEST_GRAPH_NODE_H
 
 #include "scene/gui/graph_node.h"
 #include "scene/main/window.h"
@@ -56,3 +57,5 @@ TEST_CASE("[GraphNode][SceneTree]") {
 }
 
 } // namespace TestGraphNode
+
+#endif // TEST_GRAPH_NODE_H

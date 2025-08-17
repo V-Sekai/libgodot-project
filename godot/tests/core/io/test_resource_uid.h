@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_RESOURCE_UID_H
+#define TEST_RESOURCE_UID_H
 
 #include "core/io/resource_uid.h"
 
@@ -66,3 +67,5 @@ TEST_CASE("[ResourceUID] Must encode and decode various UIDs correctly") {
 }
 
 } // namespace TestResourceUID
+
+#endif // TEST_RESOURCE_UID_H

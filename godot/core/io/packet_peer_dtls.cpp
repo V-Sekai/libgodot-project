@@ -30,6 +30,9 @@
 
 #include "packet_peer_dtls.h"
 
+PacketPeerDTLS *(*PacketPeerDTLS::_create)(bool p_notify_postinitialize) = nullptr;
+bool PacketPeerDTLS::available = false;
+
 PacketPeerDTLS *PacketPeerDTLS::create(bool p_notify_postinitialize) {
 	if (_create) {
 		return _create(p_notify_postinitialize);

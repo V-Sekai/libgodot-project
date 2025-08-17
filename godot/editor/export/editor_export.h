@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef EDITOR_EXPORT_H
+#define EDITOR_EXPORT_H
 
 #include "editor_export_platform.h"
 #include "editor_export_plugin.h"
@@ -83,4 +84,7 @@ public:
 	void connect_presets_runnable_updated(const Callable &p_target);
 
 	EditorExport();
+	~EditorExport();
 };
+
+#endif // EDITOR_EXPORT_H

@@ -32,9 +32,6 @@
 
 #include "core/io/certs_compressed.gen.h"
 #include "core/io/dir_access.h"
-#ifdef SDL_ENABLED
-#include "drivers/sdl/joypad_sdl.h"
-#endif
 #include "main/main.h"
 #include "servers/display_server.h"
 #include "servers/rendering_server.h"
@@ -71,14 +68,15 @@
 #endif
 
 #include <dlfcn.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/utsname.h>
 #include <unistd.h>
-#include <cstdio>
-#include <cstdlib>
 
-#if __has_include(<mntent.h>)
+#ifdef HAVE_MNTENT
 #include <mntent.h>
 #endif
 
@@ -94,7 +92,7 @@ void OS_LinuxBSD::alert(const String &p_alert, const String &p_title) {
 	String program;
 
 	for (int i = 0; i < path_elems.size(); i++) {
-		for (uint64_t k = 0; k < std::size(message_programs); k++) {
+		for (uint64_t k = 0; k < sizeof(message_programs) / sizeof(char *); k++) {
 			String tested_path = path_elems[i].path_join(message_programs[k]);
 
 			if (FileAccess::exists(tested_path)) {
@@ -161,13 +159,8 @@ void OS_LinuxBSD::initialize() {
 }
 
 void OS_LinuxBSD::initialize_joypads() {
-#ifdef SDL_ENABLED
-	joypad_sdl = memnew(JoypadSDL());
-	if (joypad_sdl->initialize() != OK) {
-		ERR_PRINT("Couldn't initialize SDL joypad input driver.");
-		memdelete(joypad_sdl);
-		joypad_sdl = nullptr;
-	}
+#ifdef JOYDEV_ENABLED
+	joypad = memnew(JoypadLinux(Input::get_singleton()));
 #endif
 }
 
@@ -180,7 +173,7 @@ String OS_LinuxBSD::get_unique_id() const {
 		memset(buf, 0, sizeof(buf));
 		size_t len = sizeof(buf) - 1;
 		if (sysctl(mib, 2, buf, &len, 0x0, 0) != -1) {
-			machine_id = String::utf8(buf).remove_char('-');
+			machine_id = String::utf8(buf).replace("-", "");
 		}
 #else
 		Ref<FileAccess> f = FileAccess::open("/etc/machine-id", FileAccess::READ);
@@ -249,9 +242,9 @@ void OS_LinuxBSD::finalize() {
 	driver_alsamidi.close();
 #endif
 
-#ifdef SDL_ENABLED
-	if (joypad_sdl) {
-		memdelete(joypad_sdl);
+#ifdef JOYDEV_ENABLED
+	if (joypad) {
+		memdelete(joypad);
 	}
 #endif
 }
@@ -776,7 +769,7 @@ Vector<String> OS_LinuxBSD::get_system_font_path_for_text(const String &p_font_n
 
 	Vector<String> ret;
 	static const char *allowed_formats[] = { "TrueType", "CFF" };
-	for (size_t i = 0; i < std::size(allowed_formats); i++) {
+	for (size_t i = 0; i < sizeof(allowed_formats) / sizeof(const char *); i++) {
 		FcPattern *pattern = FcPatternCreate();
 		if (pattern) {
 			FcPatternAddBool(pattern, FC_SCALABLE, FcTrue);
@@ -981,10 +974,8 @@ void OS_LinuxBSD::run() {
 
 	while (true) {
 		DisplayServer::get_singleton()->process_events(); // get rid of pending events
-#ifdef SDL_ENABLED
-		if (joypad_sdl) {
-			joypad_sdl->process_events();
-		}
+#ifdef JOYDEV_ENABLED
+		joypad->process_joypads();
 #endif
 		if (Main::iteration()) {
 			break;
@@ -1008,7 +999,7 @@ static String get_mountpoint(const String &p_path) {
 		return "";
 	}
 
-#if __has_include(<mntent.h>)
+#ifdef HAVE_MNTENT
 	dev_t dev = s.st_dev;
 	FILE *fd = setmntent("/proc/mounts", "r");
 	if (!fd) {
@@ -1207,7 +1198,6 @@ String OS_LinuxBSD::get_system_ca_certificates() {
 	return f->get_as_text();
 }
 
-#ifdef TOOLS_ENABLED
 bool OS_LinuxBSD::_test_create_rendering_device(const String &p_display_driver) const {
 	// Tests Rendering Device creation.
 
@@ -1274,7 +1264,6 @@ bool OS_LinuxBSD::_test_create_rendering_device_and_gl(const String &p_display_d
 #endif
 	return _test_create_rendering_device(p_display_driver);
 }
-#endif
 
 OS_LinuxBSD::OS_LinuxBSD() {
 	main_loop = nullptr;

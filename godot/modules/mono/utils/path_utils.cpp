@@ -35,7 +35,7 @@
 #include "core/io/file_access.h"
 #include "core/os/os.h"
 
-#include <cstdlib>
+#include <stdlib.h>
 
 #ifdef WINDOWS_ENABLED
 #define WIN32_LEAN_AND_MEAN
@@ -43,13 +43,13 @@
 
 #define ENV_PATH_SEP ";"
 #else
+#include <limits.h>
 #include <unistd.h>
-#include <climits>
 
 #define ENV_PATH_SEP ":"
 #endif
 
-namespace Path {
+namespace path {
 
 String find_executable(const String &p_name) {
 #ifdef WINDOWS_ENABLED
@@ -62,7 +62,7 @@ String find_executable(const String &p_name) {
 	}
 
 	for (int i = 0; i < env_path.size(); i++) {
-		String p = Path::join(env_path[i], p_name);
+		String p = path::join(env_path[i], p_name);
 
 #ifdef WINDOWS_ENABLED
 		for (int j = 0; j < exts.size(); j++) {
@@ -87,12 +87,13 @@ String cwd() {
 	const DWORD expected_size = ::GetCurrentDirectoryW(0, nullptr);
 
 	Char16String buffer;
-	buffer.resize_uninitialized((int)expected_size);
+	buffer.resize((int)expected_size);
 	if (::GetCurrentDirectoryW(expected_size, (wchar_t *)buffer.ptrw()) == 0) {
 		return ".";
 	}
 
-	String result = String::utf16(buffer.ptr());
+	String result;
+	result.parse_utf16(buffer.ptr());
 	if (result.is_empty()) {
 		return ".";
 	}
@@ -104,7 +105,7 @@ String cwd() {
 	}
 
 	String result;
-	if (result.append_utf8(buffer) != OK) {
+	if (result.parse_utf8(buffer) != OK) {
 		return ".";
 	}
 
@@ -116,7 +117,7 @@ String abspath(const String &p_path) {
 	if (p_path.is_absolute_path()) {
 		return p_path.simplify_path();
 	} else {
-		return Path::join(Path::cwd(), p_path).simplify_path();
+		return path::join(path::cwd(), p_path).simplify_path();
 	}
 }
 
@@ -139,12 +140,13 @@ String realpath(const String &p_path) {
 	}
 
 	Char16String buffer;
-	buffer.resize_uninitialized((int)expected_size);
+	buffer.resize((int)expected_size);
 	::GetFinalPathNameByHandleW(hFile, (wchar_t *)buffer.ptrw(), expected_size, FILE_NAME_NORMALIZED);
 
 	::CloseHandle(hFile);
 
-	String result = String::utf16(buffer.ptr());
+	String result;
+	result.parse_utf16(buffer.ptr());
 	if (result.is_empty()) {
 		return p_path;
 	}
@@ -158,7 +160,7 @@ String realpath(const String &p_path) {
 	}
 
 	String result;
-	Error parse_ok = result.append_utf8(resolved_path);
+	Error parse_ok = result.parse_utf8(resolved_path);
 	::free(resolved_path);
 
 	if (parse_ok != OK) {
@@ -184,11 +186,11 @@ String join(const String &p_a, const String &p_b) {
 }
 
 String join(const String &p_a, const String &p_b, const String &p_c) {
-	return Path::join(Path::join(p_a, p_b), p_c);
+	return path::join(path::join(p_a, p_b), p_c);
 }
 
 String join(const String &p_a, const String &p_b, const String &p_c, const String &p_d) {
-	return Path::join(Path::join(Path::join(p_a, p_b), p_c), p_d);
+	return path::join(path::join(path::join(p_a, p_b), p_c), p_d);
 }
 
 String relative_to_impl(const String &p_path, const String &p_relative_to) {
@@ -261,4 +263,4 @@ String get_csharp_project_name() {
 	return name;
 }
 
-} // namespace Path
+} // namespace path

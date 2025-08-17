@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TRANSLATION_H
+#define TRANSLATION_H
 
 #include "core/io/resource.h"
 #include "core/object/gdvirtual.gen.inc"
@@ -44,6 +45,8 @@ class Translation : public Resource {
 	virtual Vector<String> _get_message_list() const;
 	virtual Dictionary _get_messages() const;
 	virtual void _set_messages(const Dictionary &p_messages);
+
+	void _notify_translation_changed_if_applies();
 
 protected:
 	static void _bind_methods();
@@ -66,3 +69,5 @@ public:
 
 	Translation() {}
 };
+
+#endif // TRANSLATION_H

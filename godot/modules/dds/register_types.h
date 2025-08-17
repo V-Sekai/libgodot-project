@@ -28,9 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef DDS_REGISTER_TYPES_H
+#define DDS_REGISTER_TYPES_H
 
 #include "modules/register_module_types.h"
 
 void initialize_dds_module(ModuleInitializationLevel p_level);
 void uninitialize_dds_module(ModuleInitializationLevel p_level);
+
+#endif // DDS_REGISTER_TYPES_H

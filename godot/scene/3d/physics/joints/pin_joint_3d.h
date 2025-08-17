@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef PIN_JOINT_3D_H
+#define PIN_JOINT_3D_H
 
 #include "scene/3d/physics/joints/joint_3d.h"
 
@@ -55,3 +56,5 @@ public:
 };
 
 VARIANT_ENUM_CAST(PinJoint3D::Param);
+
+#endif // PIN_JOINT_3D_H

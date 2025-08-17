@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SPRING_BONE_COLLISION_SPHERE_3D_H
+#define SPRING_BONE_COLLISION_SPHERE_3D_H
 
 #include "scene/3d/spring_bone_collision_3d.h"
 
@@ -54,3 +55,5 @@ public:
 	void set_inside(bool p_enabled);
 	bool is_inside() const;
 };
+
+#endif // SPRING_BONE_COLLISION_SPHERE_3D_H

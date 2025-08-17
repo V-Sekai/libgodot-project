@@ -28,9 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef MSDFGEN_REGISTER_TYPES_H
+#define MSDFGEN_REGISTER_TYPES_H
 
 #include "modules/register_module_types.h"
 
-void initialize_msdfgen_module(ModuleInitializationLevel p_level) {}
-void uninitialize_msdfgen_module(ModuleInitializationLevel p_level) {}
+void initialize_msdfgen_module(ModuleInitializationLevel p_level);
+void uninitialize_msdfgen_module(ModuleInitializationLevel p_level);
+
+#endif // MSDFGEN_REGISTER_TYPES_H

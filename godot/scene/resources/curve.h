@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef CURVE_H
+#define CURVE_H
 
 #include "core/io/resource.h"
 
@@ -251,6 +252,8 @@ public:
 
 	PackedVector2Array tessellate(int p_max_stages = 5, real_t p_tolerance = 4) const; //useful for display
 	PackedVector2Array tessellate_even_length(int p_max_stages = 5, real_t p_length = 20.0) const; // Useful for baking.
+
+	Curve2D();
 };
 
 class Curve3D : public Resource {
@@ -358,4 +361,8 @@ public:
 
 	PackedVector3Array tessellate(int p_max_stages = 5, real_t p_tolerance = 4) const; // Useful for display.
 	PackedVector3Array tessellate_even_length(int p_max_stages = 5, real_t p_length = 0.2) const; // Useful for baking.
+
+	Curve3D();
 };
+
+#endif // CURVE_H

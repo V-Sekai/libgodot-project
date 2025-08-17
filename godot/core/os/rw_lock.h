@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef RW_LOCK_H
+#define RW_LOCK_H
 
 #include "core/typedefs.h"
 
@@ -101,3 +102,5 @@ public:
 		lock.write_unlock();
 	}
 };
+
+#endif // RW_LOCK_H

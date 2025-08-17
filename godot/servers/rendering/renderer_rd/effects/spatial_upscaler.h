@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SPATIAL_UPSCALER_RD_H
+#define SPATIAL_UPSCALER_RD_H
 
 #include "core/object/ref_counted.h"
 
@@ -36,10 +37,12 @@ class RenderSceneBuffersRD;
 
 class SpatialUpscaler {
 public:
-	virtual const Span<char> get_label() const = 0;
+	virtual String get_label() const = 0;
 	virtual void ensure_context(Ref<RenderSceneBuffersRD> p_render_buffers) = 0;
 	virtual void process(Ref<RenderSceneBuffersRD> p_render_buffers, RID p_source_rd_texture, RID p_destination_texture) = 0;
 
 	SpatialUpscaler() = default;
 	virtual ~SpatialUpscaler() = default;
 };
+
+#endif // SPATIAL_UPSCALER_RD_H

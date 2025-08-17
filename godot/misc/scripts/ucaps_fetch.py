@@ -55,7 +55,8 @@ def generate_ucaps_fetch() -> None:
     source: str = generate_copyright_header("ucaps.h")
 
     source += f"""
-#pragma once
+#ifndef UCAPS_H
+#define UCAPS_H
 
 // This file was generated using the `misc/scripts/ucaps_fetch.py` script.
 
@@ -104,6 +105,8 @@ static int _find_lower(int ch) {
 
 \treturn ch;
 }
+
+#endif // UCAPS_H
 """
 
     ucaps_path: str = os.path.join(os.path.dirname(__file__), "../../core/string/ucaps.h")

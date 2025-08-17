@@ -141,9 +141,8 @@ static const int kC2 = WEBP_TRANSFORM_AC3_C2;
   "sh              %[" #TEMP8 "],   " #D "(%[temp20])               \n\t"      \
   "sh              %[" #TEMP12 "],  " #B "(%[temp20])               \n\t"
 
-static void FTransform_MIPSdspR2(const uint8_t* WEBP_RESTRICT src,
-                                 const uint8_t* WEBP_RESTRICT ref,
-                                 int16_t* WEBP_RESTRICT out) {
+static void FTransform_MIPSdspR2(const uint8_t* src, const uint8_t* ref,
+                                 int16_t* out) {
   const int c2217 = 2217;
   const int c5352 = 5352;
   int temp0, temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8;
@@ -172,9 +171,8 @@ static void FTransform_MIPSdspR2(const uint8_t* WEBP_RESTRICT src,
 #undef VERTICAL_PASS
 #undef HORIZONTAL_PASS
 
-static WEBP_INLINE void ITransformOne(const uint8_t* WEBP_RESTRICT ref,
-                                      const int16_t* WEBP_RESTRICT in,
-                                      uint8_t* WEBP_RESTRICT dst) {
+static WEBP_INLINE void ITransformOne(const uint8_t* ref, const int16_t* in,
+                                      uint8_t* dst) {
   int temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8, temp9;
   int temp10, temp11, temp12, temp13, temp14, temp15, temp16, temp17, temp18;
 
@@ -241,18 +239,16 @@ static WEBP_INLINE void ITransformOne(const uint8_t* WEBP_RESTRICT ref,
   );
 }
 
-static void ITransform_MIPSdspR2(const uint8_t* WEBP_RESTRICT ref,
-                                 const int16_t* WEBP_RESTRICT in,
-                                 uint8_t* WEBP_RESTRICT dst, int do_two) {
+static void ITransform_MIPSdspR2(const uint8_t* ref, const int16_t* in,
+                                 uint8_t* dst, int do_two) {
   ITransformOne(ref, in, dst);
   if (do_two) {
     ITransformOne(ref + 4, in + 16, dst + 4);
   }
 }
 
-static int Disto4x4_MIPSdspR2(const uint8_t* WEBP_RESTRICT const a,
-                              const uint8_t* WEBP_RESTRICT const b,
-                              const uint16_t* WEBP_RESTRICT const w) {
+static int Disto4x4_MIPSdspR2(const uint8_t* const a, const uint8_t* const b,
+                              const uint16_t* const w) {
   int temp1, temp2, temp3, temp4, temp5, temp6, temp7, temp8, temp9;
   int temp10, temp11, temp12, temp13, temp14, temp15, temp16, temp17;
 
@@ -318,9 +314,9 @@ static int Disto4x4_MIPSdspR2(const uint8_t* WEBP_RESTRICT const a,
   return abs(temp3 - temp17) >> 5;
 }
 
-static int Disto16x16_MIPSdspR2(const uint8_t* WEBP_RESTRICT const a,
-                                const uint8_t* WEBP_RESTRICT const b,
-                                const uint16_t* WEBP_RESTRICT const w) {
+static int Disto16x16_MIPSdspR2(const uint8_t* const a,
+                                const uint8_t* const b,
+                                const uint16_t* const w) {
   int D = 0;
   int x, y;
   for (y = 0; y < 16 * BPS; y += 4 * BPS) {
@@ -371,8 +367,8 @@ static int Disto16x16_MIPSdspR2(const uint8_t* WEBP_RESTRICT const a,
 } while (0)
 
 #define VERTICAL_PRED(DST, TOP, SIZE)                                          \
-static WEBP_INLINE void VerticalPred##SIZE(                                    \
-    uint8_t* WEBP_RESTRICT (DST), const uint8_t* WEBP_RESTRICT (TOP)) {        \
+static WEBP_INLINE void VerticalPred##SIZE(uint8_t* (DST),                     \
+                                           const uint8_t* (TOP)) {             \
   int j;                                                                       \
   if ((TOP)) {                                                                 \
     for (j = 0; j < (SIZE); ++j) memcpy((DST) + j * BPS, (TOP), (SIZE));       \
@@ -387,8 +383,8 @@ VERTICAL_PRED(dst, top, 16)
 #undef VERTICAL_PRED
 
 #define HORIZONTAL_PRED(DST, LEFT, SIZE)                                       \
-static WEBP_INLINE void HorizontalPred##SIZE(                                  \
-    uint8_t* WEBP_RESTRICT (DST), const uint8_t* WEBP_RESTRICT (LEFT)) {       \
+static WEBP_INLINE void HorizontalPred##SIZE(uint8_t* (DST),                   \
+                                             const uint8_t* (LEFT)) {          \
   if (LEFT) {                                                                  \
     int j;                                                                     \
     for (j = 0; j < (SIZE); ++j) {                                             \
@@ -455,9 +451,8 @@ HORIZONTAL_PRED(dst, left, 16)
 } while (0)
 
 #define TRUE_MOTION(DST, LEFT, TOP, SIZE)                                      \
-static WEBP_INLINE void TrueMotion##SIZE(uint8_t* WEBP_RESTRICT (DST),         \
-                                         const uint8_t* WEBP_RESTRICT (LEFT),  \
-                                         const uint8_t* WEBP_RESTRICT (TOP)) { \
+static WEBP_INLINE void TrueMotion##SIZE(uint8_t* (DST), const uint8_t* (LEFT),\
+                                         const uint8_t* (TOP)) {               \
   if ((LEFT) != NULL) {                                                        \
     if ((TOP) != NULL) {                                                       \
       CLIP_TO_DST((DST), (LEFT), (TOP), (SIZE));                               \
@@ -485,9 +480,8 @@ TRUE_MOTION(dst, left, top, 16)
 #undef CLIP_8B_TO_DST
 #undef CLIPPING
 
-static WEBP_INLINE void DCMode16(uint8_t* WEBP_RESTRICT dst,
-                                 const uint8_t* WEBP_RESTRICT left,
-                                 const uint8_t* WEBP_RESTRICT top) {
+static WEBP_INLINE void DCMode16(uint8_t* dst, const uint8_t* left,
+                                 const uint8_t* top) {
   int DC, DC1;
   int temp0, temp1, temp2, temp3;
 
@@ -549,9 +543,8 @@ static WEBP_INLINE void DCMode16(uint8_t* WEBP_RESTRICT dst,
   FILL_8_OR_16(dst, DC, 16);
 }
 
-static WEBP_INLINE void DCMode8(uint8_t* WEBP_RESTRICT dst,
-                                const uint8_t* WEBP_RESTRICT left,
-                                const uint8_t* WEBP_RESTRICT top) {
+static WEBP_INLINE void DCMode8(uint8_t* dst, const uint8_t* left,
+                                const uint8_t* top) {
   int DC, DC1;
   int temp0, temp1, temp2, temp3;
 
@@ -595,7 +588,7 @@ static WEBP_INLINE void DCMode8(uint8_t* WEBP_RESTRICT dst,
   FILL_8_OR_16(dst, DC, 8);
 }
 
-static void DC4(uint8_t* WEBP_RESTRICT dst, const uint8_t* WEBP_RESTRICT top) {
+static void DC4(uint8_t* dst, const uint8_t* top) {
   int temp0, temp1;
   __asm__ volatile(
     "ulw          %[temp0],   0(%[top])               \n\t"
@@ -616,7 +609,7 @@ static void DC4(uint8_t* WEBP_RESTRICT dst, const uint8_t* WEBP_RESTRICT top) {
   );
 }
 
-static void TM4(uint8_t* WEBP_RESTRICT dst, const uint8_t* WEBP_RESTRICT top) {
+static void TM4(uint8_t* dst, const uint8_t* top) {
   int a10, a32, temp0, temp1, temp2, temp3, temp4, temp5;
   const int c35 = 0xff00ff;
   __asm__ volatile (
@@ -671,7 +664,7 @@ static void TM4(uint8_t* WEBP_RESTRICT dst, const uint8_t* WEBP_RESTRICT top) {
   );
 }
 
-static void VE4(uint8_t* WEBP_RESTRICT dst, const uint8_t* WEBP_RESTRICT top) {
+static void VE4(uint8_t* dst, const uint8_t* top) {
   int temp0, temp1, temp2, temp3, temp4, temp5, temp6;
   __asm__ volatile(
     "ulw             %[temp0],   -1(%[top])              \n\t"
@@ -702,7 +695,7 @@ static void VE4(uint8_t* WEBP_RESTRICT dst, const uint8_t* WEBP_RESTRICT top) {
   );
 }
 
-static void HE4(uint8_t* WEBP_RESTRICT dst, const uint8_t* WEBP_RESTRICT top) {
+static void HE4(uint8_t* dst, const uint8_t* top) {
   int temp0, temp1, temp2, temp3, temp4, temp5, temp6;
   __asm__ volatile(
     "ulw             %[temp0],   -4(%[top])              \n\t"
@@ -738,7 +731,7 @@ static void HE4(uint8_t* WEBP_RESTRICT dst, const uint8_t* WEBP_RESTRICT top) {
   );
 }
 
-static void RD4(uint8_t* WEBP_RESTRICT dst, const uint8_t* WEBP_RESTRICT top) {
+static void RD4(uint8_t* dst, const uint8_t* top) {
   int temp0, temp1, temp2, temp3, temp4, temp5;
   int temp6, temp7, temp8, temp9, temp10, temp11;
   __asm__ volatile(
@@ -787,7 +780,7 @@ static void RD4(uint8_t* WEBP_RESTRICT dst, const uint8_t* WEBP_RESTRICT top) {
   );
 }
 
-static void VR4(uint8_t* WEBP_RESTRICT dst, const uint8_t* WEBP_RESTRICT top) {
+static void VR4(uint8_t* dst, const uint8_t* top) {
   int temp0, temp1, temp2, temp3, temp4;
   int temp5, temp6, temp7, temp8, temp9;
   __asm__ volatile (
@@ -837,7 +830,7 @@ static void VR4(uint8_t* WEBP_RESTRICT dst, const uint8_t* WEBP_RESTRICT top) {
   );
 }
 
-static void LD4(uint8_t* WEBP_RESTRICT dst, const uint8_t* WEBP_RESTRICT top) {
+static void LD4(uint8_t* dst, const uint8_t* top) {
   int temp0, temp1, temp2, temp3, temp4, temp5;
   int temp6, temp7, temp8, temp9, temp10, temp11;
   __asm__ volatile(
@@ -884,7 +877,7 @@ static void LD4(uint8_t* WEBP_RESTRICT dst, const uint8_t* WEBP_RESTRICT top) {
   );
 }
 
-static void VL4(uint8_t* WEBP_RESTRICT dst, const uint8_t* WEBP_RESTRICT top) {
+static void VL4(uint8_t* dst, const uint8_t* top) {
   int temp0, temp1, temp2, temp3, temp4;
   int temp5, temp6, temp7, temp8, temp9;
   __asm__ volatile (
@@ -933,7 +926,7 @@ static void VL4(uint8_t* WEBP_RESTRICT dst, const uint8_t* WEBP_RESTRICT top) {
   );
 }
 
-static void HD4(uint8_t* WEBP_RESTRICT dst, const uint8_t* WEBP_RESTRICT top) {
+static void HD4(uint8_t* dst, const uint8_t* top) {
   int temp0, temp1, temp2, temp3, temp4;
   int temp5, temp6, temp7, temp8, temp9;
   __asm__ volatile (
@@ -981,7 +974,7 @@ static void HD4(uint8_t* WEBP_RESTRICT dst, const uint8_t* WEBP_RESTRICT top) {
   );
 }
 
-static void HU4(uint8_t* WEBP_RESTRICT dst, const uint8_t* WEBP_RESTRICT top) {
+static void HU4(uint8_t* dst, const uint8_t* top) {
   int temp0, temp1, temp2, temp3, temp4, temp5, temp6, temp7;
   __asm__ volatile (
     "ulw             %[temp0],   -5(%[top])              \n\t"
@@ -1020,9 +1013,8 @@ static void HU4(uint8_t* WEBP_RESTRICT dst, const uint8_t* WEBP_RESTRICT top) {
 //------------------------------------------------------------------------------
 // Chroma 8x8 prediction (paragraph 12.2)
 
-static void IntraChromaPreds_MIPSdspR2(uint8_t* WEBP_RESTRICT dst,
-                                       const uint8_t* WEBP_RESTRICT left,
-                                       const uint8_t* WEBP_RESTRICT top) {
+static void IntraChromaPreds_MIPSdspR2(uint8_t* dst, const uint8_t* left,
+                                       const uint8_t* top) {
   // U block
   DCMode8(C8DC8 + dst, left, top);
   VerticalPred8(C8VE8 + dst, top);
@@ -1041,9 +1033,8 @@ static void IntraChromaPreds_MIPSdspR2(uint8_t* WEBP_RESTRICT dst,
 //------------------------------------------------------------------------------
 // luma 16x16 prediction (paragraph 12.3)
 
-static void Intra16Preds_MIPSdspR2(uint8_t* WEBP_RESTRICT dst,
-                                   const uint8_t* WEBP_RESTRICT left,
-                                   const uint8_t* WEBP_RESTRICT top) {
+static void Intra16Preds_MIPSdspR2(uint8_t* dst,
+                                   const uint8_t* left, const uint8_t* top) {
   DCMode16(I16DC16 + dst, left, top);
   VerticalPred16(I16VE16 + dst, top);
   HorizontalPred16(I16HE16 + dst, left);
@@ -1052,8 +1043,7 @@ static void Intra16Preds_MIPSdspR2(uint8_t* WEBP_RESTRICT dst,
 
 // Left samples are top[-5 .. -2], top_left is top[-1], top are
 // located at top[0..3], and top right is top[4..7]
-static void Intra4Preds_MIPSdspR2(uint8_t* WEBP_RESTRICT dst,
-                                  const uint8_t* WEBP_RESTRICT top) {
+static void Intra4Preds_MIPSdspR2(uint8_t* dst, const uint8_t* top) {
   DC4(I4DC4 + dst, top);
   TM4(I4TM4 + dst, top);
   VE4(I4VE4 + dst, top);
@@ -1089,8 +1079,7 @@ static void Intra4Preds_MIPSdspR2(uint8_t* WEBP_RESTRICT dst,
   GET_SSE_INNER(C)                        \
   GET_SSE_INNER(D)
 
-static int SSE16x16_MIPSdspR2(const uint8_t* WEBP_RESTRICT a,
-                              const uint8_t* WEBP_RESTRICT b) {
+static int SSE16x16_MIPSdspR2(const uint8_t* a, const uint8_t* b) {
   int count;
   int temp0, temp1, temp2, temp3;
   __asm__ volatile (
@@ -1120,8 +1109,7 @@ static int SSE16x16_MIPSdspR2(const uint8_t* WEBP_RESTRICT a,
   return count;
 }
 
-static int SSE16x8_MIPSdspR2(const uint8_t* WEBP_RESTRICT a,
-                             const uint8_t* WEBP_RESTRICT b) {
+static int SSE16x8_MIPSdspR2(const uint8_t* a, const uint8_t* b) {
   int count;
   int temp0, temp1, temp2, temp3;
   __asm__ volatile (
@@ -1143,8 +1131,7 @@ static int SSE16x8_MIPSdspR2(const uint8_t* WEBP_RESTRICT a,
   return count;
 }
 
-static int SSE8x8_MIPSdspR2(const uint8_t* WEBP_RESTRICT a,
-                            const uint8_t* WEBP_RESTRICT b) {
+static int SSE8x8_MIPSdspR2(const uint8_t* a, const uint8_t* b) {
   int count;
   int temp0, temp1, temp2, temp3;
   __asm__ volatile (
@@ -1162,8 +1149,7 @@ static int SSE8x8_MIPSdspR2(const uint8_t* WEBP_RESTRICT a,
   return count;
 }
 
-static int SSE4x4_MIPSdspR2(const uint8_t* WEBP_RESTRICT a,
-                            const uint8_t* WEBP_RESTRICT b) {
+static int SSE4x4_MIPSdspR2(const uint8_t* a, const uint8_t* b) {
   int count;
   int temp0, temp1, temp2, temp3;
   __asm__ volatile (
@@ -1287,7 +1273,7 @@ static int SSE4x4_MIPSdspR2(const uint8_t* WEBP_RESTRICT a,
 "3:                                                          \n\t"
 
 static int QuantizeBlock_MIPSdspR2(int16_t in[16], int16_t out[16],
-                                   const VP8Matrix* WEBP_RESTRICT const mtx) {
+                                   const VP8Matrix* const mtx) {
   int temp0, temp1, temp2, temp3, temp4, temp5,temp6;
   int sign, coeff, level;
   int max_level = MAX_LEVEL;
@@ -1328,7 +1314,7 @@ static int QuantizeBlock_MIPSdspR2(int16_t in[16], int16_t out[16],
 }
 
 static int Quantize2Blocks_MIPSdspR2(int16_t in[32], int16_t out[32],
-                                     const VP8Matrix* WEBP_RESTRICT const mtx) {
+                                     const VP8Matrix* const mtx) {
   int nz;
   nz  = QuantizeBlock_MIPSdspR2(in + 0 * 16, out + 0 * 16, mtx) << 0;
   nz |= QuantizeBlock_MIPSdspR2(in + 1 * 16, out + 1 * 16, mtx) << 1;
@@ -1374,8 +1360,7 @@ static int Quantize2Blocks_MIPSdspR2(int16_t in[32], int16_t out[32],
   "usw             %[" #TEMP4 "],  " #C "(%[out])                 \n\t"        \
   "usw             %[" #TEMP6 "],  " #D "(%[out])                 \n\t"
 
-static void FTransformWHT_MIPSdspR2(const int16_t* WEBP_RESTRICT in,
-                                    int16_t* WEBP_RESTRICT out) {
+static void FTransformWHT_MIPSdspR2(const int16_t* in, int16_t* out) {
   int temp0, temp1, temp2, temp3, temp4;
   int temp5, temp6, temp7, temp8, temp9;
 

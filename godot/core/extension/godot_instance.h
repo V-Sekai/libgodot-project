@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GODOT_INSTANCE_H
+#define GODOT_INSTANCE_H
 
 #include "core/extension/gdextension_interface.h"
 #include "core/object/class_db.h"
@@ -99,3 +100,5 @@ public:
 	TaskExecutor *get_executor();
 	void execute(Callable p_callback, bool p_async);
 };
+
+#endif // GODOT_INSTANCE_H

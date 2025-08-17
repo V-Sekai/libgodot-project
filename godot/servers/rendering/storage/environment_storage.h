@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef ENVIRONMENT_STORAGE_H
+#define ENVIRONMENT_STORAGE_H
 
 #include "core/templates/rid_owner.h"
 #include "servers/rendering_server.h"
@@ -304,3 +305,5 @@ public:
 	bool environment_get_use_1d_color_correction(RID p_env) const;
 	RID environment_get_color_correction(RID p_env) const;
 };
+
+#endif // ENVIRONMENT_STORAGE_H

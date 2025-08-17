@@ -28,9 +28,9 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#import "godot_window.h"
+#include "godot_window.h"
 
-#import "display_server_macos.h"
+#include "display_server_macos.h"
 
 @implementation GodotWindow
 

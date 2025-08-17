@@ -28,11 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef MONO_PATH_UTILS_H
+#define MONO_PATH_UTILS_H
 
 #include "core/string/ustring.h"
 
-namespace Path {
+namespace path {
 
 String find_executable(const String &p_name);
 
@@ -58,4 +59,6 @@ String realpath(const String &p_path);
 String relative_to(const String &p_path, const String &p_relative_to);
 
 String get_csharp_project_name();
-} // namespace Path
+} // namespace path
+
+#endif // MONO_PATH_UTILS_H

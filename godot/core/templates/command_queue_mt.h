@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef COMMAND_QUEUE_MT_H
+#define COMMAND_QUEUE_MT_H
 
 #include "core/object/worker_thread_pool.h"
 #include "core/os/condition_variable.h"
@@ -113,7 +114,7 @@ class CommandQueueMT {
 	uint32_t sync_awaiters = 0;
 	WorkerThreadPool::TaskID pump_task_id = WorkerThreadPool::INVALID_TASK_ID;
 	uint64_t flush_read_ptr = 0;
-	std::atomic<bool> pending{ false };
+	std::atomic<bool> pending;
 
 	template <typename T, typename... Args>
 	_FORCE_INLINE_ void create_command(Args &&...p_args) {
@@ -255,3 +256,5 @@ public:
 	CommandQueueMT();
 	~CommandQueueMT();
 };
+
+#endif // COMMAND_QUEUE_MT_H

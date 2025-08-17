@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef RENDERING_NATIVE_SURFACE_ANDROID_H
+#define RENDERING_NATIVE_SURFACE_ANDROID_H
 
 #include "core/variant/native_ptr.h"
 #include "servers/rendering/rendering_native_surface.h"
@@ -56,3 +57,5 @@ public:
 	RenderingNativeSurfaceAndroid();
 	~RenderingNativeSurfaceAndroid();
 };
+
+#endif // RENDERING_NATIVE_SURFACE_ANDROID_H

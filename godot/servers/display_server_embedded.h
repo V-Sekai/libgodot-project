@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef DISPLAY_SERVER_EMBEDDED_H
+#define DISPLAY_SERVER_EMBEDDED_H
 
 #include "core/input/input.h"
 #include "servers/display_server.h"
@@ -200,3 +201,5 @@ public:
 	virtual void swap_buffers() override;
 	virtual void gl_window_make_current(DisplayServer::WindowID p_window_id) override;
 };
+
+#endif // DISPLAY_SERVER_EMBEDDED_H

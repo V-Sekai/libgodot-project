@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_PATH_FOLLOW_2D_H
+#define TEST_PATH_FOLLOW_2D_H
 
 #include "scene/2d/path_2d.h"
 #include "scene/main/window.h"
@@ -253,3 +254,5 @@ TEST_CASE("[SceneTree][PathFollow2D] Progress out of range") {
 	memdelete(path);
 }
 } // namespace TestPathFollow2D
+
+#endif // TEST_PATH_FOLLOW_2D_H

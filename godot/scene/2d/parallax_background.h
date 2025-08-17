@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef PARALLAX_BACKGROUND_H
+#define PARALLAX_BACKGROUND_H
 
 #include "scene/main/canvas_layer.h"
 
@@ -80,3 +81,5 @@ public:
 
 	ParallaxBackground();
 };
+
+#endif // PARALLAX_BACKGROUND_H

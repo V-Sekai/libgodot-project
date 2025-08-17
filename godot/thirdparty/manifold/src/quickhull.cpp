@@ -20,7 +20,7 @@
 #include <algorithm>
 #include <limits>
 
-#include "impl.h"
+#include "./impl.h"
 
 namespace manifold {
 
@@ -289,7 +289,7 @@ std::pair<Vec<Halfedge>, Vec<vec3>> QuickHull::buildMesh(double epsilon) {
   for_each(
       autoPolicy(halfedges.size()), halfedges.begin(), halfedges.end(),
       [&](Halfedge& he) { he.pairedHalfedge = mapping[he.pairedHalfedge]; });
-  counts.resize_nofill(originalVertexData.size() + 1);
+  counts.resize(originalVertexData.size() + 1);
   fill(counts.begin(), counts.end(), 0);
 
   // remove unused vertices
@@ -804,7 +804,7 @@ void QuickHull::setupInitialTetrahedron() {
 
 std::unique_ptr<Vec<size_t>> QuickHull::getIndexVectorFromPool() {
   auto r = indexVectorPool.get();
-  r->clear();
+  r->resize(0);
   return r;
 }
 
@@ -851,9 +851,10 @@ void Manifold::Impl::Hull(VecView<vec3> vertPos) {
   std::tie(halfedge_, vertPos_) = qh.buildMesh();
   CalculateBBox();
   SetEpsilon();
+  CalculateNormals();
   InitializeOriginal();
   Finish();
-  MarkCoplanar();
+  CreateFaces();
 }
 
 }  // namespace manifold

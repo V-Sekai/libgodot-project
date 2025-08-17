@@ -32,8 +32,8 @@
 
 #if defined(X11_ENABLED) && defined(GLES3_ENABLED)
 
-#include <cstdio>
-#include <cstdlib>
+#include <stdio.h>
+#include <stdlib.h>
 
 const char *GLManagerEGL_X11::_get_platform_extension_name() const {
 	return "EGL_KHR_platform_x11";

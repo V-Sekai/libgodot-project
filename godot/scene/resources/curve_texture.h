@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef CURVE_TEXTURE_H
+#define CURVE_TEXTURE_H
 
 #include "scene/resources/texture.h"
 
@@ -71,6 +72,7 @@ public:
 	virtual int get_height() const override { return 1; }
 	virtual bool has_alpha() const override { return false; }
 
+	CurveTexture();
 	~CurveTexture();
 };
 
@@ -113,5 +115,8 @@ public:
 	virtual int get_height() const override { return 1; }
 	virtual bool has_alpha() const override { return false; }
 
+	CurveXYZTexture();
 	~CurveXYZTexture();
 };
+
+#endif // CURVE_TEXTURE_H

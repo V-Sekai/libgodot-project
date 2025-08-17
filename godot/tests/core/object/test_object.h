@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_OBJECT_H
+#define TEST_OBJECT_H
 
 #include "core/object/class_db.h"
 #include "core/object/object.h"
@@ -143,6 +144,15 @@ TEST_CASE("[Object] Core getters") {
 	CHECK_MESSAGE(
 			object.get_save_class() == "Object",
 			"The returned save class should match the expected value.");
+
+	List<String> inheritance_list;
+	object.get_inheritance_list_static(&inheritance_list);
+	CHECK_MESSAGE(
+			inheritance_list.size() == 1,
+			"The inheritance list should consist of Object only");
+	CHECK_MESSAGE(
+			inheritance_list.front()->get() == "Object",
+			"The inheritance list should consist of Object only");
 }
 
 TEST_CASE("[Object] Metadata") {
@@ -419,7 +429,8 @@ TEST_CASE("[Object] Signals") {
 	}
 
 	SUBCASE("Emitting an existing signal should call the connected method") {
-		Array empty_signal_args = { {} };
+		Array empty_signal_args;
+		empty_signal_args.push_back(Array());
 
 		SIGNAL_WATCH(&object, "my_custom_signal");
 		SIGNAL_CHECK_FALSE("my_custom_signal");
@@ -455,75 +466,72 @@ TEST_CASE("[Object] Signals") {
 	}
 }
 
-class NotificationObjectSuperclass : public Object {
-	GDCLASS(NotificationObjectSuperclass, Object);
+class NotificationObject1 : public Object {
+	GDCLASS(NotificationObject1, Object);
 
 protected:
 	void _notification(int p_what) {
-		order_superclass = ++order_global;
+		switch (p_what) {
+			case 12345: {
+				order_internal1 = order_global++;
+			} break;
+		}
 	}
 
 public:
-	static inline int order_global = 0;
-	int order_superclass = -1;
+	static int order_global;
+	int order_internal1 = -1;
+
+	void reset_order() {
+		order_internal1 = -1;
+		order_global = 1;
+	}
 };
 
-class NotificationObjectSubclass : public NotificationObjectSuperclass {
-	GDCLASS(NotificationObjectSubclass, NotificationObjectSuperclass);
+int NotificationObject1::order_global = 1;
+
+class NotificationObject2 : public NotificationObject1 {
+	GDCLASS(NotificationObject2, NotificationObject1);
 
 protected:
 	void _notification(int p_what) {
-		order_subclass = ++order_global;
+		switch (p_what) {
+			case 12345: {
+				order_internal2 = order_global++;
+			} break;
+		}
 	}
 
 public:
-	int order_subclass = -1;
-};
-
-class NotificationScriptInstance : public _MockScriptInstance {
-	void notification(int p_notification, bool p_reversed) override {
-		order_script = ++NotificationObjectSuperclass::order_global;
+	int order_internal2 = -1;
+	void reset_order() {
+		NotificationObject1::reset_order();
+		order_internal2 = -1;
 	}
-
-public:
-	int order_script = -1;
 };
 
 TEST_CASE("[Object] Notification order") { // GH-52325
-	NotificationObjectSubclass *object = memnew(NotificationObjectSubclass);
-
-	NotificationScriptInstance *script = memnew(NotificationScriptInstance);
-	object->set_script_instance(script);
+	NotificationObject2 *test_notification_object = memnew(NotificationObject2);
 
 	SUBCASE("regular order") {
-		NotificationObjectSubclass::order_global = 0;
-		object->order_superclass = -1;
-		object->order_subclass = -1;
-		script->order_script = -1;
-		object->notification(12345, false);
+		test_notification_object->notification(12345, false);
 
-		CHECK_EQ(object->order_superclass, 1);
-		CHECK_EQ(object->order_subclass, 2);
-		// TODO If an extension is attached, it should come here.
-		CHECK_EQ(script->order_script, 3);
-		CHECK_EQ(NotificationObjectSubclass::order_global, 3);
+		CHECK_EQ(test_notification_object->order_internal1, 1);
+		CHECK_EQ(test_notification_object->order_internal2, 2);
+
+		test_notification_object->reset_order();
 	}
 
 	SUBCASE("reverse order") {
-		NotificationObjectSubclass::order_global = 0;
-		object->order_superclass = -1;
-		object->order_subclass = -1;
-		script->order_script = -1;
-		object->notification(12345, true);
+		test_notification_object->notification(12345, true);
 
-		CHECK_EQ(script->order_script, 1);
-		// TODO If an extension is attached, it should come here.
-		CHECK_EQ(object->order_subclass, 2);
-		CHECK_EQ(object->order_superclass, 3);
-		CHECK_EQ(NotificationObjectSubclass::order_global, 3);
+		CHECK_EQ(test_notification_object->order_internal1, 2);
+		CHECK_EQ(test_notification_object->order_internal2, 1);
+
+		test_notification_object->reset_order();
 	}
 
-	memdelete(object);
+	memdelete(test_notification_object);
 }
 
 TEST_CASE("[Object] Destruction at the end of the call chain is safe") {
@@ -595,3 +603,5 @@ TEST_CASE("[Object] Destruction at the end of the call chain is safe") {
 }
 
 } // namespace TestObject
+
+#endif // TEST_OBJECT_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef RANGE_H
+#define RANGE_H
 
 #include "scene/gui/control.h"
 
@@ -46,7 +47,7 @@ class Range : public Control {
 		bool allow_lesser = false;
 		HashSet<Range *> owners;
 		void emit_value_changed();
-		void emit_changed();
+		void emit_changed(const char *p_what = "");
 		void redraw_owners();
 	};
 
@@ -58,21 +59,14 @@ class Range : public Control {
 	void _share(Node *p_range);
 
 	void _value_changed_notify();
-	void _changed_notify();
+	void _changed_notify(const char *p_what = "");
 	void _set_value_no_signal(double p_val);
 
 protected:
-	static double _snapped_r128(double p_value, double p_step);
-	double _calc_value(double p_val, double p_step) const;
 	virtual void _value_changed(double p_value);
 	void _notify_shared_value_changed() { shared->emit_value_changed(); }
-	void _notification(int p_what);
 
 	static void _bind_methods();
-
-	void _accessibility_action_inc(const Variant &p_data);
-	void _accessibility_action_dec(const Variant &p_data);
-	void _accessibility_action_set_value(const Variant &p_data);
 
 	bool _rounded_values = false;
 
@@ -114,3 +108,5 @@ public:
 	Range();
 	~Range();
 };
+
+#endif // RANGE_H

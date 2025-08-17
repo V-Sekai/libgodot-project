@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GODOT_AREA_PAIR_3D_H
+#define GODOT_AREA_PAIR_3D_H
 
 #include "godot_area_3d.h"
 #include "godot_body_3d.h"
@@ -93,3 +94,5 @@ public:
 	GodotAreaSoftBodyPair3D(GodotSoftBody3D *p_sof_body, int p_soft_body_shape, GodotArea3D *p_area, int p_area_shape);
 	~GodotAreaSoftBodyPair3D();
 };
+
+#endif // GODOT_AREA_PAIR_3D_H

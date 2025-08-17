@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_PLANE_H
+#define TEST_PLANE_H
 
 #include "core/math/plane.h"
 
@@ -39,22 +40,22 @@ namespace TestPlane {
 // Plane
 
 TEST_CASE("[Plane] Constructor methods") {
-	constexpr Plane plane = Plane(32, 22, 16, 3);
-	constexpr Plane plane_vector = Plane(Vector3(32, 22, 16), 3);
-	constexpr Plane plane_copy_plane = Plane(plane);
+	const Plane plane = Plane(32, 22, 16, 3);
+	const Plane plane_vector = Plane(Vector3(32, 22, 16), 3);
+	const Plane plane_copy_plane = Plane(plane);
 
-	static_assert(
+	CHECK_MESSAGE(
 			plane == plane_vector,
 			"Planes created with same values but different methods should be equal.");
 
-	static_assert(
+	CHECK_MESSAGE(
 			plane == plane_copy_plane,
 			"Planes created with same values but different methods should be equal.");
 }
 
 TEST_CASE("[Plane] Basic getters") {
-	constexpr Plane plane = Plane(32, 22, 16, 3);
-	constexpr Plane plane_normalized = Plane(32.0 / 42, 22.0 / 42, 16.0 / 42, 3.0 / 42);
+	const Plane plane = Plane(32, 22, 16, 3);
+	const Plane plane_normalized = Plane(32.0 / 42, 22.0 / 42, 16.0 / 42, 3.0 / 42);
 
 	CHECK_MESSAGE(
 			plane.get_normal().is_equal_approx(Vector3(32, 22, 16)),
@@ -82,8 +83,8 @@ TEST_CASE("[Plane] Basic setters") {
 }
 
 TEST_CASE("[Plane] Plane-point operations") {
-	constexpr Plane plane = Plane(32, 22, 16, 3);
-	constexpr Plane y_facing_plane = Plane(0, 1, 0, 4);
+	const Plane plane = Plane(32, 22, 16, 3);
+	const Plane y_facing_plane = Plane(0, 1, 0, 4);
 
 	CHECK_MESSAGE(
 			plane.get_center().is_equal_approx(Vector3(32 * 3, 22 * 3, 16 * 3)),
@@ -101,16 +102,16 @@ TEST_CASE("[Plane] Plane-point operations") {
 }
 
 TEST_CASE("[Plane] Has point") {
-	constexpr Plane x_facing_plane = Plane(1, 0, 0, 0);
-	constexpr Plane y_facing_plane = Plane(0, 1, 0, 0);
-	constexpr Plane z_facing_plane = Plane(0, 0, 1, 0);
+	const Plane x_facing_plane = Plane(1, 0, 0, 0);
+	const Plane y_facing_plane = Plane(0, 1, 0, 0);
+	const Plane z_facing_plane = Plane(0, 0, 1, 0);
 
-	constexpr Vector3 x_axis_point = Vector3(10, 0, 0);
-	constexpr Vector3 y_axis_point = Vector3(0, 10, 0);
-	constexpr Vector3 z_axis_point = Vector3(0, 0, 10);
+	const Vector3 x_axis_point = Vector3(10, 0, 0);
+	const Vector3 y_axis_point = Vector3(0, 10, 0);
+	const Vector3 z_axis_point = Vector3(0, 0, 10);
 
-	constexpr Plane x_facing_plane_with_d_offset = Plane(1, 0, 0, 1);
-	constexpr Vector3 y_axis_point_with_d_offset = Vector3(1, 10, 0);
+	const Plane x_facing_plane_with_d_offset = Plane(1, 0, 0, 1);
+	const Vector3 y_axis_point_with_d_offset = Vector3(1, 10, 0);
 
 	CHECK_MESSAGE(
 			x_facing_plane.has_point(y_axis_point),
@@ -139,9 +140,9 @@ TEST_CASE("[Plane] Has point") {
 }
 
 TEST_CASE("[Plane] Intersection") {
-	constexpr Plane x_facing_plane = Plane(1, 0, 0, 1);
-	constexpr Plane y_facing_plane = Plane(0, 1, 0, 2);
-	constexpr Plane z_facing_plane = Plane(0, 0, 1, 3);
+	const Plane x_facing_plane = Plane(1, 0, 0, 1);
+	const Plane y_facing_plane = Plane(0, 1, 0, 2);
+	const Plane z_facing_plane = Plane(0, 0, 1, 3);
 
 	Vector3 vec_out;
 
@@ -168,10 +169,10 @@ TEST_CASE("[Plane] Intersection") {
 }
 
 TEST_CASE("[Plane] Finite number checks") {
-	constexpr Vector3 x(0, 1, 2);
-	constexpr Vector3 infinite_vec(Math::NaN, Math::NaN, Math::NaN);
-	constexpr real_t y = 0;
-	constexpr real_t infinite_y = Math::NaN;
+	const Vector3 x(0, 1, 2);
+	const Vector3 infinite_vec(NAN, NAN, NAN);
+	const real_t y = 0;
+	const real_t infinite_y = NAN;
 
 	CHECK_MESSAGE(
 			Plane(x, y).is_finite(),
@@ -190,3 +191,5 @@ TEST_CASE("[Plane] Finite number checks") {
 }
 
 } // namespace TestPlane
+
+#endif // TEST_PLANE_H

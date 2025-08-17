@@ -28,9 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef WEBRTC_REGISTER_TYPES_H
+#define WEBRTC_REGISTER_TYPES_H
 
 #include "modules/register_module_types.h"
 
 void initialize_webrtc_module(ModuleInitializationLevel p_level);
 void uninitialize_webrtc_module(ModuleInitializationLevel p_level);
+
+#endif // WEBRTC_REGISTER_TYPES_H

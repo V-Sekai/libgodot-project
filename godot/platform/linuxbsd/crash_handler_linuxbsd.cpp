@@ -31,7 +31,6 @@
 #include "crash_handler_linuxbsd.h"
 
 #include "core/config/project_settings.h"
-#include "core/object/script_language.h"
 #include "core/os/os.h"
 #include "core/string/print_string.h"
 #include "core/version.h"
@@ -46,8 +45,8 @@
 #include <dlfcn.h>
 #include <execinfo.h>
 #include <link.h>
-#include <csignal>
-#include <cstdlib>
+#include <signal.h>
+#include <stdlib.h>
 
 static void handle_crash(int sig) {
 	signal(SIGSEGV, SIG_DFL);
@@ -67,8 +66,9 @@ static void handle_crash(int sig) {
 	String _execpath = OS::get_singleton()->get_executable_path();
 
 	String msg;
-	if (ProjectSettings::get_singleton()) {
-		msg = GLOBAL_GET("debug/settings/crash_handler/message");
+	const ProjectSettings *proj_settings = ProjectSettings::get_singleton();
+	if (proj_settings) {
+		msg = proj_settings->get("debug/settings/crash_handler/message");
 	}
 
 	// Tell MainLoop about the crash. This can be handled by users too in Node.
@@ -81,10 +81,10 @@ static void handle_crash(int sig) {
 	print_error(vformat("%s: Program crashed with signal %d", __FUNCTION__, sig));
 
 	// Print the engine version just before, so that people are reminded to include the version in backtrace reports.
-	if (String(GODOT_VERSION_HASH).is_empty()) {
-		print_error(vformat("Engine version: %s", GODOT_VERSION_FULL_NAME));
+	if (String(VERSION_HASH).is_empty()) {
+		print_error(vformat("Engine version: %s", VERSION_FULL_NAME));
 	} else {
-		print_error(vformat("Engine version: %s (%s)", GODOT_VERSION_FULL_NAME, GODOT_VERSION_HASH));
+		print_error(vformat("Engine version: %s (%s)", VERSION_FULL_NAME, VERSION_HASH));
 	}
 	print_error(vformat("Dumping the backtrace. %s", msg));
 	char **strings = backtrace_symbols(bt_buffer, size);
@@ -137,22 +137,13 @@ static void handle_crash(int sig) {
 				}
 			}
 
-			// Simplify printed file paths to remove redundant `/./` sections (e.g. `/opt/godot/./core` -> `/opt/godot/core`).
-			print_error(vformat("[%d] %s (%s)", (int64_t)i, fname, err == OK ? addr2line_results[i].replace("/./", "/") : ""));
+			print_error(vformat("[%d] %s (%s)", (int64_t)i, fname, err == OK ? addr2line_results[i] : ""));
 		}
 
 		free(strings);
 	}
-	print_error("-- END OF C++ BACKTRACE --");
+	print_error("-- END OF BACKTRACE --");
 	print_error("================================================================");
-
-	for (const Ref<ScriptBacktrace> &backtrace : ScriptServer::capture_script_backtraces(false)) {
-		if (!backtrace->is_empty()) {
-			print_error(backtrace->format());
-			print_error(vformat("-- END OF %s BACKTRACE --", backtrace->get_language_name().to_upper()));
-			print_error("================================================================");
-		}
-	}
 
 	// Abort to pass the error to the OS
 	abort();

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef LIGHTMAP_RAYCASTER_EMBREE_H
+#define LIGHTMAP_RAYCASTER_EMBREE_H
 
 #ifdef TOOLS_ENABLED
 
@@ -77,3 +78,5 @@ public:
 };
 
 #endif // TOOLS_ENABLED
+
+#endif // LIGHTMAP_RAYCASTER_EMBREE_H

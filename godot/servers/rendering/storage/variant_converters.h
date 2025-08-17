@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef VARIANT_CONVERTERS_H
+#define VARIANT_CONVERTERS_H
 
 #include "core/error/error_macros.h"
 #include "core/variant/array.h"
@@ -318,3 +319,5 @@ void write_array_std140(const Vector<From> &p_values, To *p_write, int p_array_s
 		}
 	}
 }
+
+#endif // VARIANT_CONVERTERS_H

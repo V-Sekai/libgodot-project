@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef EDITOR_OBJECT_SELECTOR_H
+#define EDITOR_OBJECT_SELECTOR_H
 
 #include "scene/gui/box_container.h"
 #include "scene/gui/button.h"
@@ -67,3 +68,5 @@ public:
 
 	EditorObjectSelector(EditorSelectionHistory *p_history);
 };
+
+#endif // EDITOR_OBJECT_SELECTOR_H

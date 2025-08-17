@@ -5,6 +5,7 @@
 #pragma once
 
 #include <Jolt/Core/NonCopyable.h>
+#include <Jolt/Core/FPException.h>
 #include <Jolt/Geometry/ClosestPoint.h>
 #include <Jolt/Geometry/ConvexSupport.h>
 

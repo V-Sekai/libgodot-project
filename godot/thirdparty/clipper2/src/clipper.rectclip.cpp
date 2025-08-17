@@ -1,12 +1,13 @@
 /*******************************************************************************
 * Author    :  Angus Johnson                                                   *
 * Date      :  5 July 2024                                                     *
-* Website   :  https://www.angusj.com                                          *
+* Website   :  http://www.angusj.com                                           *
 * Copyright :  Angus Johnson 2010-2024                                         *
 * Purpose   :  FAST rectangular clipping                                       *
-* License   :  https://www.boost.org/LICENSE_1_0.txt                           *
+* License   :  http://www.boost.org/LICENSE_1_0.txt                            *
 *******************************************************************************/
 
+#include <cmath>
 #include "clipper2/clipper.h"
 #include "clipper2/clipper.rectclip.h"
 
@@ -281,7 +282,7 @@ namespace Clipper2Lib {
   {
     if (op->edge) return;
     op->edge = &edge;
-    edge.emplace_back(op);
+    edge.push_back(op);
   }
 
   inline void UncoupleEdge(OutPt2* op)
@@ -327,7 +328,7 @@ namespace Clipper2Lib {
       result->pt = pt;
       result->next = result;
       result->prev = result;
-      results_.emplace_back(result);
+      results_.push_back(result);
     }
     else
     {
@@ -488,7 +489,7 @@ namespace Clipper2Lib {
         {
           bool isClockw = IsClockwise(prev, loc, prev_pt, path[i], rect_mp_);
           do {
-            start_locs_.emplace_back(prev);
+            start_locs_.push_back(prev);
             prev = GetAdjacentLocation(prev, isClockw);
           } while (prev != loc);
           crossing_loc = crossing_prev; // still not crossed
@@ -513,7 +514,7 @@ namespace Clipper2Lib {
         if (first_cross_ == Location::Inside)
         {
           first_cross_ = crossing_loc;
-          start_locs_.emplace_back(prev);
+          start_locs_.push_back(prev);
         }
         else if (prev != crossing_loc)
         {
@@ -535,7 +536,7 @@ namespace Clipper2Lib {
         if (first_cross_ == Location::Inside)
         {
           first_cross_ = loc;
-          start_locs_.emplace_back(prev);
+          start_locs_.push_back(prev);
         }
 
         loc = crossing_loc;
@@ -749,7 +750,7 @@ namespace Clipper2Lib {
       if (!isRejoining)
       {
         size_t new_idx = results_.size();
-        results_.emplace_back(p1a);
+        results_.push_back(p1a);
         SetNewOwner(p1a, new_idx);
       }
 
@@ -860,11 +861,11 @@ namespace Clipper2Lib {
     if (!op2) return Path64();
 
     Path64 result;
-    result.emplace_back(op->pt);
+    result.push_back(op->pt);
     op2 = op->next;
     while (op2 != op)
     {
-      result.emplace_back(op2->pt);
+      result.push_back(op2->pt);
       op2 = op2->next;
     }
     return result;
@@ -884,7 +885,7 @@ namespace Clipper2Lib {
       else if (rect_.Contains(path_bounds_))
       {
         // the path must be completely inside rect_
-        result.emplace_back(path);
+        result.push_back(path);
         continue;
       }
 
@@ -897,7 +898,7 @@ namespace Clipper2Lib {
       {
         Path64 tmp = GetPath(op);
         if (!tmp.empty())
-          result.emplace_back(std::move(tmp));
+          result.emplace_back(tmp);
       }
 
       //clean up after every loop
@@ -929,7 +930,7 @@ namespace Clipper2Lib {
       {
         Path64 tmp = GetPath(op);
         if (!tmp.empty())
-          result.emplace_back(std::move(tmp));
+          result.emplace_back(tmp);
       }
       results_.clear();
 
@@ -1014,11 +1015,11 @@ namespace Clipper2Lib {
     Path64 result;
     if (!op || op == op->next) return result;
     op = op->next; // starting at path beginning
-    result.emplace_back(op->pt);
+    result.push_back(op->pt);
     OutPt2 *op2 = op->next;
     while (op2 != op)
     {
-      result.emplace_back(op2->pt);
+      result.push_back(op2->pt);
       op2 = op2->next;
     }
     return result;

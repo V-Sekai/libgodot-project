@@ -28,10 +28,24 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef LRU_H
+#define LRU_H
 
+#include "core/math/math_funcs.h"
 #include "hash_map.h"
 #include "list.h"
+
+#if defined(__GNUC__) && !defined(__clang__)
+#define ADDRESS_DIAGNOSTIC_WARNING_DISABLE \
+	_Pragma("GCC diagnostic push");        \
+	_Pragma("GCC diagnostic ignored \"-Waddress\"");
+
+#define ADDRESS_DIAGNOSTIC_POP \
+	_Pragma("GCC diagnostic pop");
+#else
+#define ADDRESS_DIAGNOSTIC_WARNING_DISABLE
+#define ADDRESS_DIAGNOSTIC_POP
+#endif
 
 template <typename TKey, typename TData, typename Hasher = HashMapHasherDefault, typename Comparator = HashMapComparatorDefault<TKey>, void (*BeforeEvict)(TKey &, TData &) = nullptr>
 class LRUCache {
@@ -60,11 +74,11 @@ public:
 		Element n = _list.push_front(Pair(p_key, p_value));
 
 		if (e) {
-			GODOT_GCC_WARNING_PUSH_AND_IGNORE("-Waddress")
+			ADDRESS_DIAGNOSTIC_WARNING_DISABLE;
 			if constexpr (BeforeEvict != nullptr) {
 				BeforeEvict((*e)->get().key, (*e)->get().data);
 			}
-			GODOT_GCC_WARNING_POP
+			ADDRESS_DIAGNOSTIC_POP;
 			_list.erase(*e);
 			_map.erase(p_key);
 		}
@@ -72,11 +86,11 @@ public:
 
 		while (_map.size() > capacity) {
 			Element d = _list.back();
-			GODOT_GCC_WARNING_PUSH_AND_IGNORE("-Waddress")
+			ADDRESS_DIAGNOSTIC_WARNING_DISABLE
 			if constexpr (BeforeEvict != nullptr) {
 				BeforeEvict(d->get().key, d->get().data);
 			}
-			GODOT_GCC_WARNING_POP
+			ADDRESS_DIAGNOSTIC_POP
 			_map.erase(d->get().key);
 			_list.pop_back();
 		}
@@ -129,11 +143,11 @@ public:
 			capacity = p_capacity;
 			while (_map.size() > capacity) {
 				Element d = _list.back();
-				GODOT_GCC_WARNING_PUSH_AND_IGNORE("-Waddress")
+				ADDRESS_DIAGNOSTIC_WARNING_DISABLE;
 				if constexpr (BeforeEvict != nullptr) {
 					BeforeEvict(d->get().key, d->get().data);
 				}
-				GODOT_GCC_WARNING_POP
+				ADDRESS_DIAGNOSTIC_POP;
 				_map.erase(d->get().key);
 				_list.pop_back();
 			}
@@ -148,3 +162,8 @@ public:
 		capacity = p_capacity;
 	}
 };
+
+#undef ADDRESS_DIAGNOSTIC_WARNING_DISABLE
+#undef ADDRESS_DIAGNOSTIC_POP
+
+#endif // LRU_H

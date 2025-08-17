@@ -156,7 +156,7 @@ struct index_map_subset_plan_t
       unsigned outer = (*new_varidx) >> 16;
       unsigned bit_count = (outer == 0) ? 1 : hb_bit_storage (outer);
       outer_bit_count = hb_max (bit_count, outer_bit_count);
-
+      
       unsigned inner = (*new_varidx) & 0xFFFF;
       bit_count = (inner == 0) ? 1 : hb_bit_storage (inner);
       inner_bit_count = hb_max (bit_count, inner_bit_count);
@@ -284,8 +284,6 @@ struct HVARVVAR
   static constexpr hb_tag_t HVARTag = HB_OT_TAG_HVAR;
   static constexpr hb_tag_t VVARTag = HB_OT_TAG_VVAR;
 
-  bool has_data () const { return version.major != 0; }
-
   bool sanitize (hb_sanitize_context_t *c) const
   {
     TRACE_SANITIZE (this);
@@ -384,15 +382,24 @@ struct HVARVVAR
 						hvar_plan.index_map_plans.as_array ()));
   }
 
-  HB_ALWAYS_INLINE
   float get_advance_delta_unscaled (hb_codepoint_t  glyph,
 				    const int *coords, unsigned int coord_count,
-				    hb_scalar_cache_t *store_cache = nullptr) const
+				    ItemVariationStore::cache_t *store_cache = nullptr) const
   {
     uint32_t varidx = (this+advMap).map (glyph);
     return (this+varStore).get_delta (varidx,
 				      coords, coord_count,
 				      store_cache);
+  }
+
+  bool get_lsb_delta_unscaled (hb_codepoint_t glyph,
+			       const int *coords, unsigned int coord_count,
+			       float *lsb) const
+  {
+    if (!lsbMap) return false;
+    uint32_t varidx = (this+lsbMap).map (glyph);
+    *lsb = (this+varStore).get_delta (varidx, coords, coord_count);
+    return true;
   }
 
   public:
@@ -447,16 +454,14 @@ struct VVAR : HVARVVAR {
 
   bool subset (hb_subset_context_t *c) const { return HVARVVAR::_subset<VVAR> (c); }
 
-  HB_ALWAYS_INLINE
-  float get_vorg_delta_unscaled (hb_codepoint_t glyph,
-				 const int *coords, unsigned int coord_count,
-				 hb_scalar_cache_t *store_cache = nullptr) const
+  bool get_vorg_delta_unscaled (hb_codepoint_t glyph,
+				const int *coords, unsigned int coord_count,
+				float *delta) const
   {
-    if (!vorgMap) return 0.f;
+    if (!vorgMap) return false;
     uint32_t varidx = (this+vorgMap).map (glyph);
-    return (this+varStore).get_delta (varidx,
-				      coords, coord_count,
-				      store_cache);
+    *delta = (this+varStore).get_delta (varidx, coords, coord_count);
+    return true;
   }
 
   protected:

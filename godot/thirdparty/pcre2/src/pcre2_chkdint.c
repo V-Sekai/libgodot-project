@@ -63,7 +63,7 @@ The INT64_OR_DOUBLE type is a 64-bit integer type when available,
 otherwise double. */
 
 BOOL
-PCRE2_SUFFIX(_pcre2_ckd_smul_)(PCRE2_SIZE *r, int a, int b)
+PCRE2_SUFFIX(_pcre2_ckd_smul)(PCRE2_SIZE *r, int a, int b)
 {
 #ifdef HAVE_BUILTIN_MUL_OVERFLOW
 PCRE2_SIZE m;
@@ -74,7 +74,9 @@ if (__builtin_mul_overflow(a, b, &m)) return TRUE;
 #else
 INT64_OR_DOUBLE m;
 
-PCRE2_ASSERT(a >= 0 && b >= 0);
+#ifdef PCRE2_DEBUG
+if (a < 0 || b < 0) abort();
+#endif
 
 m = (INT64_OR_DOUBLE)a * (INT64_OR_DOUBLE)b;
 
@@ -91,4 +93,4 @@ if (m > PCRE2_SIZE_MAX) return TRUE;
 return FALSE;
 }
 
-/* End of pcre2_chkdint.c */
+/* End of pcre_chkdint.c */

@@ -53,9 +53,7 @@ struct WindowData {
 	CAEAGLLayer *layer;
 #endif
 #if defined(MACOS_ENABLED)
-	GODOT_CLANG_WARNING_PUSH_AND_IGNORE("-Wdeprecated-declarations") // OpenGL is deprecated in macOS 10.14.
 	CAOpenGLLayer *layer;
-	GODOT_CLANG_WARNING_POP
 #endif
 };
 
@@ -101,8 +99,8 @@ void GLESContextApple::initialize() {
 
 void GLESContextApple::resized(DisplayServer::WindowID p_id) {
 	ERR_FAIL_COND(!windows.has(p_id));
-#if defined(IOS_ENABLED)
 	WindowData &gles_data = windows[p_id];
+#if defined(IOS_ENABLED)
 	[EAGLContext setCurrentContext:context];
 	CAEAGLLayer *layer = gles_data.layer;
 	destroy_framebuffer(p_id);
@@ -112,8 +110,8 @@ void GLESContextApple::resized(DisplayServer::WindowID p_id) {
 
 void GLESContextApple::begin_rendering(DisplayServer::WindowID p_id) {
 	ERR_FAIL_COND(!windows.has(p_id));
-#if defined(IOS_ENABLED)
 	WindowData &gles_data = windows[p_id];
+#if defined(IOS_ENABLED)
 	[EAGLContext setCurrentContext:context];
 	glBindFramebufferOES(GL_FRAMEBUFFER_OES, gles_data.viewFramebuffer);
 #endif
@@ -121,8 +119,8 @@ void GLESContextApple::begin_rendering(DisplayServer::WindowID p_id) {
 
 void GLESContextApple::end_rendering(DisplayServer::WindowID p_id) {
 	ERR_FAIL_COND(!windows.has(p_id));
-#if defined(IOS_ENABLED)
 	WindowData &gles_data = windows[p_id];
+#if defined(IOS_ENABLED)
 	[EAGLContext setCurrentContext:context];
 	glBindRenderbufferOES(GL_RENDERBUFFER_OES, gles_data.viewRenderbuffer);
 	[context presentRenderbuffer:GL_RENDERBUFFER_OES];
@@ -165,8 +163,8 @@ bool GLESContextApple::create_framebuffer(DisplayServer::WindowID p_id, Ref<Rend
 }
 
 bool GLESContextApple::create_framebuffer(DisplayServer::WindowID p_id, void *p_layer) {
-#if defined(IOS_ENABLED)
 	WindowData &gles_data = windows[p_id];
+#if defined(IOS_ENABLED)
 	[EAGLContext setCurrentContext:context];
 	gles_data.layer = (__bridge CAEAGLLayer *)p_layer;
 
@@ -203,8 +201,8 @@ bool GLESContextApple::create_framebuffer(DisplayServer::WindowID p_id, void *p_
 // Clean up any buffers we have allocated.
 bool GLESContextApple::destroy_framebuffer(DisplayServer::WindowID p_id) {
 	ERR_FAIL_COND_V(!windows.has(p_id), false);
-#if defined(IOS_ENABLED)
 	WindowData &gles_data = windows[p_id];
+#if defined(IOS_ENABLED)
 	[EAGLContext setCurrentContext:context];
 	glDeleteFramebuffersOES(1, &gles_data.viewFramebuffer);
 	gles_data.viewFramebuffer = 0;
@@ -254,7 +252,7 @@ uint64_t RenderingNativeSurfaceApple::get_layer() {
 RenderingContextDriver *RenderingNativeSurfaceApple::create_rendering_context(const String &p_rendering_driver) {
 #if defined(VULKAN_ENABLED)
 	if (p_rendering_driver == "vulkan") {
-		return memnew(RenderingContextDriverVulkanMoltenVK);
+		return memnew(RenderingContextDriverVulkanMoltenVk);
 	}
 #endif
 #if defined(METAL_ENABLED)

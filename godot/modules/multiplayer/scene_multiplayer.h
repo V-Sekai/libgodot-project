@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SCENE_MULTIPLAYER_H
+#define SCENE_MULTIPLAYER_H
 
 #include "scene_cache_interface.h"
 #include "scene_replication_interface.h"
@@ -203,3 +204,5 @@ public:
 	SceneMultiplayer();
 	~SceneMultiplayer();
 };
+
+#endif // SCENE_MULTIPLAYER_H

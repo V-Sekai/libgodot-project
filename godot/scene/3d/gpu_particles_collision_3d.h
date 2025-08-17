@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GPU_PARTICLES_COLLISION_3D_H
+#define GPU_PARTICLES_COLLISION_3D_H
 
 #include "core/templates/local_vector.h"
 #include "scene/3d/visual_instance_3d.h"
@@ -363,3 +364,5 @@ public:
 	GPUParticlesAttractorVectorField3D();
 	~GPUParticlesAttractorVectorField3D();
 };
+
+#endif // GPU_PARTICLES_COLLISION_3D_H

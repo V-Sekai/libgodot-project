@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef EDITOR_VALIDATION_PANEL_H
+#define EDITOR_VALIDATION_PANEL_H
 
 #include "scene/gui/panel_container.h"
 
@@ -83,3 +84,5 @@ public:
 
 	EditorValidationPanel();
 };
+
+#endif // EDITOR_VALIDATION_PANEL_H

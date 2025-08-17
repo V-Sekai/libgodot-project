@@ -5,9 +5,13 @@
 #VERSION_DEFINES
 
 #ifdef USE_MULTIVIEW
+#ifdef has_VK_KHR_multiview
 #extension GL_EXT_multiview : enable
 #define ViewIndex gl_ViewIndex
-#endif // USE_MULTIVIEW
+#else // has_VK_KHR_multiview
+#define ViewIndex 0
+#endif // has_VK_KHR_multiview
+#endif //USE_MULTIVIEW
 
 #define FLAG_FLIP_Y (1 << 0)
 #define FLAG_USE_SECTION (1 << 1)
@@ -62,6 +66,15 @@ void main() {
 #version 450
 
 #VERSION_DEFINES
+
+#ifdef USE_MULTIVIEW
+#ifdef has_VK_KHR_multiview
+#extension GL_EXT_multiview : enable
+#define ViewIndex gl_ViewIndex
+#else // has_VK_KHR_multiview
+#define ViewIndex 0
+#endif // has_VK_KHR_multiview
+#endif //USE_MULTIVIEW
 
 #define FLAG_FLIP_Y (1 << 0)
 #define FLAG_USE_SECTION (1 << 1)

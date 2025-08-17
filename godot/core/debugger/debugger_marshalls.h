@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef DEBUGGER_MARSHALLS_H
+#define DEBUGGER_MARSHALLS_H
 
 #include "core/input/shortcut.h"
 #include "core/object/script_language.h"
@@ -72,3 +73,5 @@ struct DebuggerMarshalls {
 	static Array serialize_key_shortcut(const Ref<Shortcut> &p_shortcut);
 	static Ref<Shortcut> deserialize_key_shortcut(const Array &p_keys);
 };
+
+#endif // DEBUGGER_MARSHALLS_H

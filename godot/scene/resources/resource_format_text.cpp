@@ -34,7 +34,6 @@
 #include "core/io/dir_access.h"
 #include "core/io/missing_resource.h"
 #include "core/object/script_language.h"
-#include "scene/property_utils.h"
 
 void ResourceLoaderText::_printerr() {
 	ERR_PRINT(vformat("%s:%d - Parse Error: %s.", res_path, lines, error_text));
@@ -157,6 +156,10 @@ Error ResourceLoaderText::_parse_ext_resource(VariantParser::Stream *p_stream, R
 					}
 				}
 			} else {
+#ifdef TOOLS_ENABLED
+				//remember ID for saving
+				res->set_id_for_path(local_path, id);
+#endif
 				r_res = res;
 			}
 		} else {
@@ -481,13 +484,6 @@ Error ResourceLoaderText::load() {
 
 		resource_current++;
 	}
-
-#ifdef TOOLS_ENABLED
-	for (const KeyValue<String, ExtResource> &E : ext_resources) {
-		// Remember ID for saving.
-		Resource::set_resource_id_for_path(local_path, E.value.path, E.key);
-	}
-#endif
 
 	//these are the ones that count
 	resources_total -= resource_current;
@@ -1227,9 +1223,14 @@ Error ResourceLoaderText::get_classes_used(HashSet<StringName> *r_classes) {
 			return error;
 		}
 
-		if (next_tag.fields.has("type")) {
-			r_classes->insert(next_tag.fields["type"]);
+		if (!next_tag.fields.has("type")) {
+			error = ERR_FILE_CORRUPT;
+			error_text = "Missing 'type' in external resource tag";
+			_printerr();
+			return error;
 		}
+
+		r_classes->insert(next_tag.fields["type"]);
 
 		while (true) {
 			String assign;
@@ -1446,9 +1447,9 @@ bool ResourceFormatLoaderText::handles_type(const String &p_type) const {
 }
 
 void ResourceFormatLoaderText::get_classes_used(const String &p_path, HashSet<StringName> *r_classes) {
-	const String type = get_resource_type(p_path);
-	if (!type.is_empty()) {
-		r_classes->insert(type);
+	String ext = p_path.get_extension().to_lower();
+	if (ext == "tscn") {
+		r_classes->insert("PackedScene");
 	}
 
 	// ...for anything else must test...
@@ -1673,11 +1674,14 @@ void ResourceFormatSaverTextInstance::_find_resources(const Variant &p_variant, 
 			Dictionary d = p_variant;
 			_find_resources(d.get_typed_key_script());
 			_find_resources(d.get_typed_value_script());
-			for (const KeyValue<Variant, Variant> &kv : d) {
+			List<Variant> keys;
+			d.get_key_list(&keys);
+			for (const Variant &E : keys) {
 				// Of course keys should also be cached, after all we can't prevent users from using resources as keys, right?
 				// See also ResourceFormatSaverBinaryInstance::_find_resources (when p_variant is of type Variant::DICTIONARY)
-				_find_resources(kv.key);
-				_find_resources(kv.value);
+				_find_resources(E);
+				Variant v = d[E];
+				_find_resources(v);
 			}
 		} break;
 		case Variant::PACKED_BYTE_ARRAY: {
@@ -1904,18 +1908,18 @@ Error ResourceFormatSaverTextInstance::save(const String &p_path, const Ref<Reso
 
 		List<PropertyInfo> property_list;
 		res->get_property_list(&property_list);
-		for (const PropertyInfo &pi : property_list) {
-			if (skip_editor && pi.name.begins_with("__editor")) {
+		for (List<PropertyInfo>::Element *PE = property_list.front(); PE; PE = PE->next()) {
+			if (skip_editor && PE->get().name.begins_with("__editor")) {
 				continue;
 			}
-			if (pi.name == META_PROPERTY_MISSING_RESOURCES) {
+			if (PE->get().name == META_PROPERTY_MISSING_RESOURCES) {
 				continue;
 			}
 
-			if (pi.usage & PROPERTY_USAGE_STORAGE || missing_resource_properties.has(pi.name)) {
-				String name = pi.name;
+			if (PE->get().usage & PROPERTY_USAGE_STORAGE || missing_resource_properties.has(PE->get().name)) {
+				String name = PE->get().name;
 				Variant value;
-				if (pi.usage & PROPERTY_USAGE_RESOURCE_NOT_PERSISTENT) {
+				if (PE->get().usage & PROPERTY_USAGE_RESOURCE_NOT_PERSISTENT) {
 					NonPersistentKey npk;
 					npk.base = res;
 					npk.property = name;
@@ -1926,22 +1930,21 @@ Error ResourceFormatSaverTextInstance::save(const String &p_path, const Ref<Reso
 					value = res->get(name);
 				}
 
-				if (pi.type == Variant::OBJECT && missing_resource_properties.has(pi.name)) {
+				if (PE->get().type == Variant::OBJECT && missing_resource_properties.has(PE->get().name)) {
 					// Was this missing resource overridden? If so do not save the old value.
 					Ref<Resource> ures = value;
 					if (ures.is_null()) {
-						value = missing_resource_properties[pi.name];
+						value = missing_resource_properties[PE->get().name];
 					}
 				}
 
-				bool is_script = name == CoreStringName(script);
-				Variant default_value = is_script ? Variant() : PropertyUtils::get_property_default_value(res.ptr(), name);
+				Variant default_value = ClassDB::class_get_default_property_value(res->get_class(), name);
 
 				if (default_value.get_type() != Variant::NIL && bool(Variant::evaluate(Variant::OP_EQUAL, value, default_value))) {
 					continue;
 				}
 
-				if (pi.type == Variant::OBJECT && value.is_zero() && !(pi.usage & PROPERTY_USAGE_STORE_IF_NULL)) {
+				if (PE->get().type == Variant::OBJECT && value.is_zero() && !(PE->get().usage & PROPERTY_USAGE_STORE_IF_NULL)) {
 					continue;
 				}
 

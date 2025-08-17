@@ -28,13 +28,14 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GODOT_LSP_H
+#define GODOT_LSP_H
 
 #include "core/doc_data.h"
 #include "core/object/class_db.h"
 #include "core/templates/list.h"
 
-namespace LSP {
+namespace lsp {
 
 typedef String DocumentUri;
 
@@ -238,25 +239,6 @@ struct ReferenceContext {
 	bool includeDeclaration = false;
 };
 
-struct ShowMessageParams {
-	/**
-	 * The message type. See {@link MessageType}.
-	 */
-	int type;
-
-	/**
-	 * The actual message.
-	 */
-	String message;
-
-	_FORCE_INLINE_ Dictionary to_json() const {
-		Dictionary dict;
-		dict["type"] = type;
-		dict["message"] = message;
-		return dict;
-	}
-};
-
 struct ReferenceParams : TextDocumentPositionParams {
 	ReferenceContext context;
 };
@@ -402,7 +384,7 @@ struct Command {
 };
 
 // Use namespace instead of enumeration to follow the LSP specifications.
-// `LSP::EnumName::EnumValue` is OK but `LSP::EnumValue` is not.
+// `lsp::EnumName::EnumValue` is OK but `lsp::EnumValue` is not.
 
 namespace TextDocumentSyncKind {
 /**
@@ -423,25 +405,6 @@ static const int Full = 1;
  */
 static const int Incremental = 2;
 }; // namespace TextDocumentSyncKind
-
-namespace MessageType {
-/**
- * An error message.
- */
-static const int Error = 1;
-/**
- * A warning message.
- */
-static const int Warning = 2;
-/**
- * An information message.
- */
-static const int Info = 3;
-/**
- * A log message.
- */
-static const int Log = 4;
-}; // namespace MessageType
 
 /**
  * Completion options.
@@ -898,7 +861,7 @@ struct MarkupContent {
 };
 
 // Use namespace instead of enumeration to follow the LSP specifications
-// `LSP::EnumName::EnumValue` is OK but `LSP::EnumValue` is not.
+// `lsp::EnumName::EnumValue` is OK but `lsp::EnumValue` is not.
 // And here C++ compilers are unhappy with our enumeration name like `Color`, `File`, `RefCounted` etc.
 /**
  * The kind of a completion entry.
@@ -1155,7 +1118,7 @@ struct CompletionList {
 };
 
 // Use namespace instead of enumeration to follow the LSP specifications
-// `LSP::EnumName::EnumValue` is OK but `LSP::EnumValue` is not
+// `lsp::EnumName::EnumValue` is OK but `lsp::EnumValue` is not
 // And here C++ compilers are unhappy with our enumeration name like `String`, `Array`, `Object` etc
 /**
  * A symbol kind.
@@ -1296,7 +1259,7 @@ struct DocumentSymbol {
 	}
 
 	_FORCE_INLINE_ CompletionItem make_completion_item(bool resolved = false) const {
-		LSP::CompletionItem item;
+		lsp::CompletionItem item;
 		item.label = name;
 
 		if (resolved) {
@@ -1304,33 +1267,33 @@ struct DocumentSymbol {
 		}
 
 		switch (kind) {
-			case LSP::SymbolKind::Enum:
-				item.kind = LSP::CompletionItemKind::Enum;
+			case lsp::SymbolKind::Enum:
+				item.kind = lsp::CompletionItemKind::Enum;
 				break;
-			case LSP::SymbolKind::Class:
-				item.kind = LSP::CompletionItemKind::Class;
+			case lsp::SymbolKind::Class:
+				item.kind = lsp::CompletionItemKind::Class;
 				break;
-			case LSP::SymbolKind::Property:
-				item.kind = LSP::CompletionItemKind::Property;
+			case lsp::SymbolKind::Property:
+				item.kind = lsp::CompletionItemKind::Property;
 				break;
-			case LSP::SymbolKind::Method:
-			case LSP::SymbolKind::Function:
-				item.kind = LSP::CompletionItemKind::Method;
+			case lsp::SymbolKind::Method:
+			case lsp::SymbolKind::Function:
+				item.kind = lsp::CompletionItemKind::Method;
 				break;
-			case LSP::SymbolKind::Event:
-				item.kind = LSP::CompletionItemKind::Event;
+			case lsp::SymbolKind::Event:
+				item.kind = lsp::CompletionItemKind::Event;
 				break;
-			case LSP::SymbolKind::Constant:
-				item.kind = LSP::CompletionItemKind::Constant;
+			case lsp::SymbolKind::Constant:
+				item.kind = lsp::CompletionItemKind::Constant;
 				break;
-			case LSP::SymbolKind::Variable:
-				item.kind = LSP::CompletionItemKind::Variable;
+			case lsp::SymbolKind::Variable:
+				item.kind = lsp::CompletionItemKind::Variable;
 				break;
-			case LSP::SymbolKind::File:
-				item.kind = LSP::CompletionItemKind::File;
+			case lsp::SymbolKind::File:
+				item.kind = lsp::CompletionItemKind::File;
 				break;
 			default:
-				item.kind = LSP::CompletionItemKind::Text;
+				item.kind = lsp::CompletionItemKind::Text;
 				break;
 		}
 
@@ -1790,7 +1753,7 @@ struct ServerCapabilities {
 	/**
 	 * The server provides workspace symbol support.
 	 */
-	bool workspaceSymbolProvider = false;
+	bool workspaceSymbolProvider = true;
 
 	/**
 	 * The server supports workspace folder.
@@ -1911,7 +1874,7 @@ struct GodotNativeClassInfo {
 	const DocData::ClassDoc *class_doc = nullptr;
 	const ClassDB::ClassInfo *class_info = nullptr;
 
-	Dictionary to_json() const {
+	Dictionary to_json() {
 		Dictionary dict;
 		dict["name"] = name;
 		dict["inherits"] = class_doc->inherits;
@@ -1926,11 +1889,11 @@ struct GodotCapabilities {
 	 */
 	List<GodotNativeClassInfo> native_classes;
 
-	Dictionary to_json() const {
+	Dictionary to_json() {
 		Dictionary dict;
 		Array classes;
-		for (const GodotNativeClassInfo &native_class : native_classes) {
-			classes.push_back(native_class.to_json());
+		for (List<GodotNativeClassInfo>::Element *E = native_classes.front(); E; E = E->next()) {
+			classes.push_back(E->get().to_json());
 		}
 		dict["native_classes"] = classes;
 		return dict;
@@ -1954,7 +1917,7 @@ static String marked_documentation(const String &p_bbcode) {
 			in_code_block = true;
 			line = "\n";
 		} else if (in_code_block) {
-			line = "\t" + line.substr(code_block_indent);
+			line = "\t" + line.substr(code_block_indent, line.length());
 		}
 
 		if (in_code_block && line.contains("[/codeblock]")) {
@@ -1977,7 +1940,8 @@ static String marked_documentation(const String &p_bbcode) {
 			line = line.replace("[signal ", "`");
 			line = line.replace("[enum ", "`");
 			line = line.replace("[constant ", "`");
-			line = line.replace_chars("[]", '`');
+			line = line.replace("[", "`");
+			line = line.replace("]", "`");
 		}
 
 		if (!in_code_block && i < lines.size() - 1) {
@@ -1989,4 +1953,6 @@ static String marked_documentation(const String &p_bbcode) {
 	}
 	return markdown;
 }
-} // namespace LSP
+} // namespace lsp
+
+#endif // GODOT_LSP_H

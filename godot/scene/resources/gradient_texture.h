@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GRADIENT_TEXTURE_H
+#define GRADIENT_TEXTURE_H
 
 #include "scene/resources/texture.h"
 
@@ -141,3 +142,5 @@ public:
 
 VARIANT_ENUM_CAST(GradientTexture2D::Fill);
 VARIANT_ENUM_CAST(GradientTexture2D::Repeat);
+
+#endif // GRADIENT_TEXTURE_H

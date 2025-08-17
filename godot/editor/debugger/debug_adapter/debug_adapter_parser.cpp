@@ -34,8 +34,8 @@
 #include "editor/debugger/editor_debugger_node.h"
 #include "editor/debugger/script_editor_debugger.h"
 #include "editor/export/editor_export_platform.h"
-#include "editor/run/editor_run_bar.h"
-#include "editor/script/script_editor_plugin.h"
+#include "editor/gui/editor_run_bar.h"
+#include "editor/plugins/script_editor_plugin.h"
 
 void DebugAdapterParser::_bind_methods() {
 	// Requests
@@ -144,7 +144,9 @@ Dictionary DebugAdapterParser::req_initialize(const Dictionary &p_params) const 
 		// Send all current breakpoints
 		List<String> breakpoints;
 		ScriptEditor::get_singleton()->get_breakpoints(&breakpoints);
-		for (const String &breakpoint : breakpoints) {
+		for (List<String>::Element *E = breakpoints.front(); E; E = E->next()) {
+			String breakpoint = E->get();
+
 			String path = breakpoint.left(breakpoint.find_char(':', 6)); // Skip initial part of path, aka "res://"
 			int line = breakpoint.substr(path.size()).to_int();
 
@@ -299,11 +301,12 @@ Dictionary DebugAdapterParser::req_threads(const Dictionary &p_params) const {
 	Dictionary response = prepare_success_response(p_params), body;
 	response["body"] = body;
 
+	Array arr;
 	DAP::Thread thread;
 
 	thread.id = 1; // Hardcoded because Godot only supports debugging one thread at the moment
 	thread.name = "Main";
-	Array arr = { thread.to_json() };
+	arr.push_back(thread.to_json());
 	body["threads"] = arr;
 
 	return response;
@@ -322,7 +325,8 @@ Dictionary DebugAdapterParser::req_stackTrace(const Dictionary &p_params) const 
 
 	Array arr;
 	DebugAdapterProtocol *dap = DebugAdapterProtocol::get_singleton();
-	for (DAP::StackFrame sf : dap->stackframe_list) {
+	for (const KeyValue<DAP::StackFrame, List<int>> &E : dap->stackframe_list) {
+		DAP::StackFrame sf = E.key;
 		if (!lines_at_one) {
 			sf.line--;
 		}
@@ -356,7 +360,7 @@ Dictionary DebugAdapterParser::req_setBreakpoints(const Dictionary &p_params) co
 
 	// If path contains \, it's a Windows path, so we need to convert it to /, and make the drive letter uppercase
 	if (source.path.contains_char('\\')) {
-		source.path = source.path.replace_char('\\', '/');
+		source.path = source.path.replace("\\", "/");
 		source.path = source.path.substr(0, 1).to_upper() + source.path.substr(1);
 	}
 
@@ -368,8 +372,6 @@ Dictionary DebugAdapterParser::req_setBreakpoints(const Dictionary &p_params) co
 		lines.push_back(breakpoint.line + !lines_at_one);
 	}
 
-	// Always update the source checksum for the requested path, as it might have been modified externally.
-	DebugAdapterProtocol::get_singleton()->update_source(source.path);
 	Array updated_breakpoints = DebugAdapterProtocol::get_singleton()->update_breakpoints(source.path, lines);
 	body["breakpoints"] = updated_breakpoints;
 
@@ -381,12 +383,13 @@ Dictionary DebugAdapterParser::req_breakpointLocations(const Dictionary &p_param
 	response["body"] = body;
 	Dictionary args = p_params["arguments"];
 
+	Array locations;
 	DAP::BreakpointLocation location;
 	location.line = args["line"];
 	if (args.has("endLine")) {
 		location.endLine = args["endLine"];
 	}
-	Array locations = { location.to_json() };
+	locations.push_back(location.to_json());
 
 	body["breakpoints"] = locations;
 	return response;
@@ -400,13 +403,15 @@ Dictionary DebugAdapterParser::req_scopes(const Dictionary &p_params) const {
 	int frame_id = args["frameId"];
 	Array scope_list;
 
-	HashMap<DebugAdapterProtocol::DAPStackFrameID, Vector<int>>::Iterator E = DebugAdapterProtocol::get_singleton()->scope_list.find(frame_id);
+	DAP::StackFrame frame;
+	frame.id = frame_id;
+	HashMap<DAP::StackFrame, List<int>, DAP::StackFrame>::Iterator E = DebugAdapterProtocol::get_singleton()->stackframe_list.find(frame);
 	if (E) {
-		const Vector<int> &scope_ids = E->value;
-		ERR_FAIL_COND_V(scope_ids.size() != 3, prepare_error_response(p_params, DAP::ErrorType::UNKNOWN));
-		for (int i = 0; i < 3; ++i) {
+		ERR_FAIL_COND_V(E->value.size() != 3, prepare_error_response(p_params, DAP::ErrorType::UNKNOWN));
+		List<int>::ConstIterator itr = E->value.begin();
+		for (int i = 0; i < 3; ++itr, ++i) {
 			DAP::Scope scope;
-			scope.variablesReference = scope_ids[i];
+			scope.variablesReference = *itr;
 			switch (i) {
 				case 0:
 					scope.name = "Locals";
@@ -590,7 +595,8 @@ Dictionary DebugAdapterParser::ev_stopped_breakpoint(const int &p_id) const {
 	body["reason"] = "breakpoint";
 	body["description"] = "Breakpoint";
 
-	Array breakpoints = { p_id };
+	Array breakpoints;
+	breakpoints.push_back(p_id);
 	body["hitBreakpointIds"] = breakpoints;
 
 	return event;

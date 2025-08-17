@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef RAYCAST_OCCLUSION_CULL_H
+#define RAYCAST_OCCLUSION_CULL_H
 
 #include "core/math/projection.h"
 #include "core/templates/local_vector.h"
@@ -189,3 +190,5 @@ public:
 	RaycastOcclusionCull();
 	~RaycastOcclusionCull();
 };
+
+#endif // RAYCAST_OCCLUSION_CULL_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef NAVIGATION_UTILITIES_H
+#define NAVIGATION_UTILITIES_H
 
 #include "core/math/vector3.h"
 #include "core/variant/typed_array.h"
@@ -59,3 +60,5 @@ enum PathMetadataFlags {
 };
 
 } //namespace NavigationUtilities
+
+#endif // NAVIGATION_UTILITIES_H

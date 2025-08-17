@@ -44,6 +44,7 @@
 #include "audio/effects/audio_effect_eq.h"
 #include "audio/effects/audio_effect_filter.h"
 #include "audio/effects/audio_effect_hard_limiter.h"
+#include "audio/effects/audio_effect_limiter.h"
 #include "audio/effects/audio_effect_panner.h"
 #include "audio/effects/audio_effect_phaser.h"
 #include "audio/effects/audio_effect_pitch_shift.h"
@@ -58,7 +59,9 @@
 #include "debugger/servers_debugger.h"
 #include "display/native_menu.h"
 #include "display_server.h"
+#include "display_server_embedded.h"
 #include "movie_writer/movie_writer.h"
+#include "movie_writer/movie_writer_mjpeg.h"
 #include "movie_writer/movie_writer_pngwav.h"
 #include "rendering/renderer_rd/framebuffer_cache_rd.h"
 #include "rendering/renderer_rd/storage_rd/render_data_rd.h"
@@ -77,30 +80,19 @@
 #include "text/text_server_dummy.h"
 #include "text/text_server_extension.h"
 #include "text_server.h"
-#ifndef DISABLE_DEPRECATED
-#include "audio/effects/audio_effect_limiter.h"
-#endif
 
 // 2D physics and navigation.
-#ifndef NAVIGATION_2D_DISABLED
 #include "navigation_server_2d.h"
-#endif // NAVIGATION_2D_DISABLED
-#ifndef PHYSICS_2D_DISABLED
 #include "physics_server_2d.h"
 #include "physics_server_2d_dummy.h"
 #include "servers/extensions/physics_server_2d_extension.h"
-#endif // PHYSICS_2D_DISABLED
 
-// 3D physics and navigation.
-#ifndef NAVIGATION_3D_DISABLED
+// 3D physics and navigation (3D navigation is needed for 2D).
 #include "navigation_server_3d.h"
-#endif // NAVIGATION_3D_DISABLED
-#ifndef PHYSICS_3D_DISABLED
+#ifndef _3D_DISABLED
 #include "physics_server_3d.h"
 #include "physics_server_3d_dummy.h"
 #include "servers/extensions/physics_server_3d_extension.h"
-#endif // PHYSICS_3D_DISABLED
-#ifndef XR_DISABLED
 #include "xr/xr_body_tracker.h"
 #include "xr/xr_controller_tracker.h"
 #include "xr/xr_face_tracker.h"
@@ -109,21 +101,19 @@
 #include "xr/xr_interface_extension.h"
 #include "xr/xr_positional_tracker.h"
 #include "xr_server.h"
-#endif // XR_DISABLED
+#endif // _3D_DISABLED
 
 ShaderTypes *shader_types = nullptr;
 
-#ifndef PHYSICS_2D_DISABLED
-static PhysicsServer2D *_create_dummy_physics_server_2d() {
-	return memnew(PhysicsServer2DDummy);
-}
-#endif // PHYSICS_2D_DISABLED
-
-#ifndef PHYSICS_3D_DISABLED
+#ifndef _3D_DISABLED
 static PhysicsServer3D *_create_dummy_physics_server_3d() {
 	return memnew(PhysicsServer3DDummy);
 }
-#endif // PHYSICS_3D_DISABLED
+#endif // _3D_DISABLED
+
+static PhysicsServer2D *_create_dummy_physics_server_2d() {
+	return memnew(PhysicsServer2DDummy);
+}
 
 static bool has_server_feature_callback(const String &p_feature) {
 	if (RenderingServer::get_singleton()) {
@@ -135,12 +125,14 @@ static bool has_server_feature_callback(const String &p_feature) {
 	return false;
 }
 
+static MovieWriterMJPEG *writer_mjpeg = nullptr;
 static MovieWriterPNGWAV *writer_pngwav = nullptr;
 
 void register_core_server_types() {
 	OS::get_singleton()->benchmark_begin_measure("Servers", "Register Core Extensions");
 	GDREGISTER_ABSTRACT_CLASS(RenderingNativeSurface);
 	GDREGISTER_ABSTRACT_CLASS(DisplayServer);
+	GDREGISTER_ABSTRACT_CLASS(DisplayServerEmbedded);
 	OS::get_singleton()->benchmark_end_measure("Servers", "Register Core Extensions");
 }
 
@@ -215,18 +207,16 @@ void register_server_types() {
 		GDREGISTER_CLASS(AudioEffectChorus);
 		GDREGISTER_CLASS(AudioEffectDelay);
 		GDREGISTER_CLASS(AudioEffectCompressor);
+		GDREGISTER_CLASS(AudioEffectLimiter);
 		GDREGISTER_CLASS(AudioEffectHardLimiter);
 		GDREGISTER_CLASS(AudioEffectPitchShift);
 		GDREGISTER_CLASS(AudioEffectPhaser);
+
 		GDREGISTER_CLASS(AudioEffectRecord);
 		GDREGISTER_CLASS(AudioEffectSpectrumAnalyzer);
 		GDREGISTER_ABSTRACT_CLASS(AudioEffectSpectrumAnalyzerInstance);
 
 		GDREGISTER_CLASS(AudioEffectCapture);
-
-#ifndef DISABLE_DEPRECATED
-		GDREGISTER_CLASS(AudioEffectLimiter);
-#endif
 	}
 
 	GDREGISTER_ABSTRACT_CLASS(RenderingDevice);
@@ -270,13 +260,6 @@ void register_server_types() {
 
 	ServersDebugger::initialize();
 
-#ifndef NAVIGATION_2D_DISABLED
-	GDREGISTER_ABSTRACT_CLASS(NavigationServer2D);
-	GDREGISTER_CLASS(NavigationPathQueryParameters2D);
-	GDREGISTER_CLASS(NavigationPathQueryResult2D);
-#endif // NAVIGATION_2D_DISABLED
-
-#ifndef PHYSICS_2D_DISABLED
 	// Physics 2D
 	GDREGISTER_CLASS(PhysicsServer2DManager);
 	Engine::get_singleton()->add_singleton(Engine::Singleton("PhysicsServer2DManager", PhysicsServer2DManager::get_singleton(), "PhysicsServer2DManager"));
@@ -302,15 +285,12 @@ void register_server_types() {
 	GLOBAL_DEF(PropertyInfo(Variant::STRING, PhysicsServer2DManager::setting_property_name, PROPERTY_HINT_ENUM, "DEFAULT"), "DEFAULT");
 
 	PhysicsServer2DManager::get_singleton()->register_server("Dummy", callable_mp_static(_create_dummy_physics_server_2d));
-#endif // PHYSICS_2D_DISABLED
 
-#ifndef NAVIGATION_3D_DISABLED
-	GDREGISTER_ABSTRACT_CLASS(NavigationServer3D);
-	GDREGISTER_CLASS(NavigationPathQueryParameters3D);
-	GDREGISTER_CLASS(NavigationPathQueryResult3D);
-#endif // NAVIGATION_3D_DISABLED
+	GDREGISTER_ABSTRACT_CLASS(NavigationServer2D);
+	GDREGISTER_CLASS(NavigationPathQueryParameters2D);
+	GDREGISTER_CLASS(NavigationPathQueryResult2D);
 
-#ifndef PHYSICS_3D_DISABLED
+#ifndef _3D_DISABLED
 	// Physics 3D
 	GDREGISTER_CLASS(PhysicsServer3DManager);
 	Engine::get_singleton()->add_singleton(Engine::Singleton("PhysicsServer3DManager", PhysicsServer3DManager::get_singleton(), "PhysicsServer3DManager"));
@@ -338,9 +318,7 @@ void register_server_types() {
 	GLOBAL_DEF(PropertyInfo(Variant::STRING, PhysicsServer3DManager::setting_property_name, PROPERTY_HINT_ENUM, "DEFAULT"), "DEFAULT");
 
 	PhysicsServer3DManager::get_singleton()->register_server("Dummy", callable_mp_static(_create_dummy_physics_server_3d));
-#endif // PHYSICS_3D_DISABLED
 
-#ifndef XR_DISABLED
 	GDREGISTER_ABSTRACT_CLASS(XRInterface);
 	GDREGISTER_CLASS(XRVRS);
 	GDREGISTER_CLASS(XRBodyTracker);
@@ -352,12 +330,17 @@ void register_server_types() {
 	GDREGISTER_CLASS(XRPositionalTracker);
 	GDREGISTER_CLASS(XRServer);
 	GDREGISTER_ABSTRACT_CLASS(XRTracker);
-#endif // XR_DISABLED
+#endif // _3D_DISABLED
 
-	if (GD_IS_CLASS_ENABLED(MovieWriterPNGWAV)) {
-		writer_pngwav = memnew(MovieWriterPNGWAV);
-		MovieWriter::add_writer(writer_pngwav);
-	}
+	GDREGISTER_ABSTRACT_CLASS(NavigationServer3D);
+	GDREGISTER_CLASS(NavigationPathQueryParameters3D);
+	GDREGISTER_CLASS(NavigationPathQueryResult3D);
+
+	writer_mjpeg = memnew(MovieWriterMJPEG);
+	MovieWriter::add_writer(writer_mjpeg);
+
+	writer_pngwav = memnew(MovieWriterPNGWAV);
+	MovieWriter::add_writer(writer_pngwav);
 
 	OS::get_singleton()->benchmark_end_measure("Servers", "Register Extensions");
 }
@@ -367,9 +350,8 @@ void unregister_server_types() {
 
 	ServersDebugger::deinitialize();
 	memdelete(shader_types);
-	if (GD_IS_CLASS_ENABLED(MovieWriterPNGWAV)) {
-		memdelete(writer_pngwav);
-	}
+	memdelete(writer_mjpeg);
+	memdelete(writer_pngwav);
 
 	OS::get_singleton()->benchmark_end_measure("Servers", "Unregister Extensions");
 }
@@ -381,22 +363,15 @@ void register_server_singletons() {
 	Engine::get_singleton()->add_singleton(Engine::Singleton("CameraServer", CameraServer::get_singleton(), "CameraServer"));
 	Engine::get_singleton()->add_singleton(Engine::Singleton("DisplayServer", DisplayServer::get_singleton(), "DisplayServer"));
 	Engine::get_singleton()->add_singleton(Engine::Singleton("NativeMenu", NativeMenu::get_singleton(), "NativeMenu"));
-	Engine::get_singleton()->add_singleton(Engine::Singleton("RenderingServer", RenderingServer::get_singleton(), "RenderingServer"));
-#ifndef NAVIGATION_2D_DISABLED
 	Engine::get_singleton()->add_singleton(Engine::Singleton("NavigationServer2D", NavigationServer2D::get_singleton(), "NavigationServer2D"));
-#endif // NAVIGATION_2D_DISABLED
-#ifndef NAVIGATION_3D_DISABLED
 	Engine::get_singleton()->add_singleton(Engine::Singleton("NavigationServer3D", NavigationServer3D::get_singleton(), "NavigationServer3D"));
-#endif // NAVIGATION_3D_DISABLED
-#ifndef PHYSICS_2D_DISABLED
+	Engine::get_singleton()->add_singleton(Engine::Singleton("RenderingServer", RenderingServer::get_singleton(), "RenderingServer"));
+
 	Engine::get_singleton()->add_singleton(Engine::Singleton("PhysicsServer2D", PhysicsServer2D::get_singleton(), "PhysicsServer2D"));
-#endif // PHYSICS_2D_DISABLED
-#ifndef PHYSICS_3D_DISABLED
+#ifndef _3D_DISABLED
 	Engine::get_singleton()->add_singleton(Engine::Singleton("PhysicsServer3D", PhysicsServer3D::get_singleton(), "PhysicsServer3D"));
-#endif // PHYSICS_3D_DISABLED
-#ifndef XR_DISABLED
 	Engine::get_singleton()->add_singleton(Engine::Singleton("XRServer", XRServer::get_singleton(), "XRServer"));
-#endif // XR_DISABLED
+#endif // _3D_DISABLED
 
 	OS::get_singleton()->benchmark_end_measure("Servers", "Register Singletons");
 }

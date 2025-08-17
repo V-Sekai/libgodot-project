@@ -519,7 +519,7 @@ uint32_t CollisionObject3D::create_shape_owner(Object *p_owner) {
 	ShapeData sd;
 	uint32_t id;
 
-	if (shapes.is_empty()) {
+	if (shapes.size() == 0) {
 		id = 0;
 	} else {
 		id = shapes.back()->key() + 1;

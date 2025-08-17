@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GODOT_BODY_2D_H
+#define GODOT_BODY_2D_H
 
 #include "godot_area_2d.h"
 #include "godot_collision_object_2d.h"
@@ -181,7 +182,6 @@ public:
 	}
 
 	_FORCE_INLINE_ void set_max_contacts_reported(int p_size) {
-		ERR_FAIL_INDEX(p_size, MAX_CONTACTS_REPORTED_2D_MAX);
 		contacts.resize(p_size);
 		contact_count = 0;
 		if (mode == PhysicsServer2D::BODY_MODE_KINEMATIC && p_size) {
@@ -385,3 +385,5 @@ void GodotBody2D::add_contact(const Vector2 &p_local_pos, const Vector2 &p_local
 	c[idx].collider_velocity_at_pos = p_collider_velocity_at_pos;
 	c[idx].impulse = p_impulse;
 }
+
+#endif // GODOT_BODY_2D_H

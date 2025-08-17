@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GRID_CONTAINER_H
+#define GRID_CONTAINER_H
 
 #include "scene/gui/container.h"
 
@@ -52,4 +53,8 @@ public:
 	virtual Size2 get_minimum_size() const override;
 
 	int get_h_separation() const;
+
+	GridContainer();
 };
+
+#endif // GRID_CONTAINER_H

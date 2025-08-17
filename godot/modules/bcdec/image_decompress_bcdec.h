@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef IMAGE_DECOMPRESS_BCDEC_H
+#define IMAGE_DECOMPRESS_BCDEC_H
 
 #include "core/io/image.h"
 
@@ -44,3 +45,5 @@ enum BCdecFormat {
 };
 
 void image_decompress_bcdec(Image *p_image);
+
+#endif // IMAGE_DECOMPRESS_BCDEC_H

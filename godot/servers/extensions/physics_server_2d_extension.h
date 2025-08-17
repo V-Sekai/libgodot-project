@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef PHYSICS_SERVER_2D_EXTENSION_H
+#define PHYSICS_SERVER_2D_EXTENSION_H
 
 #include "core/extension/ext_wrappers.gen.inc"
 #include "core/object/gdvirtual.gen.inc"
@@ -85,12 +86,6 @@ public:
 
 	EXBIND1(set_sleep_state, bool)
 	EXBIND0RC(bool, is_sleeping)
-
-	EXBIND1(set_collision_layer, uint32_t);
-	EXBIND0RC(uint32_t, get_collision_layer);
-
-	EXBIND1(set_collision_mask, uint32_t);
-	EXBIND0RC(uint32_t, get_collision_mask);
 
 	EXBIND0RC(int, get_contact_count)
 
@@ -456,3 +451,5 @@ public:
 	PhysicsServer2DExtension();
 	~PhysicsServer2DExtension();
 };
+
+#endif // PHYSICS_SERVER_2D_EXTENSION_H

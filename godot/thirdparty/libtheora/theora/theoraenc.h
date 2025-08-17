@@ -6,19 +6,20 @@
  * IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.       *
  *                                                                  *
  * THE Theora SOURCE CODE IS COPYRIGHT (C) 2002-2009                *
- * by the Xiph.Org Foundation https://www.xiph.org/                 *
+ * by the Xiph.Org Foundation http://www.xiph.org/                  *
  *                                                                  *
  ********************************************************************
 
   function:
+  last mod: $Id: theora.h,v 1.8 2004/03/15 22:17:32 derf Exp $
 
  ********************************************************************/
 
 /**\file
  * The <tt>libtheoraenc</tt> C encoding API.*/
 
-#if !defined(OGG_THEORA_THEORAENC_HEADER)
-# define OGG_THEORA_THEORAENC_HEADER (1)
+#if !defined(_O_THEORA_THEORAENC_H_)
+# define _O_THEORA_THEORAENC_H_ (1)
 # include <stddef.h>
 # include <ogg/ogg.h>
 # include "codec.h"
@@ -500,7 +501,7 @@ extern int th_encode_flushheader(th_enc_ctx *_enc,
  *                and their use is generally discouraged, as they will not be
  *                well-supported by players and other media frameworks.
  *               See Section 4.4 of
- *                <a href="https://www.theora.org/doc/Theora.pdf">the Theora
+ *                <a href="http://www.theora.org/doc/Theora.pdf">the Theora
  *                specification</a> for details if you wish to use them anyway.
  * \retval 0         Success.
  * \retval TH_EFAULT \a _enc or \a _ycbcr is <tt>NULL</tt>.
@@ -544,4 +545,4 @@ extern void th_encode_free(th_enc_ctx *_enc);
 }
 #endif
 
-#endif /* OGG_THEORA_THEORAENC_HEADER */
+#endif

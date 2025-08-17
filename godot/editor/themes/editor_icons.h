@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef EDITOR_ICONS_H
+#define EDITOR_ICONS_H
 
 #include "scene/resources/theme.h"
 
@@ -37,3 +38,5 @@ void editor_register_icons(const Ref<Theme> &p_theme, bool p_dark_theme, float p
 void editor_copy_icons(const Ref<Theme> &p_theme, const Ref<Theme> &p_old_theme);
 
 String get_default_project_icon();
+
+#endif // EDITOR_ICONS_H

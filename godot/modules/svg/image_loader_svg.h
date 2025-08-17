@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef IMAGE_LOADER_SVG_H
+#define IMAGE_LOADER_SVG_H
 
 #include "core/io/image_loader.h"
 
@@ -52,3 +53,5 @@ public:
 
 	ImageLoaderSVG();
 };
+
+#endif // IMAGE_LOADER_SVG_H

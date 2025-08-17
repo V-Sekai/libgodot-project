@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEXTURE_PROGRESS_BAR_H
+#define TEXTURE_PROGRESS_BAR_H
 
 #include "scene/gui/range.h"
 
@@ -121,3 +122,5 @@ private:
 };
 
 VARIANT_ENUM_CAST(TextureProgressBar::FillMode);
+
+#endif // TEXTURE_PROGRESS_BAR_H

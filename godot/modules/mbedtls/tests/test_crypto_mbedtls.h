@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_CRYPTO_MBEDTLS_H
+#define TEST_CRYPTO_MBEDTLS_H
 
 #include "core/crypto/crypto.h"
 #include "core/crypto/hashing_context.h"
@@ -87,3 +88,5 @@ TEST_CASE("[Crypto] CryptoKey save public_only") {
 }
 
 } // namespace TestCryptoMbedTLS
+
+#endif // TEST_CRYPTO_MBEDTLS_H

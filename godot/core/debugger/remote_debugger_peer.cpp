@@ -44,10 +44,8 @@ bool RemoteDebuggerPeerTCP::has_message() {
 
 Array RemoteDebuggerPeerTCP::get_message() {
 	MutexLock lock(mutex);
-	List<Array>::Element *E = in_queue.front();
-	ERR_FAIL_NULL_V_MSG(E, Array(), "No remote debugger messages in queue.");
-
-	Array out = E->get();
+	ERR_FAIL_COND_V(!has_message(), Array());
+	Array out = in_queue.front()->get();
 	in_queue.pop_front();
 	return out;
 }
@@ -98,13 +96,11 @@ void RemoteDebuggerPeerTCP::_write_out() {
 	while (tcp_client->get_status() == StreamPeerTCP::STATUS_CONNECTED && tcp_client->wait(NetSocket::POLL_TYPE_OUT) == OK) {
 		uint8_t *buf = out_buf.ptrw();
 		if (out_left <= 0) {
-			mutex.lock();
-			List<Array>::Element *E = out_queue.front();
-			if (!E) {
-				mutex.unlock();
-				break;
+			if (out_queue.size() == 0) {
+				break; // Nothing left to send
 			}
-			Variant var = E->get();
+			mutex.lock();
+			Variant var = out_queue.front()->get();
 			out_queue.pop_front();
 			mutex.unlock();
 			int size = 0;
@@ -167,8 +163,7 @@ Error RemoteDebuggerPeerTCP::connect_to_host(const String &p_host, uint16_t p_po
 	const int tries = 6;
 	const int waits[tries] = { 1, 10, 100, 1000, 1000, 1000 };
 
-	Error err = tcp_client->connect_to_host(ip, port);
-	ERR_FAIL_COND_V_MSG(err != OK, err, vformat("Remote Debugger: Unable to connect to host '%s:%d'.", p_host, port));
+	tcp_client->connect_to_host(ip, port);
 
 	for (int i = 0; i < tries; i++) {
 		tcp_client->poll();

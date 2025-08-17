@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GDSCRIPT_LAMBDA_CALLABLE_H
+#define GDSCRIPT_LAMBDA_CALLABLE_H
 
 #include "gdscript.h"
 
@@ -96,3 +97,5 @@ public:
 	GDScriptLambdaSelfCallable(Object *p_self, GDScriptFunction *p_function, const Vector<Variant> &p_captures);
 	virtual ~GDScriptLambdaSelfCallable() = default;
 };
+
+#endif // GDSCRIPT_LAMBDA_CALLABLE_H

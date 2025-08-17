@@ -28,9 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef BASIS_UNIVERSAL_REGISTER_TYPES_H
+#define BASIS_UNIVERSAL_REGISTER_TYPES_H
 
 #include "modules/register_module_types.h"
 
 void initialize_basis_universal_module(ModuleInitializationLevel p_level);
 void uninitialize_basis_universal_module(ModuleInitializationLevel p_level);
+
+#endif // BASIS_UNIVERSAL_REGISTER_TYPES_H

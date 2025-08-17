@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef COLOR_PALETTE_H
+#define COLOR_PALETTE_H
 
 #include "core/io/resource.h"
 
@@ -45,3 +46,5 @@ public:
 	void set_colors(const PackedColorArray &p_colors);
 	PackedColorArray get_colors() const;
 };
+
+#endif // COLOR_PALETTE_H

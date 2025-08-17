@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SPRING_ARM_3D_H
+#define SPRING_ARM_3D_H
 
 #include "scene/3d/node_3d.h"
 
@@ -61,6 +62,10 @@ public:
 	void set_margin(real_t p_margin);
 	real_t get_margin();
 
+	SpringArm3D() {}
+
 private:
 	void process_spring();
 };
+
+#endif // SPRING_ARM_3D_H

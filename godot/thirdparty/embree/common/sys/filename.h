@@ -20,6 +20,9 @@ namespace embree
 
     /*! create a valid filename from a string */
     FileName (const std::string& filename);
+    
+    /*! returns path to home folder */
+    static FileName homeFolder();
 
     /*! returns path to executable */
     static FileName executableFolder();

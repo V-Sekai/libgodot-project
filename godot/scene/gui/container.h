@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef CONTAINER_H
+#define CONTAINER_H
 
 #include "scene/gui/control.h"
 
@@ -74,3 +75,5 @@ public:
 
 	Container();
 };
+
+#endif // CONTAINER_H

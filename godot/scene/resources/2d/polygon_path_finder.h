@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef POLYGON_PATH_FINDER_H
+#define POLYGON_PATH_FINDER_H
 
 #include "core/io/resource.h"
 
@@ -93,3 +94,5 @@ public:
 
 	PolygonPathFinder();
 };
+
+#endif // POLYGON_PATH_FINDER_H

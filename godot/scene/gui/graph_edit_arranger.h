@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GRAPH_EDIT_ARRANGER_H
+#define GRAPH_EDIT_ARRANGER_H
 
 #include "core/object/ref_counted.h"
 #include "core/templates/hash_map.h"
@@ -62,3 +63,5 @@ public:
 	GraphEditArranger(GraphEdit *p_graph_edit) :
 			graph_edit(p_graph_edit) {}
 };
+
+#endif // GRAPH_EDIT_ARRANGER_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_REGEX_H
+#define TEST_REGEX_H
 
 #include "../regex.h"
 
@@ -422,3 +423,5 @@ TEST_CASE("[RegEx] Lookbehind groups empty matches") {
 }
 
 } // namespace TestRegEx
+
+#endif // TEST_REGEX_H

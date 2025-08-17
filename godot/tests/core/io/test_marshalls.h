@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_MARSHALLS_H
+#define TEST_MARSHALLS_H
 
 #include "core/io/marshalls.h"
 
@@ -490,3 +491,5 @@ TEST_CASE("[Marshalls] Typed dictionary decoding") {
 }
 
 } // namespace TestMarshalls
+
+#endif // TEST_MARSHALLS_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GPU_PARTICLES_2D_H
+#define GPU_PARTICLES_2D_H
 
 #include "scene/2d/node_2d.h"
 
@@ -68,7 +69,7 @@ private:
 	uint32_t seed = 0;
 	bool use_fixed_seed = false;
 #ifdef TOOLS_ENABLED
-	bool show_gizmos = false;
+	bool show_visibility_rect = false;
 #endif
 	Ref<Material> process_material;
 
@@ -100,9 +101,6 @@ protected:
 	static void _bind_methods();
 	void _validate_property(PropertyInfo &p_property) const;
 	void _notification(int p_what);
-#ifdef TOOLS_ENABLED
-	void _draw_emission_gizmo();
-#endif
 	void _update_collision_size();
 
 #ifndef DISABLE_DEPRECATED
@@ -131,7 +129,7 @@ public:
 	void request_particles_process(real_t p_requested_process_time);
 
 #ifdef TOOLS_ENABLED
-	void set_show_gizmos(bool p_show_gizmos);
+	void set_show_visibility_rect(bool p_show_visibility_rect);
 #endif
 
 	bool is_emitting() const;
@@ -202,3 +200,5 @@ public:
 
 VARIANT_ENUM_CAST(GPUParticles2D::DrawOrder)
 VARIANT_ENUM_CAST(GPUParticles2D::EmitFlags)
+
+#endif // GPU_PARTICLES_2D_H

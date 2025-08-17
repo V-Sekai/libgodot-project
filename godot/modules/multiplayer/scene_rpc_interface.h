@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SCENE_RPC_INTERFACE_H
+#define SCENE_RPC_INTERFACE_H
 
 #include "core/object/ref_counted.h"
 #include "scene/main/multiplayer_api.h"
@@ -109,3 +110,5 @@ public:
 		multiplayer_replicator = p_replicator;
 	}
 };
+
+#endif // SCENE_RPC_INTERFACE_H

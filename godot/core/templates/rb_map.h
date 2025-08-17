@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef RB_MAP_H
+#define RB_MAP_H
 
 #include "core/error/error_macros.h"
 #include "core/os/memory.h"
@@ -776,3 +777,5 @@ public:
 		clear();
 	}
 };
+
+#endif // RB_MAP_H

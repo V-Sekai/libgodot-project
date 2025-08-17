@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef EDITOR_BOTTOM_PANEL_H
+#define EDITOR_BOTTOM_PANEL_H
 
 #include "scene/gui/panel_container.h"
 
@@ -89,3 +90,5 @@ public:
 
 	EditorBottomPanel();
 };
+
+#endif // EDITOR_BOTTOM_PANEL_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_TEXTURE_PROGRESS_BAR_H
+#define TEST_TEXTURE_PROGRESS_BAR_H
 
 #include "scene/gui/texture_progress_bar.h"
 
@@ -63,22 +64,22 @@ TEST_CASE("[SceneTree][TextureProgressBar]") {
 		texture_progress_bar->set_radial_initial_angle(30.5);
 
 		ERR_PRINT_OFF;
-		texture_progress_bar->set_radial_initial_angle(Math::INF);
+		texture_progress_bar->set_radial_initial_angle(INFINITY);
 		ERR_PRINT_ON;
 		CHECK(Math::is_equal_approx(texture_progress_bar->get_radial_initial_angle(), (float)30.5));
 
 		ERR_PRINT_OFF;
-		texture_progress_bar->set_radial_initial_angle(-Math::INF);
+		texture_progress_bar->set_radial_initial_angle(-INFINITY);
 		ERR_PRINT_ON;
 		CHECK(Math::is_equal_approx(texture_progress_bar->get_radial_initial_angle(), (float)30.5));
 
 		ERR_PRINT_OFF;
-		texture_progress_bar->set_radial_initial_angle(Math::NaN);
+		texture_progress_bar->set_radial_initial_angle(NAN);
 		ERR_PRINT_ON;
 		CHECK(Math::is_equal_approx(texture_progress_bar->get_radial_initial_angle(), (float)30.5));
 
 		ERR_PRINT_OFF;
-		texture_progress_bar->set_radial_initial_angle(-Math::NaN);
+		texture_progress_bar->set_radial_initial_angle(-NAN);
 		ERR_PRINT_ON;
 		CHECK(Math::is_equal_approx(texture_progress_bar->get_radial_initial_angle(), (float)30.5));
 	}
@@ -87,3 +88,5 @@ TEST_CASE("[SceneTree][TextureProgressBar]") {
 }
 
 } // namespace TestTextureProgressBar
+
+#endif // TEST_TEXTURE_PROGRESS_BAR_H

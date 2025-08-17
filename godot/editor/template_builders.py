@@ -1,8 +1,7 @@
 """Functions used to generate source files during build time"""
 
 import os
-
-import methods
+from io import StringIO
 
 
 def parse_template(inherits, source, delimiter):
@@ -37,36 +36,54 @@ def parse_template(inherits, source, delimiter):
             script_template["script"].replace('"', '\\"').lstrip().replace("\n", "\\n").replace("\t", "_TS_")
         )
         return (
-            f'{{ String("{script_template["inherits"]}"), '
-            + f'String("{script_template["name"]}"), '
-            + f'String("{script_template["description"]}"), '
-            + f'String("{script_template["script"]}") }},'
+            '{ String("'
+            + script_template["inherits"]
+            + '"), String("'
+            + script_template["name"]
+            + '"),  String("'
+            + script_template["description"]
+            + '"),  String("'
+            + script_template["script"]
+            + '")'
+            + " },\n"
         )
 
 
 def make_templates(target, source, env):
-    delimiter = "#"  # GDScript single line comment delimiter by default.
-    if source:
-        ext = os.path.splitext(str(source[0]))[1]
-        if ext == ".cs":
-            delimiter = "//"
+    dst = str(target[0])
+    with StringIO() as s:
+        s.write("/* THIS FILE IS GENERATED DO NOT EDIT */\n\n")
+        s.write("#ifndef _CODE_TEMPLATES_H\n")
+        s.write("#define _CODE_TEMPLATES_H\n\n")
+        s.write('#include "core/object/object.h"\n')
+        s.write('#include "core/object/script_language.h"\n')
 
-    parsed_templates = []
+        delimiter = "#"  # GDScript single line comment delimiter by default.
+        if source:
+            ext = os.path.splitext(str(source[0]))[1]
+            if ext == ".cs":
+                delimiter = "//"
 
-    for filepath in source:
-        filepath = str(filepath)
-        node_name = os.path.basename(os.path.dirname(filepath))
-        parsed_templates.append(parse_template(node_name, filepath, delimiter))
+        parsed_template_string = ""
+        number_of_templates = 0
 
-    parsed_template_string = "\n\t".join(parsed_templates)
+        for filepath in source:
+            filepath = str(filepath)
+            node_name = os.path.basename(os.path.dirname(filepath))
+            parsed_template = parse_template(node_name, filepath, delimiter)
+            parsed_template_string += "\t" + parsed_template
+            number_of_templates += 1
 
-    with methods.generated_wrapper(str(target[0])) as file:
-        file.write(f"""\
-#include "core/object/object.h"
-#include "core/object/script_language.h"
+        s.write("\nstatic const int TEMPLATES_ARRAY_SIZE = " + str(number_of_templates) + ";\n")
+        s.write(
+            "\nstatic const struct ScriptLanguage::ScriptTemplate TEMPLATES[" + str(number_of_templates) + "] = {\n"
+        )
 
-inline constexpr int TEMPLATES_ARRAY_SIZE = {len(parsed_templates)};
-static const struct ScriptLanguage::ScriptTemplate TEMPLATES[TEMPLATES_ARRAY_SIZE] = {{
-	{parsed_template_string}
-}};
-""")
+        s.write(parsed_template_string)
+
+        s.write("};\n")
+
+        s.write("\n#endif\n")
+
+        with open(dst, "w", encoding="utf-8", newline="\n") as f:
+            f.write(s.getvalue())

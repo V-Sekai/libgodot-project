@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GDSCRIPT_TEST_RUNNER_H
+#define GDSCRIPT_TEST_RUNNER_H
 
 #include "../gdscript.h"
 
@@ -135,3 +136,5 @@ public:
 };
 
 } // namespace GDScriptTests
+
+#endif // GDSCRIPT_TEST_RUNNER_H

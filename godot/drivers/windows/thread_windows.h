@@ -28,10 +28,13 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef THREAD_WINDOWS_H
+#define THREAD_WINDOWS_H
 
 #ifdef WINDOWS_ENABLED
 
 void init_thread_win();
 
 #endif // WINDOWS_ENABLED
+
+#endif // THREAD_WINDOWS_H

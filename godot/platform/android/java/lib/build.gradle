@@ -4,9 +4,7 @@ plugins {
 }
 
 ext {
-    DEBUG_PUBLISH_ARTIFACT_ID = 'godot-debug'
     PUBLISH_ARTIFACT_ID = 'godot'
-    TOOLS_PUBLISH_ARTIFACT_ID = 'godot-tools'
 }
 
 apply from: "../scripts/publish-module.gradle"
@@ -68,11 +66,9 @@ android {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
 
-        // Debug symbols are kept for development within Android Studio.
+        // 'doNotStrip' is enabled for development within Android Studio
         if (shouldNotStrip()) {
-            jniLibs {
-                keepDebugSymbols += '**/*.so'
-            }
+            doNotStrip '**/*.so'
         }
     }
 
@@ -185,15 +181,7 @@ android {
     }
 
     publishing {
-        singleVariant("templateDebug") {
-            withSourcesJar()
-            withJavadocJar()
-        }
         singleVariant("templateRelease") {
-            withSourcesJar()
-            withJavadocJar()
-        }
-        singleVariant("editorRelease") {
             withSourcesJar()
             withJavadocJar()
         }

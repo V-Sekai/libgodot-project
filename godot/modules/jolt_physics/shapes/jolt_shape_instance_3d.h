@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef JOLT_SHAPE_INSTANCE_3D_H
+#define JOLT_SHAPE_INSTANCE_3D_H
 
 #include "core/math/transform_3d.h"
 
@@ -40,19 +41,20 @@ class JoltShapedObject3D;
 class JoltShape3D;
 
 class JoltShapeInstance3D {
-	// This RAII helper exists solely to avoid needing to maintain move construction/assignment in `JoltShapeInstance3D`.
+	// This RAII helper exists solely to avoid needing to maintain copy construction/assignment in the shape instance.
+	// Ideally this would be move-only instead, but Godot's containers don't support that at the moment.
 	struct ShapeReference {
 		JoltShapedObject3D *parent = nullptr;
 		JoltShape3D *shape = nullptr;
 
 		ShapeReference() = default;
 		ShapeReference(JoltShapedObject3D *p_parent, JoltShape3D *p_shape);
-		ShapeReference(const ShapeReference &p_other) = delete;
-		ShapeReference(ShapeReference &&p_other);
+		ShapeReference(const ShapeReference &p_other);
+		ShapeReference(ShapeReference &&p_other) = delete;
 		~ShapeReference();
 
-		ShapeReference &operator=(const ShapeReference &p_other) = delete;
-		ShapeReference &operator=(ShapeReference &&p_other);
+		ShapeReference &operator=(const ShapeReference &p_other);
+		ShapeReference &operator=(ShapeReference &&p_other) = delete;
 
 		JoltShape3D *operator*() const { return shape; }
 		JoltShape3D *operator->() const { return shape; }
@@ -97,3 +99,5 @@ public:
 
 	bool try_build();
 };
+
+#endif // JOLT_SHAPE_INSTANCE_3D_H

@@ -789,7 +789,7 @@ namespace basisu
 
 	struct opencl_context
 	{
-		size_t m_ocl_total_pixel_blocks;
+		uint32_t m_ocl_total_pixel_blocks;
 		cl_mem m_ocl_pixel_blocks;
 
 		cl_command_queue m_command_queue;
@@ -907,7 +907,7 @@ namespace basisu
 	};
 #pragma pack(pop)
 
-	bool opencl_set_pixel_blocks(opencl_context_ptr pContext, size_t total_blocks, const cl_pixel_block* pPixel_blocks)
+	bool opencl_set_pixel_blocks(opencl_context_ptr pContext, uint32_t total_blocks, const cl_pixel_block* pPixel_blocks)
 	{
 		if (!opencl_is_available())
 			return false;
@@ -938,11 +938,9 @@ namespace basisu
 		assert(pContext->m_ocl_pixel_blocks);
 		if (!pContext->m_ocl_pixel_blocks)
 			return false;
-
-		assert(pContext->m_ocl_total_pixel_blocks <= INT_MAX);
 				
 		cl_encode_etc1s_param_struct ps;
-		ps.m_total_blocks = (int)pContext->m_ocl_total_pixel_blocks;
+		ps.m_total_blocks = pContext->m_ocl_total_pixel_blocks;
 		ps.m_perceptual = perceptual;
 		ps.m_total_perms = total_perms;
 
@@ -1064,11 +1062,9 @@ exit:
 		assert(pContext->m_ocl_pixel_blocks);
 		if (!pContext->m_ocl_pixel_blocks)
 			return false;
-
-		assert(pContext->m_ocl_total_pixel_blocks <= INT_MAX);
 				
 		cl_rec_param_struct ps;
-		ps.m_total_blocks = (int)pContext->m_ocl_total_pixel_blocks;
+		ps.m_total_blocks = pContext->m_ocl_total_pixel_blocks;
 		ps.m_perceptual = perceptual;
 
 		bool status = false;
@@ -1122,10 +1118,8 @@ exit:
 		if (!pContext->m_ocl_pixel_blocks)
 			return false;
 
-		assert(pContext->m_ocl_total_pixel_blocks <= INT_MAX);
-
 		fosc_param_struct ps;
-		ps.m_total_blocks = (int)pContext->m_ocl_total_pixel_blocks;
+		ps.m_total_blocks = pContext->m_ocl_total_pixel_blocks;
 		ps.m_perceptual = perceptual;
 		
 		bool status = false;
@@ -1176,10 +1170,8 @@ exit:
 		if (!pContext->m_ocl_pixel_blocks)
 			return false;
 
-		assert(pContext->m_ocl_total_pixel_blocks <= INT_MAX);
-
 		ds_param_struct ps;
-		ps.m_total_blocks = (int)pContext->m_ocl_total_pixel_blocks;
+		ps.m_total_blocks = pContext->m_ocl_total_pixel_blocks;
 		ps.m_perceptual = perceptual;
 
 		bool status = false;
@@ -1240,7 +1232,7 @@ namespace basisu
 		BASISU_NOTE_UNUSED(context);
 	}
 
-	bool opencl_set_pixel_blocks(opencl_context_ptr pContext, size_t total_blocks, const cl_pixel_block* pPixel_blocks)
+	bool opencl_set_pixel_blocks(opencl_context_ptr pContext, uint32_t total_blocks, const cl_pixel_block* pPixel_blocks)
 	{
 		BASISU_NOTE_UNUSED(pContext);
 		BASISU_NOTE_UNUSED(total_blocks);

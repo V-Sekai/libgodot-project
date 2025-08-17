@@ -28,14 +28,17 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef CORE_GLOBALS_H
+#define CORE_GLOBALS_H
 
 // Home for state needed from global functions
 // that cannot be stored in Engine or OS due to e.g. circular includes
 
 class CoreGlobals {
 public:
-	static inline bool leak_reporting_enabled = true;
-	static inline bool print_line_enabled = true;
-	static inline bool print_error_enabled = true;
+	static bool leak_reporting_enabled;
+	static bool print_line_enabled;
+	static bool print_error_enabled;
 };
+
+#endif // CORE_GLOBALS_H

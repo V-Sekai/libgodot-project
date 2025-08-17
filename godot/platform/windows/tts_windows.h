@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TTS_WINDOWS_H
+#define TTS_WINDOWS_H
 
 #include "core/string/ustring.h"
 #include "core/templates/hash_map.h"
@@ -38,8 +39,8 @@
 
 #include <objbase.h>
 #include <sapi.h>
+#include <wchar.h>
 #include <winnls.h>
-#include <cwchar>
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -77,3 +78,5 @@ public:
 	TTS_Windows();
 	~TTS_Windows();
 };
+
+#endif // TTS_WINDOWS_H

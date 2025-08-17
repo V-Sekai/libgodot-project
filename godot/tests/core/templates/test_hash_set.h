@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_HASH_SET_H
+#define TEST_HASH_SET_H
 
 #include "core/templates/hash_set.h"
 
@@ -238,20 +239,6 @@ TEST_CASE("[HashSet] Copy") {
 	}
 }
 
-TEST_CASE("[HashSet] Equality") {
-	// Empty sets.
-	CHECK(HashSet<int>{} == HashSet<int>{});
-	CHECK(HashSet<int>{} != HashSet<int>{ 1, 2, 3 });
-	CHECK(HashSet<int>{ 1, 2, 3 } != HashSet<int>{});
-
-	// Different length.
-	CHECK(HashSet<int>{ 1, 2, 3 } != HashSet<int>{ 1, 2, 3, 4 });
-	CHECK(HashSet<int>{ 1, 2, 3, 4 } != HashSet<int>{ 4, 3, 2 });
-
-	// Same length.
-	CHECK(HashSet<int>{ 1, 2, 3 } == HashSet<int>{ 1, 2, 3 });
-	CHECK(HashSet<int>{ 1, 2, 3 } == HashSet<int>{ 3, 2, 1 });
-	CHECK(HashSet<int>{ 1, 2, 3 } != HashSet<int>{ 1, 2, 8 });
-}
-
 } // namespace TestHashSet
+
+#endif // TEST_HASH_SET_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GODOT_BROAD_PHASE_2D_BVH_H
+#define GODOT_BROAD_PHASE_2D_BVH_H
 
 #include "godot_broad_phase_2d.h"
 
@@ -96,3 +97,5 @@ public:
 	static GodotBroadPhase2D *_create();
 	GodotBroadPhase2DBVH();
 };
+
+#endif // GODOT_BROAD_PHASE_2D_BVH_H

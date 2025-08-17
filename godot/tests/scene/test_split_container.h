@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_SPLIT_CONTAINER_H
+#define TEST_SPLIT_CONTAINER_H
 
 #include "scene/gui/split_container.h"
 #include "scene/main/window.h"
@@ -1169,7 +1170,9 @@ TEST_CASE("[SceneTree][SplitContainer] Two children") {
 	SUBCASE("[SplitContainer] Drag") {
 		SUBCASE("[SplitContainer] Vertical, no expand flags") {
 			SIGNAL_WATCH(split_container, "dragged");
-			Array signal_args = { { 0 } };
+			Array signal_args;
+			signal_args.push_back(Array());
+			((Array)signal_args[0]).push_back(0);
 
 			split_container->set_vertical(true);
 			Point2 mouse_offset = Point2(1, 1);
@@ -1473,3 +1476,5 @@ TEST_CASE("[SceneTree][SplitContainer] Two children") {
 }
 
 } // namespace TestSplitContainer
+
+#endif // TEST_SPLIT_CONTAINER_H

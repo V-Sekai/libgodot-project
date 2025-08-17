@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GD_MONO_H
+#define GD_MONO_H
 
 #include "../godotsharp_defs.h"
 
@@ -76,9 +77,9 @@ class GDMono {
 	void _try_load_project_assembly();
 #endif
 
-#ifdef DEBUG_ENABLED
+#ifdef DEBUG_METHODS_ENABLED
 	uint64_t api_core_hash = 0;
-#endif // DEBUG_ENABLED
+#endif
 #ifdef TOOLS_ENABLED
 	uint64_t api_editor_hash = 0;
 #endif
@@ -92,7 +93,7 @@ protected:
 	static GDMono *singleton;
 
 public:
-#ifdef DEBUG_ENABLED
+#ifdef DEBUG_METHODS_ENABLED
 	uint64_t get_api_core_hash() {
 		if (api_core_hash == 0) {
 			api_core_hash = ClassDB::get_api_hash(ClassDB::API_CORE);
@@ -107,7 +108,7 @@ public:
 		return api_editor_hash;
 	}
 #endif // TOOLS_ENABLED
-#endif // DEBUG_ENABLED
+#endif // DEBUG_METHODS_ENABLED
 
 	_FORCE_INLINE_ static String get_expected_api_build_config() {
 #ifdef TOOLS_ENABLED
@@ -117,7 +118,7 @@ public:
 		return "Debug";
 #else
 		return "Release";
-#endif // DEBUG_ENABLED
+#endif
 #endif
 	}
 
@@ -161,7 +162,7 @@ public:
 	~GDMono();
 };
 
-namespace MonoBind {
+namespace mono_bind {
 
 class GodotSharp : public Object {
 	GDCLASS(GodotSharp, Object);
@@ -178,4 +179,6 @@ public:
 	~GodotSharp();
 };
 
-} // namespace MonoBind
+} // namespace mono_bind
+
+#endif // GD_MONO_H

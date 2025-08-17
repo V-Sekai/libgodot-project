@@ -196,13 +196,12 @@ void CameraFeed::set_rgb_image(const Ref<Image> &p_rgb_img) {
 			RID new_texture = RenderingServer::get_singleton()->texture_2d_create(p_rgb_img);
 			RenderingServer::get_singleton()->texture_replace(texture[CameraServer::FEED_RGBA_IMAGE], new_texture);
 
-			emit_signal(format_changed_signal_name);
+			emit_signal(SNAME("format_changed"));
 		} else {
 			RenderingServer::get_singleton()->texture_2d_update(texture[CameraServer::FEED_RGBA_IMAGE], p_rgb_img);
 		}
 
 		datatype = CameraFeed::FEED_RGB;
-		emit_signal(frame_changed_signal_name);
 	}
 }
 
@@ -220,13 +219,12 @@ void CameraFeed::set_ycbcr_image(const Ref<Image> &p_ycbcr_img) {
 			RID new_texture = RenderingServer::get_singleton()->texture_2d_create(p_ycbcr_img);
 			RenderingServer::get_singleton()->texture_replace(texture[CameraServer::FEED_RGBA_IMAGE], new_texture);
 
-			emit_signal(format_changed_signal_name);
+			emit_signal(SNAME("format_changed"));
 		} else {
 			RenderingServer::get_singleton()->texture_2d_update(texture[CameraServer::FEED_RGBA_IMAGE], p_ycbcr_img);
 		}
 
 		datatype = CameraFeed::FEED_YCBCR;
-		emit_signal(frame_changed_signal_name);
 	}
 }
 
@@ -254,14 +252,13 @@ void CameraFeed::set_ycbcr_images(const Ref<Image> &p_y_img, const Ref<Image> &p
 				RenderingServer::get_singleton()->texture_replace(texture[CameraServer::FEED_CBCR_IMAGE], new_texture);
 			}
 
-			emit_signal(format_changed_signal_name);
+			emit_signal(SNAME("format_changed"));
 		} else {
 			RenderingServer::get_singleton()->texture_2d_update(texture[CameraServer::FEED_Y_IMAGE], p_y_img);
 			RenderingServer::get_singleton()->texture_2d_update(texture[CameraServer::FEED_CBCR_IMAGE], p_cbcr_img);
 		}
 
 		datatype = CameraFeed::FEED_YCBCR_SEP;
-		emit_signal(frame_changed_signal_name);
 	}
 }
 
@@ -271,12 +268,11 @@ void CameraFeed::set_external(int p_width, int p_height) {
 		base_width = p_width;
 		base_height = p_height;
 
-		RID new_texture = RenderingServer::get_singleton()->texture_external_create(p_width, p_height, 0);
+		auto new_texture = RenderingServer::get_singleton()->texture_external_create(p_width, p_height, 0);
 		RenderingServer::get_singleton()->texture_replace(texture[CameraServer::FEED_YCBCR_IMAGE], new_texture);
 	}
 
 	datatype = CameraFeed::FEED_EXTERNAL;
-	emit_signal(frame_changed_signal_name);
 }
 
 bool CameraFeed::activate_feed() {

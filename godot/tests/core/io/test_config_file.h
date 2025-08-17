@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_CONFIG_FILE_H
+#define TEST_CONFIG_FILE_H
 
 #include "core/io/config_file.h"
 #include "core/os/os.h"
@@ -159,3 +160,5 @@ antiAliasing=false
 			"The saved configuration file should match the expected format.");
 }
 } // namespace TestConfigFile
+
+#endif // TEST_CONFIG_FILE_H

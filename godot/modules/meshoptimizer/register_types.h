@@ -28,9 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef MESHOPTIMIZER_REGISTER_TYPES_H
+#define MESHOPTIMIZER_REGISTER_TYPES_H
 
 #include "modules/register_module_types.h"
 
 void initialize_meshoptimizer_module(ModuleInitializationLevel p_level);
 void uninitialize_meshoptimizer_module(ModuleInitializationLevel p_level);
+
+#endif // MESHOPTIMIZER_REGISTER_TYPES_H

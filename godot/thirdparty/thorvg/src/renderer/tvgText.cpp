@@ -62,11 +62,7 @@ Result Text::load(const std::string& path) noexcept
 {
 #ifdef THORVG_FILE_IO_SUPPORT
     bool invalid; //invalid path
-    auto loader = LoaderMgr::loader(path, &invalid);
-    if (loader) {
-        if (loader->sharing > 0) --loader->sharing;   //font loading doesn't mean sharing.
-        return Result::Success;
-    } else {
+    if (!LoaderMgr::loader(path, &invalid)) {
         if (invalid) return Result::InvalidArguments;
         else return Result::NonSupport;
     }

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef RENDERER_COMPOSITOR_RD_H
+#define RENDERER_COMPOSITOR_RD_H
 
 #include "core/io/image.h"
 #include "servers/rendering/renderer_compositor.h"
@@ -73,6 +74,7 @@ protected:
 
 		float rotation_sin;
 		float rotation_cos;
+		float pad[2];
 
 		float eye_center[2];
 		float k1;
@@ -82,8 +84,6 @@ protected:
 		float aspect_ratio;
 		uint32_t layer;
 		uint32_t convert_to_srgb;
-		uint32_t use_debanding;
-		float pad;
 	};
 
 	struct Blit {
@@ -125,7 +125,6 @@ public:
 	void begin_frame(double frame_step);
 	void blit_render_targets_to_screen(DisplayServer::WindowID p_screen, const BlitToScreen *p_render_targets, int p_amount);
 
-	bool is_opengl() { return false; }
 	void gl_end_frame(bool p_swap_buffers) {}
 	void end_frame(bool p_present);
 	void finalize();
@@ -134,8 +133,6 @@ public:
 	_ALWAYS_INLINE_ double get_frame_delta_time() const { return delta; }
 	_ALWAYS_INLINE_ double get_total_time() const { return time; }
 	_ALWAYS_INLINE_ bool can_create_resources_async() const { return true; }
-
-	virtual bool is_xr_enabled() const { return RendererCompositor::is_xr_enabled(); }
 
 	static Error is_viable() {
 		return OK;
@@ -154,3 +151,5 @@ public:
 	RendererCompositorRD();
 	~RendererCompositorRD();
 };
+
+#endif // RENDERER_COMPOSITOR_RD_H

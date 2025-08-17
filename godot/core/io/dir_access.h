@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef DIR_ACCESS_H
+#define DIR_ACCESS_H
 
 #include "core/object/ref_counted.h"
 #include "core/string/ustring.h"
@@ -56,7 +57,7 @@ private:
 	Error _copy_dir(Ref<DirAccess> &p_target_da, const String &p_to, int p_chmod_flags, bool p_copy_links);
 	PackedStringArray _get_contents(bool p_directories);
 
-	static inline thread_local Error last_dir_open_error = OK;
+	thread_local static Error last_dir_open_error;
 	bool include_navigational = false;
 	bool include_hidden = false;
 
@@ -168,9 +169,10 @@ public:
 
 	virtual bool is_case_sensitive(const String &p_path) const;
 	virtual bool is_bundle(const String &p_file) const { return false; }
-	virtual bool is_equivalent(const String &p_path_a, const String &p_path_b) const;
 
 public:
 	DirAccess() {}
 	virtual ~DirAccess();
 };
+
+#endif // DIR_ACCESS_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef CANVAS_LAYER_H
+#define CANVAS_LAYER_H
 
 #include "scene/main/node.h"
 
@@ -63,6 +64,7 @@ class CanvasLayer : public Node {
 protected:
 	void _notification(int p_what);
 	static void _bind_methods();
+	void _validate_property(PropertyInfo &p_property) const;
 
 public:
 	void update_draw_order();
@@ -109,3 +111,5 @@ public:
 	CanvasLayer();
 	~CanvasLayer();
 };
+
+#endif // CANVAS_LAYER_H

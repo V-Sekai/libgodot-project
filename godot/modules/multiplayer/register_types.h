@@ -28,9 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef MULTIPLAYER_REGISTER_TYPES_H
+#define MULTIPLAYER_REGISTER_TYPES_H
 
 #include "modules/register_module_types.h"
 
 void initialize_multiplayer_module(ModuleInitializationLevel p_level);
 void uninitialize_multiplayer_module(ModuleInitializationLevel p_level);
+
+#endif // MULTIPLAYER_REGISTER_TYPES_H

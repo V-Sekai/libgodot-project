@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_GLTF_DOCUMENT_H
+#define TEST_GLTF_DOCUMENT_H
 
 #include "modules/gltf/extensions/gltf_document_extension_convert_importer_mesh.h"
 #include "modules/gltf/gltf_document.h"
@@ -245,3 +246,5 @@ TEST_CASE("[SceneTree][GLTFDocument] Load suzanne.glb") {
 }
 
 } // namespace TestGLTFDocument
+
+#endif // TEST_GLTF_DOCUMENT_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef EXPORT_TEMPLATE_MANAGER_H
+#define EXPORT_TEMPLATE_MANAGER_H
 
 #include "scene/gui/dialogs.h"
 
@@ -135,3 +136,5 @@ public:
 
 	ExportTemplateManager();
 };
+
+#endif // EXPORT_TEMPLATE_MANAGER_H

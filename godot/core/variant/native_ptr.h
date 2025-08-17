@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef NATIVE_PTR_H
+#define NATIVE_PTR_H
 
 #include "core/math/audio_frame.h"
 #include "core/variant/binder_common.h"
@@ -176,3 +177,5 @@ GDVIRTUAL_NATIVE_PTR(int64_t)
 GDVIRTUAL_NATIVE_PTR(uint64_t)
 GDVIRTUAL_NATIVE_PTR(float)
 GDVIRTUAL_NATIVE_PTR(double)
+
+#endif // NATIVE_PTR_H

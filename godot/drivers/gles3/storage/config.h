@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef CONFIG_GLES3_H
+#define CONFIG_GLES3_H
 
 #ifdef GLES3_ENABLED
 
@@ -83,7 +84,6 @@ public:
 	bool srgb_framebuffer_supported = false;
 
 	bool force_vertex_shading = false;
-	bool specular_occlusion = false;
 
 	bool support_anisotropic_filter = false;
 	float anisotropic_level = 0.0f;
@@ -98,6 +98,7 @@ public:
 
 	// Adreno 3XX compatibility.
 	bool disable_particles_workaround = false; // Set to 'true' to disable 'GPUParticles'.
+	bool flip_xy_workaround = false;
 
 	// PowerVR GE 8320 workaround.
 	bool disable_transform_feedback_shader_cache = false;
@@ -122,3 +123,5 @@ public:
 } // namespace GLES3
 
 #endif // GLES3_ENABLED
+
+#endif // CONFIG_GLES3_H

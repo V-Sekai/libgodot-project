@@ -91,38 +91,18 @@ Error PCKPacker::pck_start(const String &p_pck_path, int p_alignment, const Stri
 
 	file->store_32(PACK_HEADER_MAGIC);
 	file->store_32(PACK_FORMAT_VERSION);
-	file->store_32(GODOT_VERSION_MAJOR);
-	file->store_32(GODOT_VERSION_MINOR);
-	file->store_32(GODOT_VERSION_PATCH);
+	file->store_32(VERSION_MAJOR);
+	file->store_32(VERSION_MINOR);
+	file->store_32(VERSION_PATCH);
 
-	uint32_t pack_flags = PACK_REL_FILEBASE;
+	uint32_t pack_flags = 0;
 	if (enc_dir) {
 		pack_flags |= PACK_DIR_ENCRYPTED;
 	}
 	file->store_32(pack_flags); // flags
 
-	file_base_ofs = file->get_position();
-	file->store_64(0); // Files base.
-
-	dir_base_ofs = file->get_position();
-	file->store_64(0); // Directory offset.
-
-	for (int i = 0; i < 16; i++) {
-		file->store_32(0); // Reserved.
-	}
-
-	// Align for first file.
-	int pad = _get_pad(alignment, file->get_position());
-	for (int i = 0; i < pad; i++) {
-		file->store_8(0);
-	}
-
-	file_base = file->get_position();
-	file->seek(file_base_ofs);
-	file->store_64(file_base); // Update files base.
-	file->seek(file_base);
-
 	files.clear();
+	ofs = 0;
 
 	return OK;
 }
@@ -134,11 +114,12 @@ Error PCKPacker::add_file_removal(const String &p_target_path) {
 	// Simplify path here and on every 'files' access so that paths that have extra '/'
 	// symbols or 'res://' in them still match the MD5 hash for the saved path.
 	pf.path = p_target_path.simplify_path().trim_prefix("res://");
-	pf.ofs = file->get_position();
+	pf.ofs = ofs;
 	pf.size = 0;
 	pf.removal = true;
 
-	pf.md5.resize_initialized(16);
+	pf.md5.resize(16);
+	pf.md5.fill(0);
 
 	files.push_back(pf);
 
@@ -158,7 +139,7 @@ Error PCKPacker::add_file(const String &p_target_path, const String &p_source_pa
 	// symbols or 'res://' in them still match the MD5 hash for the saved path.
 	pf.path = p_target_path.simplify_path().trim_prefix("res://");
 	pf.src_path = p_source_path;
-	pf.ofs = file->get_position();
+	pf.ofs = ofs;
 	pf.size = f->get_length();
 
 	Vector<uint8_t> data = FileAccess::get_file_as_bytes(p_source_path);
@@ -172,29 +153,18 @@ Error PCKPacker::add_file(const String &p_target_path, const String &p_source_pa
 	}
 	pf.encrypted = p_encrypt;
 
-	Ref<FileAccess> ftmp = file;
-
-	Ref<FileAccessEncrypted> fae;
-	if (p_encrypt) {
-		fae.instantiate();
-		ERR_FAIL_COND_V(fae.is_null(), ERR_CANT_CREATE);
-
-		Error err = fae->open_and_parse(file, key, FileAccessEncrypted::MODE_WRITE_AES256, false);
-		ERR_FAIL_COND_V(err != OK, ERR_CANT_CREATE);
-		ftmp = fae;
+	uint64_t _size = pf.size;
+	if (p_encrypt) { // Add encryption overhead.
+		if (_size % 16) { // Pad to encryption block size.
+			_size += 16 - (_size % 16);
+		}
+		_size += 16; // hash
+		_size += 8; // data size
+		_size += 16; // iv
 	}
 
-	ftmp->store_buffer(data);
-
-	if (fae.is_valid()) {
-		ftmp.unref();
-		fae.unref();
-	}
-
-	int pad = _get_pad(alignment, file->get_position());
-	for (int j = 0; j < pad; j++) {
-		file->store_8(0);
-	}
+	int pad = _get_pad(alignment, ofs + _size);
+	ofs = ofs + _size + pad;
 
 	files.push_back(pf);
 
@@ -204,17 +174,14 @@ Error PCKPacker::add_file(const String &p_target_path, const String &p_source_pa
 Error PCKPacker::flush(bool p_verbose) {
 	ERR_FAIL_COND_V_MSG(file.is_null(), ERR_INVALID_PARAMETER, "File must be opened before use.");
 
-	int dir_padding = _get_pad(alignment, file->get_position());
-	for (int i = 0; i < dir_padding; i++) {
-		file->store_8(0);
+	int64_t file_base_ofs = file->get_position();
+	file->store_64(0); // files base
+
+	for (int i = 0; i < 16; i++) {
+		file->store_32(0); // reserved
 	}
 
-	// Write directory.
-	uint64_t dir_offset = file->get_position();
-	file->seek(dir_base_ofs);
-	file->store_64(dir_offset);
-	file->seek(dir_offset);
-
+	// write the index
 	file->store_32(uint32_t(files.size()));
 
 	Ref<FileAccessEncrypted> fae;
@@ -230,8 +197,7 @@ Error PCKPacker::flush(bool p_verbose) {
 		fhead = fae;
 	}
 
-	const int file_num = files.size();
-	for (int i = 0; i < file_num; i++) {
+	for (int i = 0; i < files.size(); i++) {
 		CharString utf8_string = files[i].path.utf8();
 		int string_len = utf8_string.length();
 		int pad = _get_pad(4, string_len);
@@ -242,9 +208,9 @@ Error PCKPacker::flush(bool p_verbose) {
 			fhead->store_8(0);
 		}
 
-		fhead->store_64(files[i].ofs - file_base);
-		fhead->store_64(files[i].size);
-		fhead->store_buffer(files[i].md5.ptr(), 16);
+		fhead->store_64(files[i].ofs);
+		fhead->store_64(files[i].size); // pay attention here, this is where file is
+		fhead->store_buffer(files[i].md5.ptr(), 16); //also save md5 for file
 
 		uint32_t flags = 0;
 		if (files[i].encrypted) {
@@ -254,10 +220,6 @@ Error PCKPacker::flush(bool p_verbose) {
 			flags |= PACK_FILE_REMOVAL;
 		}
 		fhead->store_32(flags);
-
-		if (p_verbose) {
-			print_line(vformat("[%d/%d - %d%%] PCKPacker flush: %s -> %s", i, file_num, float(i) / file_num * 100, files[i].src_path, files[i].path));
-		}
 	}
 
 	if (fae.is_valid()) {
@@ -265,12 +227,63 @@ Error PCKPacker::flush(bool p_verbose) {
 		fae.unref();
 	}
 
-	file.unref();
-	return OK;
-}
-
-PCKPacker::~PCKPacker() {
-	if (file.is_valid()) {
-		flush();
+	int header_padding = _get_pad(alignment, file->get_position());
+	for (int i = 0; i < header_padding; i++) {
+		file->store_8(0);
 	}
+
+	uint64_t file_base = file->get_position();
+	file->seek(file_base_ofs);
+	file->store_64(file_base); // update files base
+	file->seek(file_base);
+
+	const uint32_t buf_max = 65536;
+	uint8_t *buf = memnew_arr(uint8_t, buf_max);
+
+	int count = 0;
+	for (int i = 0; i < files.size(); i++) {
+		if (files[i].removal) {
+			continue;
+		}
+
+		Ref<FileAccess> src = FileAccess::open(files[i].src_path, FileAccess::READ);
+		uint64_t to_write = files[i].size;
+
+		Ref<FileAccess> ftmp = file;
+		if (files[i].encrypted) {
+			fae.instantiate();
+			ERR_FAIL_COND_V(fae.is_null(), ERR_CANT_CREATE);
+
+			Error err = fae->open_and_parse(file, key, FileAccessEncrypted::MODE_WRITE_AES256, false);
+			ERR_FAIL_COND_V(err != OK, ERR_CANT_CREATE);
+			ftmp = fae;
+		}
+
+		while (to_write > 0) {
+			uint64_t read = src->get_buffer(buf, MIN(to_write, buf_max));
+			ftmp->store_buffer(buf, read);
+			to_write -= read;
+		}
+
+		if (fae.is_valid()) {
+			ftmp.unref();
+			fae.unref();
+		}
+
+		int pad = _get_pad(alignment, file->get_position());
+		for (int j = 0; j < pad; j++) {
+			file->store_8(0);
+		}
+
+		count += 1;
+		const int file_num = files.size();
+		if (p_verbose && (file_num > 0)) {
+			print_line(vformat("[%d/%d - %d%%] PCKPacker flush: %s -> %s", count, file_num, float(count) / file_num * 100, files[i].src_path, files[i].path));
+		}
+	}
+
+	file.unref();
+	memdelete_arr(buf);
+
+	return OK;
 }

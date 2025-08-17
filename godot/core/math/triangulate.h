@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TRIANGULATE_H
+#define TRIANGULATE_H
 
 #include "core/math/vector2.h"
 #include "core/templates/vector.h"
@@ -57,3 +58,5 @@ public:
 private:
 	static bool snip(const Vector<Vector2> &p_contour, int u, int v, int w, int n, const Vector<int> &V, bool relaxed);
 };
+
+#endif // TRIANGULATE_H

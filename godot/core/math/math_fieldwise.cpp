@@ -28,7 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifdef DEBUG_ENABLED
+#ifdef TOOLS_ENABLED
 
 #include "math_fieldwise.h"
 
@@ -242,4 +242,4 @@ Variant fieldwise_assign(const Variant &p_target, const Variant &p_source, const
 	/* clang-format on */
 }
 
-#endif // DEBUG_ENABLED
+#endif // TOOLS_ENABLED

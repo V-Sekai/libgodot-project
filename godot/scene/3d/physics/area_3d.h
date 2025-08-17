@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef AREA_3D_H
+#define AREA_3D_H
 
 #include "core/templates/vset.h"
 #include "scene/3d/physics/collision_object_3d.h"
@@ -230,3 +231,5 @@ public:
 };
 
 VARIANT_ENUM_CAST(Area3D::SpaceOverride);
+
+#endif // AREA_3D_H

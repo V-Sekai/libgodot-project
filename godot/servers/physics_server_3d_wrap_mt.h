@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef PHYSICS_SERVER_3D_WRAP_MT_H
+#define PHYSICS_SERVER_3D_WRAP_MT_H
 
 #include "core/config/project_settings.h"
 #include "core/object/worker_thread_pool.h"
@@ -225,11 +226,6 @@ public:
 	FUNC3(body_apply_force, RID, const Vector3 &, const Vector3 &);
 	FUNC2(body_apply_torque, RID, const Vector3 &);
 
-	FUNC3(soft_body_apply_point_impulse, RID, int, const Vector3 &);
-	FUNC3(soft_body_apply_point_force, RID, int, const Vector3 &);
-	FUNC2(soft_body_apply_central_impulse, RID, const Vector3 &);
-	FUNC2(soft_body_apply_central_force, RID, const Vector3 &);
-
 	FUNC2(body_add_constant_central_force, RID, const Vector3 &);
 	FUNC3(body_add_constant_force, RID, const Vector3 &, const Vector3 &);
 	FUNC2(body_add_constant_torque, RID, const Vector3 &);
@@ -308,9 +304,6 @@ public:
 
 	FUNC2(soft_body_set_linear_stiffness, RID, real_t);
 	FUNC1RC(real_t, soft_body_get_linear_stiffness, RID);
-
-	FUNC2(soft_body_set_shrinking_factor, RID, real_t);
-	FUNC1RC(real_t, soft_body_get_shrinking_factor, RID);
 
 	FUNC2(soft_body_set_pressure_coefficient, RID, real_t);
 	FUNC1RC(real_t, soft_body_get_pressure_coefficient, RID);
@@ -421,3 +414,5 @@ public:
 #ifdef DEBUG_ENABLED
 #undef MAIN_THREAD_SYNC_WARN
 #endif
+
+#endif // PHYSICS_SERVER_3D_WRAP_MT_H

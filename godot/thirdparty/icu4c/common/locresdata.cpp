@@ -161,9 +161,6 @@ _uloc_getOrientationHelper(const char* localeId,
 
     if (U_FAILURE(status)) { return result; }
 
-    if (localeId == nullptr) {
-        localeId = uloc_getDefault();
-    }
     icu::CharString localeBuffer = ulocimp_canonicalize(localeId, status);
 
     if (U_FAILURE(status)) { return result; }

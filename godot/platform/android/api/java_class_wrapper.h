@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef JAVA_CLASS_WRAPPER_H
+#define JAVA_CLASS_WRAPPER_H
 
 #include "core/object/ref_counted.h"
 #include "core/variant/typed_array.h"
@@ -296,3 +297,5 @@ public:
 	JavaClassWrapper();
 	~JavaClassWrapper();
 };
+
+#endif // JAVA_CLASS_WRAPPER_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef ZIP_READER_H
+#define ZIP_READER_H
 
 #include "core/io/file_access.h"
 #include "core/object/ref_counted.h"
@@ -51,8 +52,9 @@ public:
 	PackedStringArray get_files();
 	PackedByteArray read_file(const String &p_path, bool p_case_sensitive);
 	bool file_exists(const String &p_path, bool p_case_sensitive);
-	int get_compression_level(const String &p_path, bool p_case_sensitive);
 
 	ZIPReader();
 	~ZIPReader();
 };
+
+#endif // ZIP_READER_H

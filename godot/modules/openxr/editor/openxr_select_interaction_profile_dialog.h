@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef OPENXR_SELECT_INTERACTION_PROFILE_DIALOG_H
+#define OPENXR_SELECT_INTERACTION_PROFILE_DIALOG_H
 
 #include "scene/gui/box_container.h"
 #include "scene/gui/dialogs.h"
@@ -57,3 +58,5 @@ public:
 
 	OpenXRSelectInteractionProfileDialog();
 };
+
+#endif // OPENXR_SELECT_INTERACTION_PROFILE_DIALOG_H

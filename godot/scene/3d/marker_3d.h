@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef MARKER_3D_H
+#define MARKER_3D_H
 
 #include "scene/3d/node_3d.h"
 
@@ -46,3 +47,5 @@ public:
 
 	Marker3D();
 };
+
+#endif // MARKER_3D_H

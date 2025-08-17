@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef ENET_MULTIPLAYER_PEER_H
+#define ENET_MULTIPLAYER_PEER_H
 
 #include "enet_connection.h"
 
@@ -131,3 +132,5 @@ public:
 	ENetMultiplayerPeer();
 	~ENetMultiplayerPeer();
 };
+
+#endif // ENET_MULTIPLAYER_PEER_H

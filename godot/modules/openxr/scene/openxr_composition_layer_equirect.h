@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef OPENXR_COMPOSITION_LAYER_EQUIRECT_H
+#define OPENXR_COMPOSITION_LAYER_EQUIRECT_H
 
 #include <openxr/openxr.h>
 
@@ -46,15 +47,15 @@ class OpenXRCompositionLayerEquirect : public OpenXRCompositionLayer {
 		{}, // subImage
 		{ { 0, 0, 0, 0 }, { 0, 0, 0 } }, // pose
 		1.0, // radius
-		Math::PI / 2.0, // centralHorizontalAngle
-		Math::PI / 4.0, // upperVerticalAngle
-		-Math::PI / 4.0, // lowerVerticalAngle
+		Math_PI / 2.0, // centralHorizontalAngle
+		Math_PI / 4.0, // upperVerticalAngle
+		-Math_PI / 4.0, // lowerVerticalAngle
 	};
 
 	float radius = 1.0;
-	float central_horizontal_angle = Math::PI / 2.0;
-	float upper_vertical_angle = Math::PI / 4.0;
-	float lower_vertical_angle = Math::PI / 4.0;
+	float central_horizontal_angle = Math_PI / 2.0;
+	float upper_vertical_angle = Math_PI / 4.0;
+	float lower_vertical_angle = Math_PI / 4.0;
 	uint32_t fallback_segments = 10;
 
 protected:
@@ -87,3 +88,5 @@ public:
 	OpenXRCompositionLayerEquirect();
 	~OpenXRCompositionLayerEquirect();
 };
+
+#endif // OPENXR_COMPOSITION_LAYER_EQUIRECT_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef REGISTER_CORE_TYPES_H
+#define REGISTER_CORE_TYPES_H
 
 void register_core_types();
 void register_core_settings();
@@ -37,3 +38,5 @@ void register_early_core_singletons();
 void register_core_singletons();
 void unregister_core_types();
 void unregister_core_extensions();
+
+#endif // REGISTER_CORE_TYPES_H

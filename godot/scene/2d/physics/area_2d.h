@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef AREA_2D_H
+#define AREA_2D_H
 
 #include "core/templates/vset.h"
 #include "scene/2d/physics/collision_object_2d.h"
@@ -197,3 +198,5 @@ public:
 };
 
 VARIANT_ENUM_CAST(Area2D::SpaceOverride);
+
+#endif // AREA_2D_H

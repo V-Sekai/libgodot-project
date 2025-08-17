@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SHADER_H
+#define SHADER_H
 
 #include "core/io/resource.h"
 #include "core/io/resource_loader.h"
@@ -120,3 +121,5 @@ public:
 	virtual void get_recognized_extensions(const Ref<Resource> &p_resource, List<String> *p_extensions) const override;
 	virtual bool recognize(const Ref<Resource> &p_resource) const override;
 };
+
+#endif // SHADER_H

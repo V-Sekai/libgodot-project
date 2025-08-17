@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SPHERE_SHAPE_3D_H
+#define SPHERE_SHAPE_3D_H
 
 #include "scene/resources/3d/shape_3d.h"
 
@@ -53,3 +54,5 @@ public:
 
 	SphereShape3D();
 };
+
+#endif // SPHERE_SHAPE_3D_H

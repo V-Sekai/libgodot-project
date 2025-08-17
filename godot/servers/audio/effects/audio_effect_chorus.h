@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef AUDIO_EFFECT_CHORUS_H
+#define AUDIO_EFFECT_CHORUS_H
 
 #include "servers/audio/audio_effect.h"
 
@@ -58,14 +59,16 @@ class AudioEffectChorus : public AudioEffect {
 	friend class AudioEffectChorusInstance;
 
 public:
-	static constexpr int32_t MAX_DELAY_MS = 50;
-	static constexpr int32_t MAX_DEPTH_MS = 20;
-	static constexpr int32_t MAX_WIDTH_MS = 50;
-	static constexpr int32_t MAX_VOICES = 4;
-	static constexpr int32_t CYCLES_FRAC = 16;
-	static constexpr int32_t CYCLES_MASK = (1 << CYCLES_FRAC) - 1;
-	static constexpr int32_t MAX_CHANNELS = 4;
-	static constexpr int32_t MS_CUTOFF_MAX = 16000;
+	enum {
+		MAX_DELAY_MS = 50,
+		MAX_DEPTH_MS = 20,
+		MAX_WIDTH_MS = 50,
+		MAX_VOICES = 4,
+		CYCLES_FRAC = 16,
+		CYCLES_MASK = (1 << CYCLES_FRAC) - 1,
+		MAX_CHANNELS = 4,
+		MS_CUTOFF_MAX = 16000
+	};
 
 private:
 	struct Voice {
@@ -129,3 +132,5 @@ public:
 
 	AudioEffectChorus();
 };
+
+#endif // AUDIO_EFFECT_CHORUS_H

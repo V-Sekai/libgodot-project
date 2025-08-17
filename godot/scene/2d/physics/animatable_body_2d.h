@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef ANIMATABLE_BODY_2D_H
+#define ANIMATABLE_BODY_2D_H
 
 #include "scene/2d/physics/static_body_2d.h"
 
@@ -56,3 +57,5 @@ private:
 	void set_sync_to_physics(bool p_enable);
 	bool is_sync_to_physics_enabled() const;
 };
+
+#endif // ANIMATABLE_BODY_2D_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef CAMERA_MACOS_H
+#define CAMERA_MACOS_H
 
 ///@TODO this is a near duplicate of CameraIOS, we should find a way to combine those to minimize code duplication!!!!
 // If you fix something here, make sure you fix it there as well!
@@ -36,11 +37,10 @@
 #include "servers/camera_server.h"
 
 class CameraMacOS : public CameraServer {
-	GDSOFTCLASS(CameraMacOS, CameraServer);
-
 public:
-	CameraMacOS() = default;
+	CameraMacOS();
 
 	void update_feeds();
-	void set_monitoring_feeds(bool p_monitoring_feeds) override;
 };
+
+#endif // CAMERA_MACOS_H

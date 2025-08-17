@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef OGG_PACKET_SEQUENCE_H
+#define OGG_PACKET_SEQUENCE_H
 
 #include "core/io/resource.h"
 #include "core/variant/typed_array.h"
@@ -129,3 +130,5 @@ public:
 	OggPacketSequencePlayback();
 	virtual ~OggPacketSequencePlayback();
 };
+
+#endif // OGG_PACKET_SEQUENCE_H

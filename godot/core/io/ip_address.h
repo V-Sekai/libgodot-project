@@ -28,11 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef IP_ADDRESS_H
+#define IP_ADDRESS_H
 
 #include "core/string/ustring.h"
 
-struct [[nodiscard]] IPAddress {
+struct IPAddress {
 private:
 	union {
 		uint8_t field8[16];
@@ -89,12 +90,10 @@ public:
 	const uint8_t *get_ipv6() const;
 	void set_ipv6(const uint8_t *p_buf);
 
-	explicit operator String() const;
+	operator String() const;
 	IPAddress(const String &p_string);
 	IPAddress(uint32_t p_a, uint32_t p_b, uint32_t p_c, uint32_t p_d, bool is_v6 = false);
 	IPAddress() { clear(); }
 };
 
-// Zero-constructing IPAddress initializes field, valid, and wildcard to 0 (and thus empty).
-template <>
-struct is_zero_constructible<IPAddress> : std::true_type {};
+#endif // IP_ADDRESS_H

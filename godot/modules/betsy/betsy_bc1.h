@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef BETSY_BC1_H
+#define BETSY_BC1_H
 
 constexpr const float dxt1_encoding_table[1024] = {
 	0,
@@ -1056,3 +1057,5 @@ constexpr const float dxt1_encoding_table[1024] = {
 	63,
 	63,
 };
+
+#endif // BETSY_BC1_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GODOT_AREA_3D_H
+#define GODOT_AREA_3D_H
 
 #include "godot_collision_object_3d.h"
 
@@ -235,3 +236,5 @@ struct AreaCMP {
 		refCount = 1;
 	}
 };
+
+#endif // GODOT_AREA_3D_H

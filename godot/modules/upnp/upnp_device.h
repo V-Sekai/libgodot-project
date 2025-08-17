@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef UPNP_DEVICE_H
+#define UPNP_DEVICE_H
 
 #include "core/object/ref_counted.h"
 
@@ -89,3 +90,5 @@ public:
 };
 
 VARIANT_ENUM_CAST(UPNPDevice::IGDStatus)
+
+#endif // UPNP_DEVICE_H

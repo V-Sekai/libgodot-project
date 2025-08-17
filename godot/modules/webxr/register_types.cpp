@@ -45,10 +45,8 @@ void initialize_webxr_module(ModuleInitializationLevel p_level) {
 	GDREGISTER_ABSTRACT_CLASS(WebXRInterface);
 
 #ifdef WEB_ENABLED
-	if (XRServer::get_singleton()) {
-		webxr.instantiate();
-		XRServer::get_singleton()->add_interface(webxr);
-	}
+	webxr.instantiate();
+	XRServer::get_singleton()->add_interface(webxr);
 #endif
 }
 

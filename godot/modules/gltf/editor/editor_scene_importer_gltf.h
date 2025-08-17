@@ -28,7 +28,10 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef EDITOR_SCENE_IMPORTER_GLTF_H
+#define EDITOR_SCENE_IMPORTER_GLTF_H
+
+#ifdef TOOLS_ENABLED
 
 #include "editor/import/3d/resource_importer_scene.h"
 
@@ -49,3 +52,7 @@ public:
 	virtual Variant get_option_visibility(const String &p_path, const String &p_scene_import_type,
 			const String &p_option, const HashMap<StringName, Variant> &p_options) override;
 };
+
+#endif // TOOLS_ENABLED
+
+#endif // EDITOR_SCENE_IMPORTER_GLTF_H

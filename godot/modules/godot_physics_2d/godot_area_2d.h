@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GODOT_AREA_2D_H
+#define GODOT_AREA_2D_H
 
 #include "godot_collision_object_2d.h"
 
@@ -186,3 +187,5 @@ void GodotArea2D::remove_area_from_query(GodotArea2D *p_area, uint32_t p_area_sh
 		_queue_monitor_update();
 	}
 }
+
+#endif // GODOT_AREA_2D_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef WORKER_THREAD_POOL_H
+#define WORKER_THREAD_POOL_H
 
 #include "core/os/condition_variable.h"
 #include "core/os/memory.h"
@@ -80,7 +81,6 @@ private:
 		Semaphore done_semaphore; // For user threads awaiting.
 		bool completed : 1;
 		bool pending_notify_yield_over : 1;
-		bool is_pump_task : 1;
 		Group *group = nullptr;
 		SelfList<Task> task_elem;
 		uint32_t waiting_pool = 0;
@@ -93,7 +93,6 @@ private:
 		Task() :
 				completed(false),
 				pending_notify_yield_over(false),
-				is_pump_task(false),
 				task_elem(this) {}
 	};
 
@@ -117,7 +116,6 @@ private:
 		bool yield_is_over : 1;
 		bool pre_exited_languages : 1;
 		bool exited_languages : 1;
-		bool has_pump_task : 1; // Threads can only have one pump task.
 		Task *current_task = nullptr;
 		Task *awaited_task = nullptr; // Null if not awaiting the condition variable, or special value (YIELDING).
 		ConditionVariable cond_var;
@@ -127,8 +125,7 @@ private:
 				signaled(false),
 				yield_is_over(false),
 				pre_exited_languages(false),
-				exited_languages(false),
-				has_pump_task(false) {}
+				exited_languages(false) {}
 	};
 
 	TightLocalVector<ThreadData> threads;
@@ -169,7 +166,6 @@ private:
 	uint32_t notify_index = 0; // For rotating across threads, no help distributing load.
 
 	uint64_t last_task = 1;
-	int pump_task_count = 0;
 
 	static HashMap<StringName, WorkerThreadPool *> named_pools;
 
@@ -177,7 +173,7 @@ private:
 
 	void _process_task(Task *task);
 
-	void _post_tasks(Task **p_tasks, uint32_t p_count, bool p_high_priority, MutexLock<BinaryMutex> &p_lock, bool p_pump_task);
+	void _post_tasks(Task **p_tasks, uint32_t p_count, bool p_high_priority, MutexLock<BinaryMutex> &p_lock);
 	void _notify_threads(const ThreadData *p_current_thread_data, uint32_t p_process_count, uint32_t p_promote_count);
 
 	bool _try_promote_low_priority_task();
@@ -193,7 +189,7 @@ private:
 	static thread_local UnlockableLocks unlockable_locks[MAX_UNLOCKABLE_LOCKS];
 #endif
 
-	TaskID _add_task(const Callable &p_callable, void (*p_func)(void *), void *p_userdata, BaseTemplateUserdata *p_template_userdata, bool p_high_priority, const String &p_description, bool p_pump_task = false);
+	TaskID _add_task(const Callable &p_callable, void (*p_func)(void *), void *p_userdata, BaseTemplateUserdata *p_template_userdata, bool p_high_priority, const String &p_description);
 	GroupID _add_group_task(const Callable &p_callable, void (*p_func)(void *, uint32_t), void *p_userdata, BaseTemplateUserdata *p_template_userdata, int p_elements, int p_tasks, bool p_high_priority, const String &p_description);
 
 	template <typename C, typename M, typename U>
@@ -242,8 +238,7 @@ public:
 		return _add_task(Callable(), nullptr, nullptr, ud, p_high_priority, p_description);
 	}
 	TaskID add_native_task(void (*p_func)(void *), void *p_userdata, bool p_high_priority = false, const String &p_description = String());
-	TaskID add_task(const Callable &p_action, bool p_high_priority = false, const String &p_description = String(), bool p_pump_task = false);
-	TaskID add_task_bind(const Callable &p_action, bool p_high_priority = false, const String &p_description = String());
+	TaskID add_task(const Callable &p_action, bool p_high_priority = false, const String &p_description = String());
 
 	bool is_task_completed(TaskID p_task_id) const;
 	Error wait_for_task_completion(TaskID p_task_id);
@@ -280,7 +275,6 @@ public:
 	static WorkerThreadPool *get_singleton() { return singleton; }
 	int get_thread_index() const;
 	TaskID get_caller_task_id() const;
-	GroupID get_caller_group_id() const;
 
 #ifdef THREADS_ENABLED
 	_ALWAYS_INLINE_ static uint32_t thread_enter_unlock_allowance_zone(const MutexLock<BinaryMutex> &p_lock) { return _thread_enter_unlock_allowance_zone(p_lock._get_lock()); }
@@ -300,3 +294,5 @@ public:
 	WorkerThreadPool(bool p_singleton = true);
 	~WorkerThreadPool();
 };
+
+#endif // WORKER_THREAD_POOL_H

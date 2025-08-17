@@ -34,7 +34,7 @@ public:
 	JPH_OVERRIDE_NEW_DELETE
 
 	/// Constructs the allocator with a maximum allocatable size of inSize
-	explicit						TempAllocatorImpl(size_t inSize) :
+	explicit						TempAllocatorImpl(uint inSize) :
 		mBase(static_cast<uint8 *>(AlignedAllocate(inSize, JPH_RVECTOR_ALIGNMENT))),
 		mSize(inSize)
 	{
@@ -56,10 +56,10 @@ public:
 		}
 		else
 		{
-			size_t new_top = mTop + AlignUp(inSize, JPH_RVECTOR_ALIGNMENT);
+			uint new_top = mTop + AlignUp(inSize, JPH_RVECTOR_ALIGNMENT);
 			if (new_top > mSize)
 			{
-				Trace("TempAllocator: Out of memory trying to allocate %u bytes", inSize);
+				Trace("TempAllocator: Out of memory");
 				std::abort();
 			}
 			void *address = mBase + mTop;
@@ -93,13 +93,13 @@ public:
 	}
 
 	/// Get the total size of the fixed buffer
-	size_t							GetSize() const
+	uint							GetSize() const
 	{
 		return mSize;
 	}
 
 	/// Get current usage in bytes of the buffer
-	size_t							GetUsage() const
+	uint							GetUsage() const
 	{
 		return mTop;
 	}
@@ -118,8 +118,8 @@ public:
 
 private:
 	uint8 *							mBase;							///< Base address of the memory block
-	size_t							mSize;							///< Size of the memory block
-	size_t							mTop = 0;						///< End of currently allocated area
+	uint							mSize;							///< Size of the memory block
+	uint							mTop = 0;						///< End of currently allocated area
 };
 
 /// Implementation of the TempAllocator that just falls back to malloc/free

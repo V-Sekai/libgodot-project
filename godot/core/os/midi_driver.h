@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef MIDI_DRIVER_H
+#define MIDI_DRIVER_H
 
 #include "core/typedefs.h"
 #include "core/variant/variant.h"
@@ -109,3 +110,5 @@ public:
 
 	PackedStringArray get_connected_inputs() const;
 };
+
+#endif // MIDI_DRIVER_H

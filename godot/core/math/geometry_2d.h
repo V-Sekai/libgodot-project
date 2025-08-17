@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GEOMETRY_2D_H
+#define GEOMETRY_2D_H
 
 #include "core/math/delaunay_2d.h"
 #include "core/math/math_funcs.h"
@@ -99,39 +100,27 @@ public:
 		return Math::sqrt((c1 - c2).dot(c1 - c2));
 	}
 
-#ifndef DISABLE_DEPRECATED
 	static Vector2 get_closest_point_to_segment(const Vector2 &p_point, const Vector2 *p_segment) {
-		return get_closest_point_to_segment(p_point, p_segment[0], p_segment[1]);
-	}
-#endif // DISABLE_DEPRECATED
-
-	static Vector2 get_closest_point_to_segment(const Vector2 &p_point, const Vector2 &p_segment_a, const Vector2 &p_segment_b) {
-		Vector2 p = p_point - p_segment_a;
-		Vector2 n = p_segment_b - p_segment_a;
+		Vector2 p = p_point - p_segment[0];
+		Vector2 n = p_segment[1] - p_segment[0];
 		real_t l2 = n.length_squared();
 		if (l2 < 1e-20f) {
-			return p_segment_a; // Both points are the same, just give any.
+			return p_segment[0]; // Both points are the same, just give any.
 		}
 
 		real_t d = n.dot(p) / l2;
 
 		if (d <= 0.0f) {
-			return p_segment_a; // Before first point.
+			return p_segment[0]; // Before first point.
 		} else if (d >= 1.0f) {
-			return p_segment_b; // After first point.
+			return p_segment[1]; // After first point.
 		} else {
-			return p_segment_a + n * d; // Inside.
+			return p_segment[0] + n * d; // Inside.
 		}
 	}
 
-#ifndef DISABLE_DEPRECATED
 	static real_t get_distance_to_segment(const Vector2 &p_point, const Vector2 *p_segment) {
-		return get_distance_to_segment(p_point, p_segment[0], p_segment[1]);
-	}
-#endif // DISABLE_DEPRECATED
-
-	static real_t get_distance_to_segment(const Vector2 &p_point, const Vector2 &p_segment_a, const Vector2 &p_segment_b) {
-		return p_point.distance_to(get_closest_point_to_segment(p_point, p_segment_a, p_segment_b));
+		return p_point.distance_to(get_closest_point_to_segment(p_point, p_segment));
 	}
 
 	static bool is_point_in_triangle(const Vector2 &s, const Vector2 &a, const Vector2 &b, const Vector2 &c) {
@@ -148,26 +137,24 @@ public:
 		return (cn.cross(an) > 0) == orientation;
 	}
 
-#ifndef DISABLE_DEPRECATED
 	static Vector2 get_closest_point_to_segment_uncapped(const Vector2 &p_point, const Vector2 *p_segment) {
-		return get_closest_point_to_segment_uncapped(p_point, p_segment[0], p_segment[1]);
-	}
-#endif // DISABLE_DEPRECATED
-
-	static Vector2 get_closest_point_to_segment_uncapped(const Vector2 &p_point, const Vector2 &p_segment_a, const Vector2 &p_segment_b) {
-		Vector2 p = p_point - p_segment_a;
-		Vector2 n = p_segment_b - p_segment_a;
+		Vector2 p = p_point - p_segment[0];
+		Vector2 n = p_segment[1] - p_segment[0];
 		real_t l2 = n.length_squared();
 		if (l2 < 1e-20f) {
-			return p_segment_a; // Both points are the same, just give any.
+			return p_segment[0]; // Both points are the same, just give any.
 		}
 
 		real_t d = n.dot(p) / l2;
 
-		return p_segment_a + n * d; // Inside.
+		return p_segment[0] + n * d; // Inside.
 	}
 
-	GODOT_MSVC_WARNING_PUSH_AND_IGNORE(4723) // Potential divide by 0. False positive (see: GH-44274).
+// Disable False Positives in MSVC compiler; we correctly check for 0 here to prevent a division by 0.
+// See: https://github.com/godotengine/godot/pull/44274
+#ifdef _MSC_VER
+#pragma warning(disable : 4723)
+#endif
 
 	static bool line_intersects_line(const Vector2 &p_from_a, const Vector2 &p_dir_a, const Vector2 &p_from_b, const Vector2 &p_dir_b, Vector2 &r_result) {
 		// See http://paulbourke.net/geometry/pointlineplane/
@@ -183,7 +170,10 @@ public:
 		return true;
 	}
 
-	GODOT_MSVC_WARNING_POP
+// Re-enable division by 0 warning
+#ifdef _MSC_VER
+#pragma warning(default : 4723)
+#endif
 
 	static bool segment_intersects_segment(const Vector2 &p_from_a, const Vector2 &p_to_a, const Vector2 &p_from_b, const Vector2 &p_to_b, Vector2 *r_result) {
 		Vector2 B = p_to_a - p_from_a;
@@ -499,10 +489,7 @@ public:
 		return points;
 	}
 
-	static void merge_many_polygons(const Vector<Vector<Point2>> &p_polygons, Vector<Vector<Vector2>> &r_out_polygons, Vector<Vector<Vector2>> &r_out_holes);
-	static Vector<Vector<Vector2>> decompose_many_polygons_in_convex(const Vector<Vector<Point2>> &p_polygons, const Vector<Vector<Point2>> &p_holes);
-
-	static Vector<Vector<Vector2>> decompose_polygon_in_convex(const Vector<Point2> &p_polygon);
+	static Vector<Vector<Vector2>> decompose_polygon_in_convex(const Vector<Point2> &polygon);
 
 	static void make_atlas(const Vector<Size2i> &p_rects, Vector<Point2i> &r_result, Size2i &r_size);
 	static Vector<Vector3i> partial_pack_rects(const Vector<Vector2i> &p_sizes, const Size2i &p_atlas_size);
@@ -511,3 +498,5 @@ private:
 	static Vector<Vector<Point2>> _polypaths_do_operation(PolyBooleanOperation p_op, const Vector<Point2> &p_polypath_a, const Vector<Point2> &p_polypath_b, bool is_a_open = false);
 	static Vector<Vector<Point2>> _polypath_offset(const Vector<Point2> &p_polypath, real_t p_delta, PolyJoinType p_join_type, PolyEndType p_end_type);
 };
+
+#endif // GEOMETRY_2D_H

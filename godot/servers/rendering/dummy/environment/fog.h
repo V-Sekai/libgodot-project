@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef FOG_DUMMY_H
+#define FOG_DUMMY_H
 
 #include "servers/rendering/environment/renderer_fog.h"
 
@@ -50,3 +51,5 @@ public:
 };
 
 } // namespace RendererDummy
+
+#endif // FOG_DUMMY_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef NOISE_TEXTURE_2D_H
+#define NOISE_TEXTURE_2D_H
 
 #include "noise.h"
 
@@ -122,3 +123,5 @@ public:
 	NoiseTexture2D();
 	virtual ~NoiseTexture2D();
 };
+
+#endif // NOISE_TEXTURE_2D_H

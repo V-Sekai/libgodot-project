@@ -54,6 +54,8 @@
 
 #include <net/if.h> // Order is important on OpenBSD, leave as last.
 
+#include <string.h>
+
 static IPAddress _sockaddr2ip(struct sockaddr *p_addr) {
 	IPAddress ip;
 

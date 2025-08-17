@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef XR_POSITIONAL_TRACKER_H
+#define XR_POSITIONAL_TRACKER_H
 
 #include "core/os/thread_safe.h"
 #include "servers/xr/xr_pose.h"
@@ -79,3 +80,5 @@ public:
 };
 
 VARIANT_ENUM_CAST(XRPositionalTracker::TrackerHand);
+
+#endif // XR_POSITIONAL_TRACKER_H

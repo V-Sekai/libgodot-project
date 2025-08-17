@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_GRADIENT_H
+#define TEST_GRADIENT_H
 
 #include "scene/resources/gradient.h"
 
@@ -142,3 +143,5 @@ TEST_CASE("[Gradient] Custom gradient (points specified out-of-order)") {
 			"Custom out-of-order gradient should return the expected interpolated value at offset 0.1 after removing point at index 0.");
 }
 } // namespace TestGradient
+
+#endif // TEST_GRADIENT_H

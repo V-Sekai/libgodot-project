@@ -28,9 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef VHACD_REGISTER_TYPES_H
+#define VHACD_REGISTER_TYPES_H
 
 #include "modules/register_module_types.h"
 
 void initialize_vhacd_module(ModuleInitializationLevel p_level);
 void uninitialize_vhacd_module(ModuleInitializationLevel p_level);
+
+#endif // VHACD_REGISTER_TYPES_H

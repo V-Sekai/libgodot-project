@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef PACKET_BUFFER_H
+#define PACKET_BUFFER_H
 
 #include "core/templates/ring_buffer.h"
 
@@ -127,3 +128,5 @@ public:
 		clear();
 	}
 };
+
+#endif // PACKET_BUFFER_H

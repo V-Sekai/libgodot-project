@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef OPENXR_SELECT_RUNTIME_H
+#define OPENXR_SELECT_RUNTIME_H
 
 #include "scene/gui/option_button.h"
 
@@ -45,3 +46,5 @@ private:
 	void _update_items();
 	void _on_item_selected(int p_which);
 };
+
+#endif // OPENXR_SELECT_RUNTIME_H

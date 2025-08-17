@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef ANIMATION_BLEND_TREE_H
+#define ANIMATION_BLEND_TREE_H
 
 #include "scene/animation/animation_tree.h"
 
@@ -409,7 +410,7 @@ class AnimationNodeBlendTree : public AnimationRootNode {
 		Vector<StringName> connections;
 	};
 
-	AHashMap<StringName, Node> nodes;
+	RBMap<StringName, Node, StringName::AlphCompare> nodes;
 
 	Vector2 graph_offset;
 
@@ -468,8 +469,7 @@ public:
 	virtual String get_caption() const override;
 	virtual NodeTimeInfo _process(const AnimationMixer::PlaybackInfo p_playback_info, bool p_test_only = false) override;
 
-	LocalVector<StringName> get_node_list() const;
-	TypedArray<StringName> get_node_list_as_typed_array() const;
+	void get_node_list(List<StringName> *r_list);
 
 	void set_graph_offset(const Vector2 &p_graph_offset);
 	Vector2 get_graph_offset() const;
@@ -485,3 +485,5 @@ public:
 };
 
 VARIANT_ENUM_CAST(AnimationNodeBlendTree::ConnectionError)
+
+#endif // ANIMATION_BLEND_TREE_H

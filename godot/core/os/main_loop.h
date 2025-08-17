@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef MAIN_LOOP_H
+#define MAIN_LOOP_H
 
 #include "core/input/input_event.h"
 #include "core/object/gdvirtual.gen.inc"
@@ -70,3 +71,5 @@ public:
 	MainLoop() {}
 	virtual ~MainLoop() {}
 };
+
+#endif // MAIN_LOOP_H

@@ -37,9 +37,6 @@
 #include "hb-aat-layout-trak-table.hh"
 #include "hb-aat-ltag-table.hh"
 
-#include "hb-ot-layout-gsub-table.hh"
-#include "hb-ot-layout-gdef-table.hh"
-
 
 /*
  * hb_aat_apply_context_t
@@ -58,14 +55,13 @@ AAT::hb_aat_apply_context_t::hb_aat_apply_context_t (const hb_ot_shape_plan_t *p
 						       buffer (buffer_),
 						       sanitizer (),
 						       ankr_table (&Null (AAT::ankr)),
-						       gdef (
+						       gdef_table (
 #ifndef HB_NO_OT_LAYOUT
-							 *face->table.GDEF->table
+							 face->table.GDEF->table
 #else
-							 Null (GDEF)
+							 &Null (GDEF)
 #endif
 						       ),
-						       has_glyph_classes (gdef.has_glyph_classes ()),
 						       lookup_index (0)
 {
   sanitizer.init (blob);
@@ -204,42 +200,12 @@ hb_aat_layout_find_feature_mapping (hb_tag_t tag)
 #endif
 
 
-#ifndef HB_NO_AAT_SHAPE
+#ifndef HB_NO_AAT
 
 /*
  * mort/morx/kerx/trak
  */
 
-
-bool
-AAT::morx::is_blocklisted (hb_blob_t *blob,
-                           hb_face_t *face) const
-{
-#ifdef HB_NO_AAT_LAYOUT_BLOCKLIST
-  return false;
-#endif
-
-  switch HB_CODEPOINT_ENCODE3 (blob->length,
-                               face->table.GSUB->table.get_length (),
-                               face->table.GDEF->table.get_length ())
-  {
-    /* https://github.com/harfbuzz/harfbuzz/issues/4108
-       sha1sum:a71ca6813b7e56a772cffff7c24a5166b087197c  AALMAGHRIBI.ttf */
-    case HB_CODEPOINT_ENCODE3 (19892, 2794, 340):
-      return true;
-  }
-  return false;
-}
-
-bool
-AAT::mort::is_blocklisted (hb_blob_t *blob,
-                           hb_face_t *face) const
-{
-#ifdef HB_NO_AAT_LAYOUT_BLOCKLIST
-  return false;
-#endif
-  return false;
-}
 
 void
 hb_aat_layout_compile_map (const hb_aat_map_builder_t *mapper,
@@ -288,14 +254,11 @@ hb_aat_layout_substitute (const hb_ot_shape_plan_t *plan,
 			  const hb_feature_t *features,
 			  unsigned num_features)
 {
+  hb_aat_map_builder_t builder (font->face, plan->props);
+  for (unsigned i = 0; i < num_features; i++)
+    builder.add_feature (features[i]);
   hb_aat_map_t map;
-  if (num_features)
-  {
-    hb_aat_map_builder_t builder (font->face, plan->props);
-    for (unsigned i = 0; i < num_features; i++)
-      builder.add_feature (features[i]);
-    builder.compile (map);
-  }
+  builder.compile (map);
 
   {
     auto &accel = *font->face->table.morx;
@@ -304,10 +267,7 @@ hb_aat_layout_substitute (const hb_ot_shape_plan_t *plan,
     {
       AAT::hb_aat_apply_context_t c (plan, font, buffer, accel.get_blob ());
       if (!buffer->message (font, "start table morx")) return;
-      c.buffer_glyph_set = accel.scratch.create_buffer_glyph_set ();
-      morx.apply (&c, num_features ? map : plan->aat_map, accel);
-      accel.scratch.destroy_buffer_glyph_set (c.buffer_glyph_set);
-      c.buffer_glyph_set = nullptr;
+      morx.apply (&c, map, accel);
       (void) buffer->message (font, "end table morx");
       return;
     }
@@ -320,24 +280,34 @@ hb_aat_layout_substitute (const hb_ot_shape_plan_t *plan,
     {
       AAT::hb_aat_apply_context_t c (plan, font, buffer, accel.get_blob ());
       if (!buffer->message (font, "start table mort")) return;
-      mort.apply (&c, num_features ? map : plan->aat_map, accel);
+      mort.apply (&c, map, accel);
       (void) buffer->message (font, "end table mort");
       return;
     }
   }
 }
 
+void
+hb_aat_layout_zero_width_deleted_glyphs (hb_buffer_t *buffer)
+{
+  unsigned int count = buffer->len;
+  hb_glyph_info_t *info = buffer->info;
+  hb_glyph_position_t *pos = buffer->pos;
+  for (unsigned int i = 0; i < count; i++)
+    if (unlikely (info[i].codepoint == AAT::DELETED_GLYPH))
+      pos[i].x_advance = pos[i].y_advance = pos[i].x_offset = pos[i].y_offset = 0;
+}
+
 static bool
 is_deleted_glyph (const hb_glyph_info_t *info)
 {
-  return _hb_glyph_info_is_aat_deleted (info);
+  return info->codepoint == AAT::DELETED_GLYPH;
 }
 
 void
 hb_aat_layout_remove_deleted_glyphs (hb_buffer_t *buffer)
 {
-  if (buffer->scratch_flags & HB_BUFFER_SCRATCH_FLAG_AAT_HAS_DELETED)
-    buffer->delete_glyphs_inplace (is_deleted_glyph);
+  buffer->delete_glyphs_inplace (is_deleted_glyph);
 }
 
 /**
@@ -368,11 +338,8 @@ hb_aat_layout_position (const hb_ot_shape_plan_t *plan,
 
   AAT::hb_aat_apply_context_t c (plan, font, buffer, accel.get_blob ());
   if (!buffer->message (font, "start table kerx")) return;
-  c.buffer_glyph_set = accel.scratch.create_buffer_glyph_set ();
   c.set_ankr_table (font->face->table.ankr.get ());
   accel.apply (&c);
-  accel.scratch.destroy_buffer_glyph_set (c.buffer_glyph_set);
-  c.buffer_glyph_set = nullptr;
   (void) buffer->message (font, "end table kerx");
 }
 

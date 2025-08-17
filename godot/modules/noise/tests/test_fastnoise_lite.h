@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_FASTNOISE_LITE_H
+#define TEST_FASTNOISE_LITE_H
 
 #include "../fastnoise_lite.h"
 
@@ -632,3 +633,5 @@ TEST_CASE("[FastNoiseLite] Generating seamless 2D images (11x11px) and compare t
 }
 
 } //namespace TestFastNoiseLite
+
+#endif // TEST_FASTNOISE_LITE_H

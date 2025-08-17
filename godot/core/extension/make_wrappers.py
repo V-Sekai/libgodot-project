@@ -119,7 +119,10 @@ def generate_ex_version(argcount, const=False, returns=False):
 def run(target, source, env):
     max_versions = 12
 
-    txt = "#pragma once"
+    txt = """
+#ifndef GDEXTENSION_WRAPPERS_GEN_H
+#define GDEXTENSION_WRAPPERS_GEN_H
+"""
 
     for i in range(max_versions + 1):
         txt += "\n/* Extension Wrapper " + str(i) + " Arguments */\n"
@@ -134,6 +137,8 @@ def run(target, source, env):
         txt += generate_mod_version(i, False, True)
         txt += generate_mod_version(i, True, False)
         txt += generate_mod_version(i, True, True)
+
+    txt += "\n#endif\n"
 
     with open(str(target[0]), "w", encoding="utf-8", newline="\n") as f:
         f.write(txt)

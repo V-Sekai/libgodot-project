@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef CALLABLE_BIND_H
+#define CALLABLE_BIND_H
 
 #include "core/variant/callable.h"
 #include "core/variant/variant.h"
@@ -93,3 +94,5 @@ public:
 	CallableCustomUnbind(const Callable &p_callable, int p_argcount);
 	virtual ~CallableCustomUnbind();
 };
+
+#endif // CALLABLE_BIND_H

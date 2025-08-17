@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef STATIC_RAYCASTER_EMBREE_H
+#define STATIC_RAYCASTER_EMBREE_H
 
 #ifdef TOOLS_ENABLED
 
@@ -64,3 +65,5 @@ public:
 };
 
 #endif // TOOLS_ENABLED
+
+#endif // STATIC_RAYCASTER_EMBREE_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef AUDIO_STREAM_GENERATOR_H
+#define AUDIO_STREAM_GENERATOR_H
 
 #include "core/templates/ring_buffer.h"
 #include "servers/audio/audio_stream.h"
@@ -111,3 +112,5 @@ public:
 };
 
 VARIANT_ENUM_CAST(AudioStreamGenerator::AudioStreamGeneratorMixRate);
+
+#endif // AUDIO_STREAM_GENERATOR_H

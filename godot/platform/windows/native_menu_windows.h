@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef NATIVE_MENU_WINDOWS_H
+#define NATIVE_MENU_WINDOWS_H
 
 #include "core/io/image.h"
 #include "core/templates/hash_map.h"
@@ -153,3 +154,5 @@ public:
 	NativeMenuWindows();
 	~NativeMenuWindows();
 };
+
+#endif // NATIVE_MENU_WINDOWS_H

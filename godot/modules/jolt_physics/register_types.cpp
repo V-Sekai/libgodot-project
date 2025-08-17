@@ -49,19 +49,31 @@ PhysicsServer3D *create_jolt_physics_server() {
 }
 
 void initialize_jolt_physics_module(ModuleInitializationLevel p_level) {
-	if (p_level != MODULE_INITIALIZATION_LEVEL_SERVERS) {
-		return;
+	switch (p_level) {
+		case MODULE_INITIALIZATION_LEVEL_CORE: {
+		} break;
+		case MODULE_INITIALIZATION_LEVEL_SERVERS: {
+			jolt_initialize();
+			PhysicsServer3DManager::get_singleton()->register_server("Jolt Physics", callable_mp_static(&create_jolt_physics_server));
+			JoltProjectSettings::register_settings();
+		} break;
+		case MODULE_INITIALIZATION_LEVEL_SCENE: {
+		} break;
+		case MODULE_INITIALIZATION_LEVEL_EDITOR: {
+		} break;
 	}
-
-	jolt_initialize();
-	PhysicsServer3DManager::get_singleton()->register_server("Jolt Physics", callable_mp_static(&create_jolt_physics_server));
-	JoltProjectSettings::register_settings();
 }
 
 void uninitialize_jolt_physics_module(ModuleInitializationLevel p_level) {
-	if (p_level != MODULE_INITIALIZATION_LEVEL_SERVERS) {
-		return;
+	switch (p_level) {
+		case MODULE_INITIALIZATION_LEVEL_CORE: {
+		} break;
+		case MODULE_INITIALIZATION_LEVEL_SERVERS: {
+			jolt_deinitialize();
+		} break;
+		case MODULE_INITIALIZATION_LEVEL_SCENE: {
+		} break;
+		case MODULE_INITIALIZATION_LEVEL_EDITOR: {
+		} break;
 	}
-
-	jolt_deinitialize();
 }

@@ -28,7 +28,10 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GRID_MAP_EDITOR_PLUGIN_H
+#define GRID_MAP_EDITOR_PLUGIN_H
+
+#ifdef TOOLS_ENABLED
 
 #include "../grid_map.h"
 
@@ -48,7 +51,9 @@ class BaseButton;
 class GridMapEditor : public VBoxContainer {
 	GDCLASS(GridMapEditor, VBoxContainer);
 
-	static constexpr int32_t GRID_CURSOR_SIZE = 50;
+	enum {
+		GRID_CURSOR_SIZE = 50
+	};
 
 	enum InputAction {
 		INPUT_NONE,
@@ -72,7 +77,7 @@ class GridMapEditor : public VBoxContainer {
 	double accumulated_floor_delta = 0.0;
 
 	HBoxContainer *toolbar = nullptr;
-	TightLocalVector<BaseButton *> viewport_shortcut_buttons;
+	List<BaseButton *> viewport_shortcut_buttons;
 	Ref<ButtonGroup> mode_buttons_group;
 	// mode
 	Button *transform_mode_button = nullptr;
@@ -108,7 +113,7 @@ class GridMapEditor : public VBoxContainer {
 		int old_orientation = 0;
 	};
 
-	LocalVector<SetItem> set_items;
+	List<SetItem> set_items;
 
 	GridMap *node = nullptr;
 	Ref<MeshLibrary> mesh_library = nullptr;
@@ -137,7 +142,7 @@ class GridMapEditor : public VBoxContainer {
 		RID instance;
 	};
 
-	LocalVector<ClipboardItem> clipboard_items;
+	List<ClipboardItem> clipboard_items;
 
 	Color default_color;
 	Color erase_color;
@@ -290,4 +295,11 @@ public:
 	Array get_selected_cells() const;
 	void set_selected_palette_item(int p_item) const;
 	int get_selected_palette_item() const;
+
+	GridMapEditorPlugin();
+	~GridMapEditorPlugin();
 };
+
+#endif // TOOLS_ENABLED
+
+#endif // GRID_MAP_EDITOR_PLUGIN_H

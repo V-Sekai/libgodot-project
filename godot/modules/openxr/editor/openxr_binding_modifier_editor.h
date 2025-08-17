@@ -28,13 +28,14 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef OPENXR_BINDING_MODIFIER_EDITOR_H
+#define OPENXR_BINDING_MODIFIER_EDITOR_H
 
 #include "../action_map/openxr_action_map.h"
 #include "../action_map/openxr_action_set.h"
 #include "../action_map/openxr_binding_modifier.h"
+#include "editor/editor_inspector.h"
 #include "editor/editor_undo_redo_manager.h"
-#include "editor/inspector/editor_inspector.h"
 #include "scene/gui/box_container.h"
 #include "scene/gui/button.h"
 #include "scene/gui/label.h"
@@ -108,3 +109,5 @@ public:
 
 	OpenXRBindingModifierEditor();
 };
+
+#endif // OPENXR_BINDING_MODIFIER_EDITOR_H

@@ -28,9 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef WEBSOCKET_REGISTER_TYPES_H
+#define WEBSOCKET_REGISTER_TYPES_H
 
 #include "modules/register_module_types.h"
 
 void initialize_websocket_module(ModuleInitializationLevel p_level);
 void uninitialize_websocket_module(ModuleInitializationLevel p_level);
+
+#endif // WEBSOCKET_REGISTER_TYPES_H

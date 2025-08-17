@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef CRASH_HANDLER_LINUXBSD_H
+#define CRASH_HANDLER_LINUXBSD_H
 
 class CrashHandler {
 	bool disabled;
@@ -42,3 +43,5 @@ public:
 	CrashHandler();
 	~CrashHandler();
 };
+
+#endif // CRASH_HANDLER_LINUXBSD_H

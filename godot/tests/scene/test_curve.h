@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_CURVE_H
+#define TEST_CURVE_H
 
 #include "core/math/math_funcs.h"
 #include "scene/resources/curve.h"
@@ -430,3 +431,5 @@ TEST_CASE("[Curve3D] Linear sampling should return exact value") {
 }
 
 } // namespace TestCurve
+
+#endif // TEST_CURVE_H

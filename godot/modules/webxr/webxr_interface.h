@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef WEBXR_INTERFACE_H
+#define WEBXR_INTERFACE_H
 
 #include "servers/xr/xr_controller_tracker.h"
 #include "servers/xr/xr_interface.h"
@@ -77,3 +78,5 @@ public:
 };
 
 VARIANT_ENUM_CAST(WebXRInterface::TargetRayMode);
+
+#endif // WEBXR_INTERFACE_H

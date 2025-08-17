@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef MULTIPLAYER_API_H
+#define MULTIPLAYER_API_H
 
 #include "core/object/ref_counted.h"
 #include "scene/main/multiplayer_peer.h"
@@ -74,6 +75,7 @@ public:
 	bool has_multiplayer_peer() { return get_multiplayer_peer().is_valid(); }
 	bool is_server() { return get_unique_id() == MultiplayerPeer::TARGET_PEER_SERVER; }
 
+	MultiplayerAPI() {}
 	virtual ~MultiplayerAPI() {}
 };
 
@@ -109,3 +111,5 @@ public:
 	GDVIRTUAL2R(Error, _object_configuration_add, Object *, Variant);
 	GDVIRTUAL2R(Error, _object_configuration_remove, Object *, Variant);
 };
+
+#endif // MULTIPLAYER_API_H

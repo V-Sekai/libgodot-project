@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef OPENXR_ACTION_H
+#define OPENXR_ACTION_H
 
 #include "core/io/resource.h"
 
@@ -82,3 +83,5 @@ public:
 };
 
 VARIANT_ENUM_CAST(OpenXRAction::ActionType);
+
+#endif // OPENXR_ACTION_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef RESOURCE_SAVER_WEBP_H
+#define RESOURCE_SAVER_WEBP_H
 
 #include "core/io/image.h"
 #include "core/io/resource_saver.h"
@@ -44,3 +45,5 @@ public:
 
 	ResourceSaverWebP();
 };
+
+#endif // RESOURCE_SAVER_WEBP_H

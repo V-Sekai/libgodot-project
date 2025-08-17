@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef JOLT_OBJECT_3D_H
+#define JOLT_OBJECT_3D_H
 
 #include "../shapes/jolt_shape_instance_3d.h"
 
@@ -66,7 +67,7 @@ protected:
 	RID rid;
 	ObjectID instance_id;
 	JoltSpace3D *space = nullptr;
-	JPH::Body *jolt_body = nullptr;
+	JPH::BodyID jolt_id;
 
 	uint32_t collision_layer = 1;
 	uint32_t collision_mask = 1;
@@ -121,12 +122,11 @@ public:
 	void set_instance_id(ObjectID p_id) { instance_id = p_id; }
 	Object *get_instance() const;
 
-	JPH::Body *get_jolt_body() const { return jolt_body; }
-	JPH::BodyID get_jolt_id() const { return jolt_body->GetID(); }
+	JPH::BodyID get_jolt_id() const { return jolt_id; }
 
 	JoltSpace3D *get_space() const { return space; }
 	void set_space(JoltSpace3D *p_space);
-	bool in_space() const { return space != nullptr && jolt_body != nullptr; }
+	bool in_space() const { return space != nullptr && !jolt_id.IsInvalid(); }
 
 	uint32_t get_collision_layer() const { return collision_layer; }
 	void set_collision_layer(uint32_t p_layer);
@@ -152,3 +152,5 @@ public:
 
 	String to_string() const;
 };
+
+#endif // JOLT_OBJECT_3D_H

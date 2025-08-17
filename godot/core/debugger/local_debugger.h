@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef LOCAL_DEBUGGER_H
+#define LOCAL_DEBUGGER_H
 
 #include "core/debugger/engine_debugger.h"
 #include "core/object/script_language.h"
@@ -54,3 +55,5 @@ public:
 	LocalDebugger();
 	~LocalDebugger();
 };
+
+#endif // LOCAL_DEBUGGER_H

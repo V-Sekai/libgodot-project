@@ -223,7 +223,7 @@ void BetsyCompressor::_init() {
 }
 
 void BetsyCompressor::init() {
-	WorkerThreadPool::TaskID tid = WorkerThreadPool::get_singleton()->add_task(callable_mp(this, &BetsyCompressor::_thread_loop), true, "Betsy pump task", true);
+	WorkerThreadPool::TaskID tid = WorkerThreadPool::get_singleton()->add_task(callable_mp(this, &BetsyCompressor::_thread_loop), true);
 	command_queue.set_pump_task_id(tid);
 	command_queue.push(this, &BetsyCompressor::_assign_mt_ids, tid);
 	command_queue.push_and_sync(this, &BetsyCompressor::_init);
@@ -259,14 +259,6 @@ void BetsyCompressor::_thread_exit() {
 				compress_rd->free(cached_shaders[i].compiled);
 			}
 		}
-
-		// Free the RD (and RCD if necessary).
-		memdelete(compress_rd);
-		compress_rd = nullptr;
-		if (compress_rcd != nullptr) {
-			memdelete(compress_rcd);
-			compress_rcd = nullptr;
-		}
 	}
 }
 
@@ -275,6 +267,16 @@ void BetsyCompressor::finish() {
 	if (task_id != WorkerThreadPool::INVALID_TASK_ID) {
 		WorkerThreadPool::get_singleton()->wait_for_task_completion(task_id);
 		task_id = WorkerThreadPool::INVALID_TASK_ID;
+	}
+
+	if (compress_rd != nullptr) {
+		// Free the RD (and RCD if necessary).
+		memdelete(compress_rd);
+		compress_rd = nullptr;
+		if (compress_rcd != nullptr) {
+			memdelete(compress_rcd);
+			compress_rcd = nullptr;
+		}
 	}
 }
 
@@ -437,7 +439,11 @@ Error BetsyCompressor::_compress(BetsyFormat p_format, Image *r_img) {
 
 	// Encoding table setup.
 	if ((dest_format == Image::FORMAT_DXT1 || dest_format == Image::FORMAT_DXT5) && dxt1_encoding_table_buffer.is_null()) {
-		dxt1_encoding_table_buffer = compress_rd->storage_buffer_create(1024 * 4, Span(dxt1_encoding_table).reinterpret<uint8_t>());
+		Vector<uint8_t> data;
+		data.resize(1024 * 4);
+		memcpy(data.ptrw(), dxt1_encoding_table, 1024 * 4);
+
+		dxt1_encoding_table_buffer = compress_rd->storage_buffer_create(1024 * 4, data);
 	}
 
 	const int mip_count = r_img->get_mipmap_count() + 1;

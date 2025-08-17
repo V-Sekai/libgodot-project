@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SEPARATION_RAY_SHAPE_2D_H
+#define SEPARATION_RAY_SHAPE_2D_H
 
 #include "scene/resources/2d/shape_2d.h"
 
@@ -56,3 +57,5 @@ public:
 
 	SeparationRayShape2D();
 };
+
+#endif // SEPARATION_RAY_SHAPE_2D_H

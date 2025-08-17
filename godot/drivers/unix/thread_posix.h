@@ -28,6 +28,9 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef THREAD_POSIX_H
+#define THREAD_POSIX_H
 
 void init_thread_posix();
+
+#endif // THREAD_POSIX_H

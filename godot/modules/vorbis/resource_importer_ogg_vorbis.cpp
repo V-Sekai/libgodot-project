@@ -45,7 +45,7 @@ String ResourceImporterOggVorbis::get_importer_name() const {
 }
 
 String ResourceImporterOggVorbis::get_visible_name() const {
-	return "Ogg Vorbis";
+	return "oggvorbisstr";
 }
 
 void ResourceImporterOggVorbis::get_recognized_extensions(List<String> *p_extensions) const {

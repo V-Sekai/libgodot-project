@@ -19,13 +19,10 @@ TriangleSplitterBinning::TriangleSplitterBinning(const VertexList &inVertices, c
 
 bool TriangleSplitterBinning::Split(const Range &inTriangles, Range &outLeft, Range &outRight)
 {
-	const uint *begin = mSortedTriangleIdx.data() + inTriangles.mBegin;
-	const uint *end = mSortedTriangleIdx.data() + inTriangles.mEnd;
-
 	// Calculate bounds for this range
 	AABox centroid_bounds;
-	for (const uint *t = begin; t < end; ++t)
-		centroid_bounds.Encapsulate(Vec3::sLoadFloat3Unsafe(mCentroids[*t]));
+	for (uint t = inTriangles.mBegin; t < inTriangles.mEnd; ++t)
+		centroid_bounds.Encapsulate(Vec3(mCentroids[mSortedTriangleIdx[t]]));
 
 	// Convert bounds to min coordinate and size
 	// Prevent division by zero if one of the dimensions is zero
@@ -60,11 +57,11 @@ bool TriangleSplitterBinning::Split(const Range &inTriangles, Range &outLeft, Ra
 	}
 
 	// Bin all triangles in all dimensions at once
-	for (const uint *t = begin; t < end; ++t)
+	for (uint t = inTriangles.mBegin; t < inTriangles.mEnd; ++t)
 	{
-		Vec3 centroid_pos = Vec3::sLoadFloat3Unsafe(mCentroids[*t]);
+		Vec3 centroid_pos(mCentroids[mSortedTriangleIdx[t]]);
 
-		AABox triangle_bounds = AABox::sFromTriangle(mVertices, mTriangles[*t]);
+		AABox triangle_bounds = AABox::sFromTriangle(mVertices, GetTriangle(t));
 
 		Vec3 bin_no_f = (centroid_pos - bounds_min) / bounds_size * float(num_bins);
 		UVec4 bin_no = UVec4::sMin(bin_no_f.ToInt(), UVec4::sReplicate(num_bins - 1));

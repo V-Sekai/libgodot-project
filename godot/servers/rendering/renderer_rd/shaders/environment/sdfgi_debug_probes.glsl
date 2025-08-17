@@ -2,12 +2,21 @@
 
 #version 450
 
-#ifdef USE_MULTIVIEW
+#if defined(USE_MULTIVIEW) && defined(has_VK_KHR_multiview)
 #extension GL_EXT_multiview : enable
+#endif
+
+#ifdef USE_MULTIVIEW
+#ifdef has_VK_KHR_multiview
 #define ViewIndex gl_ViewIndex
-#else // USE_MULTIVIEW
+#else // has_VK_KHR_multiview
+// !BAS! This needs to become an input once we implement our fallback!
 #define ViewIndex 0
-#endif // !USE_MULTIVIEW
+#endif // has_VK_KHR_multiview
+#else // USE_MULTIVIEW
+// Set to zero, not supported in non stereo
+#define ViewIndex 0
+#endif //USE_MULTIVIEW
 
 #VERSION_DEFINES
 
@@ -164,6 +173,22 @@ void main() {
 #[fragment]
 
 #version 450
+
+#if defined(USE_MULTIVIEW) && defined(has_VK_KHR_multiview)
+#extension GL_EXT_multiview : enable
+#endif
+
+#ifdef USE_MULTIVIEW
+#ifdef has_VK_KHR_multiview
+#define ViewIndex gl_ViewIndex
+#else // has_VK_KHR_multiview
+// !BAS! This needs to become an input once we implement our fallback!
+#define ViewIndex 0
+#endif // has_VK_KHR_multiview
+#else // USE_MULTIVIEW
+// Set to zero, not supported in non stereo
+#define ViewIndex 0
+#endif //USE_MULTIVIEW
 
 #VERSION_DEFINES
 

@@ -28,14 +28,15 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef RESOURCE_LOADER_H
+#define RESOURCE_LOADER_H
 
 #include "core/io/resource.h"
 #include "core/object/gdvirtual.gen.inc"
 #include "core/object/worker_thread_pool.h"
 #include "core/os/thread.h"
 
-namespace CoreBind {
+namespace core_bind {
 class ResourceLoader;
 }
 
@@ -104,7 +105,7 @@ typedef void (*ResourceLoadedCallback)(Ref<Resource> p_resource, const String &p
 
 class ResourceLoader {
 	friend class LoadToken;
-	friend class CoreBind::ResourceLoader;
+	friend class core_bind::ResourceLoader;
 
 	enum {
 		MAX_LOADERS = 64
@@ -159,6 +160,7 @@ private:
 	static bool abort_on_missing_resource;
 	static bool create_missing_resources_if_class_unavailable;
 	static HashMap<String, Vector<String>> translation_remaps;
+	static HashMap<String, String> path_remaps;
 
 	static String _path_remap(const String &p_path, bool *r_translation_remapped = nullptr);
 	friend class Resource;
@@ -288,6 +290,9 @@ public:
 	static String path_remap(const String &p_path);
 	static String import_remap(const String &p_path);
 
+	static void load_path_remaps();
+	static void clear_path_remaps();
+
 	static void reload_translation_remaps();
 	static void load_translation_remaps();
 	static void clear_translation_remaps();
@@ -314,3 +319,5 @@ public:
 	static void initialize();
 	static void finalize();
 };
+
+#endif // RESOURCE_LOADER_H

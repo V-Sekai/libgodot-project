@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef DETECT_PRIME_EGL_H
+#define DETECT_PRIME_EGL_H
 
 #ifdef GLES3_ENABLED
 #ifdef EGL_ENABLED
@@ -84,3 +85,5 @@ public:
 
 #endif // GLES3_ENABLED
 #endif // EGL_ENABLED
+
+#endif // DETECT_PRIME_EGL_H

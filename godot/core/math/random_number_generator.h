@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef RANDOM_NUMBER_GENERATOR_H
+#define RANDOM_NUMBER_GENERATOR_H
 
 #include "core/math/random_pcg.h"
 #include "core/object/ref_counted.h"
@@ -60,3 +61,5 @@ public:
 
 	RandomNumberGenerator() { randbase.randomize(); }
 };
+
+#endif // RANDOM_NUMBER_GENERATOR_H

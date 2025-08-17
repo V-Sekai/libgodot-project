@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SHAPE_CAST_3D_H
+#define SHAPE_CAST_3D_H
 
 #include "scene/3d/node_3d.h"
 #include "scene/resources/3d/shape_3d.h"
@@ -142,3 +143,5 @@ public:
 
 	virtual PackedStringArray get_configuration_warnings() const override;
 };
+
+#endif // SHAPE_CAST_3D_H

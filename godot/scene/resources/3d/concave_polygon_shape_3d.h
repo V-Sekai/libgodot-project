@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef CONCAVE_POLYGON_SHAPE_3D_H
+#define CONCAVE_POLYGON_SHAPE_3D_H
 
 #include "scene/resources/3d/shape_3d.h"
 
@@ -78,3 +79,5 @@ public:
 
 	ConcavePolygonShape3D();
 };
+
+#endif // CONCAVE_POLYGON_SHAPE_3D_H

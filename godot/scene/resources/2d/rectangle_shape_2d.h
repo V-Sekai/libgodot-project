@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef RECTANGLE_SHAPE_2D_H
+#define RECTANGLE_SHAPE_2D_H
 
 #include "scene/resources/2d/shape_2d.h"
 
@@ -55,3 +56,5 @@ public:
 
 	RectangleShape2D();
 };
+
+#endif // RECTANGLE_SHAPE_2D_H

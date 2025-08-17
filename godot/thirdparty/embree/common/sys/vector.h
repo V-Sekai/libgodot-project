@@ -124,10 +124,8 @@ namespace embree
 
       __forceinline       T* data()       { return items; };
       __forceinline const T* data() const { return items; };
-      
-      /* dangerous only use if you know what you're doing */
-      __forceinline void setDataPtr(T* data) { items = data; }
 
+     
       /******************** Modifiers **************************/
 
       __forceinline void push_back(const T& nt) 

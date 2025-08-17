@@ -28,21 +28,21 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef DIR_ACCESS_JANDROID_H
+#define DIR_ACCESS_JANDROID_H
 
 #include "java_godot_lib_jni.h"
 
 #include "core/io/dir_access.h"
 #include "drivers/unix/dir_access_unix.h"
 
-#include <cstdio>
+#include <stdio.h>
 
 /// Android implementation of the DirAccess interface used to provide access to
 /// ACCESS_FILESYSTEM and ACCESS_RESOURCES directory resources.
 /// The implementation use jni in order to comply with Android filesystem
 /// access restriction.
 class DirAccessJAndroid : public DirAccessUnix {
-	GDSOFTCLASS(DirAccessJAndroid, DirAccessUnix);
 	static jobject dir_access_handler;
 	static jclass cls;
 
@@ -104,3 +104,5 @@ private:
 	void dir_close(int p_id);
 	String get_absolute_path(String p_path);
 };
+
+#endif // DIR_ACCESS_JANDROID_H

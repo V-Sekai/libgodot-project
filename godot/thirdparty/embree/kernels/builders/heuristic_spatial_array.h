@@ -283,9 +283,11 @@ namespace embree
 
                 if (likely(splits <= 1)) continue; /* todo: does this ever happen ? */
 
-                const int bin0 = split.mapping.bin(prims0[i].lower)[split.dim];
-                const int bin1 = split.mapping.bin(prims0[i].upper)[split.dim];
-                if (unlikely(bin0 < split.pos && bin1 >= split.pos))
+                //int bin0 = split.mapping.bin(prims0[i].lower)[split.dim];
+                //int bin1 = split.mapping.bin(prims0[i].upper)[split.dim];
+                //if (unlikely(bin0 < split.pos && bin1 >= split.pos))
+
+                if (unlikely(prims0[i].lower[split.dim] < fpos && prims0[i].upper[split.dim] > fpos))
                 {
                   assert(splits > 1);
 

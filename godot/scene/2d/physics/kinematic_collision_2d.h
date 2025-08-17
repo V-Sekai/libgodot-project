@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef KINEMATIC_COLLISION_2D_H
+#define KINEMATIC_COLLISION_2D_H
 
 #include "core/object/ref_counted.h"
 #include "servers/physics_server_2d.h"
@@ -62,3 +63,5 @@ public:
 	int get_collider_shape_index() const;
 	Vector2 get_collider_velocity() const;
 };
+
+#endif // KINEMATIC_COLLISION_2D_H

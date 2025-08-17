@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SHAPE_2D_H
+#define SHAPE_2D_H
 
 #include "core/io/resource.h"
 
@@ -65,3 +66,5 @@ public:
 
 	~Shape2D();
 };
+
+#endif // SHAPE_2D_H

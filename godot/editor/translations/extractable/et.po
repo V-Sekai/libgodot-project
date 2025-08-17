@@ -19,12 +19,6 @@ msgstr ""
 msgid "All Recognized"
 msgstr "Kõik tuvastatud"
 
-msgid "Save"
-msgstr "Salvesta"
-
-msgid "Clear"
-msgstr "Puhasta"
-
 msgid "Network"
 msgstr "Võrk"
 
@@ -40,6 +34,9 @@ msgstr "Ava"
 
 msgid "Select Current Folder"
 msgstr "Valige praegune kaust"
+
+msgid "Save"
+msgstr "Salvesta"
 
 msgid "Select This Folder"
 msgstr "Vali see kaust"
@@ -74,11 +71,11 @@ msgstr "Failitee:"
 msgid "Refresh files."
 msgstr "Värskenda faile."
 
-msgid "Directories & Files:"
-msgstr "Kataloogid ja failid:"
-
 msgid "Toggle the visibility of hidden files."
 msgstr "Näita peidetud faile."
+
+msgid "Directories & Files:"
+msgstr "Kataloogid ja failid:"
 
 msgid "File:"
 msgstr "Fail:"
@@ -112,6 +109,9 @@ msgstr "Kleebi"
 
 msgid "Select All"
 msgstr "Vali Kõik"
+
+msgid "Clear"
+msgstr "Puhasta"
 
 msgid "Undo"
 msgstr "Võta tagasi"

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef PHYSICS_SERVER_2D_WRAP_MT_H
+#define PHYSICS_SERVER_2D_WRAP_MT_H
 
 #include "core/object/worker_thread_pool.h"
 #include "core/os/thread.h"
@@ -337,3 +338,5 @@ public:
 #ifdef DEBUG_ENABLED
 #undef MAIN_THREAD_SYNC_WARN
 #endif
+
+#endif // PHYSICS_SERVER_2D_WRAP_MT_H

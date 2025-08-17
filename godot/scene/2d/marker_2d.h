@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef MARKER_2D_H
+#define MARKER_2D_H
 
 #include "scene/2d/node_2d.h"
 
@@ -54,3 +55,5 @@ public:
 
 	Marker2D();
 };
+
+#endif // MARKER_2D_H

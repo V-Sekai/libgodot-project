@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef CAMERA_ATTRIBUTES_H
+#define CAMERA_ATTRIBUTES_H
 
 #include "core/io/resource.h"
 #include "core/templates/rid.h"
@@ -178,3 +179,5 @@ public:
 	CameraAttributesPhysical();
 	~CameraAttributesPhysical();
 };
+
+#endif // CAMERA_ATTRIBUTES_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SKELETON_MODIFICATION_2D_STACKHOLDER_H
+#define SKELETON_MODIFICATION_2D_STACKHOLDER_H
 
 #include "scene/2d/skeleton_2d.h"
 #include "scene/resources/2d/skeleton/skeleton_modification_2d.h"
@@ -59,3 +60,5 @@ public:
 	SkeletonModification2DStackHolder();
 	~SkeletonModification2DStackHolder();
 };
+
+#endif // SKELETON_MODIFICATION_2D_STACKHOLDER_H

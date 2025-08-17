@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef MANAGED_CALLABLE_H
+#define MANAGED_CALLABLE_H
 
 #include "mono_gc_handle.h"
 
@@ -72,3 +73,5 @@ public:
 	ManagedCallable(GCHandleIntPtr p_delegate_handle, void *p_trampoline, ObjectID p_object_id);
 	~ManagedCallable();
 };
+
+#endif // MANAGED_CALLABLE_H

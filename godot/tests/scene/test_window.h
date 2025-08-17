@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_WINDOW_H
+#define TEST_WINDOW_H
 
 #include "scene/gui/control.h"
 #include "scene/main/window.h"
@@ -91,3 +92,5 @@ TEST_CASE("[SceneTree][Window]") {
 }
 
 } // namespace TestWindow
+
+#endif // TEST_WINDOW_H

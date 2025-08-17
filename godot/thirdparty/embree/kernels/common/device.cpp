@@ -229,7 +229,6 @@ namespace embree
 #endif
     std::cout << std::endl;
 
-#if defined(__X86_64__)
     /* check of FTZ and DAZ flags are set in CSR */
     if (!hasFTZ || !hasDAZ) 
     {
@@ -253,68 +252,57 @@ namespace embree
         std::cout << std::endl;
       }
     }
-#endif
     std::cout << std::endl;
   }
 
-  void Device::setDeviceErrorCode(RTCError error, std::string const& msg)
+  void Device::setDeviceErrorCode(RTCError error)
   {
-    RTCErrorMessage* stored_error = errorHandler.error();
-    if (stored_error->error == RTC_ERROR_NONE) {
-      stored_error->error = error;
-      if (msg != "")
-        stored_error->msg = msg;
-    }
+    RTCError* stored_error = errorHandler.error();
+    if (*stored_error == RTC_ERROR_NONE)
+      *stored_error = error;
   }
 
   RTCError Device::getDeviceErrorCode()
   {
-    RTCErrorMessage* stored_error = errorHandler.error();
-    RTCErrorMessage error = *stored_error;
-    stored_error->error = RTC_ERROR_NONE;
-    return error.error;
+    RTCError* stored_error = errorHandler.error();
+    RTCError error = *stored_error;
+    *stored_error = RTC_ERROR_NONE;
+    return error;
   }
 
-  const char* Device::getDeviceLastErrorMessage()
+  void Device::setThreadErrorCode(RTCError error)
   {
-    RTCErrorMessage* stored_error = errorHandler.error();
-    return stored_error->msg.c_str();
-  }
-
-  void Device::setThreadErrorCode(RTCError error, std::string const& msg)
-  {
-    RTCErrorMessage* stored_error = g_errorHandler.error();
-    if (stored_error->error == RTC_ERROR_NONE) {
-      stored_error->error = error;
-      if (msg != "")
-        stored_error->msg = msg;
-    }
+    RTCError* stored_error = g_errorHandler.error();
+    if (*stored_error == RTC_ERROR_NONE)
+      *stored_error = error;
   }
 
   RTCError Device::getThreadErrorCode()
   {
-    RTCErrorMessage* stored_error = g_errorHandler.error();
-    RTCErrorMessage error = *stored_error;
-    stored_error->error = RTC_ERROR_NONE;
-    return error.error;
-  }
-
-  const char* Device::getThreadLastErrorMessage()
-  {
-    RTCErrorMessage* stored_error = g_errorHandler.error();
-    return stored_error->msg.c_str();
+    RTCError* stored_error = g_errorHandler.error();
+    RTCError error = *stored_error;
+    *stored_error = RTC_ERROR_NONE;
+    return error;
   }
 
   void Device::process_error(Device* device, RTCError error, const char* str)
-  {
+  { 
     /* store global error code when device construction failed */
     if (!device)
-      return setThreadErrorCode(error, str ? std::string(str) : std::string());
+      return setThreadErrorCode(error);
 
     /* print error when in verbose mode */
-    if (device->verbosity(1))
+    if (device->verbosity(1)) 
     {
-      std::cerr << "Embree: " << getErrorString(error);
+      switch (error) {
+      case RTC_ERROR_NONE         : std::cerr << "Embree: No error"; break;
+      case RTC_ERROR_UNKNOWN    : std::cerr << "Embree: Unknown error"; break;
+      case RTC_ERROR_INVALID_ARGUMENT : std::cerr << "Embree: Invalid argument"; break;
+      case RTC_ERROR_INVALID_OPERATION: std::cerr << "Embree: Invalid operation"; break;
+      case RTC_ERROR_OUT_OF_MEMORY    : std::cerr << "Embree: Out of memory"; break;
+      case RTC_ERROR_UNSUPPORTED_CPU  : std::cerr << "Embree: Unsupported CPU"; break;
+      default                   : std::cerr << "Embree: Invalid error code"; break;                   
+      };
       if (str) std::cerr << ", (" << str << ")";
       std::cerr << std::endl;
     }
@@ -324,7 +312,7 @@ namespace embree
       device->error_function(device->error_function_userptr,error,str); 
 
     /* record error code */
-    device->setDeviceErrorCode(error, str ? std::string(str) : std::string());
+    device->setDeviceErrorCode(error);
   }
 
   void Device::memoryMonitor(ssize_t bytes, bool post)
@@ -582,22 +570,6 @@ namespace embree
     case RTC_DEVICE_PROPERTY_PARALLEL_COMMIT_SUPPORTED: return 0;
 #endif
 
-#if defined(EMBREE_SYCL_SUPPORT)
-    case RTC_DEVICE_PROPERTY_CPU_DEVICE:  {
-      if (!dynamic_cast<DeviceGPU*>(this))
-        return 1;
-      return 0;
-    };
-    case RTC_DEVICE_PROPERTY_SYCL_DEVICE: {
-      if (!dynamic_cast<DeviceGPU*>(this))
-        return 0;
-      return 1;
-    };
-#else
-    case RTC_DEVICE_PROPERTY_CPU_DEVICE:  return 1;
-    case RTC_DEVICE_PROPERTY_SYCL_DEVICE: return 0;
-#endif
-
     default: throw_RTCError(RTC_ERROR_INVALID_ARGUMENT, "unknown readable property"); break;
     };
   }
@@ -606,31 +578,10 @@ namespace embree
     return alignedMalloc(size,align);
   }
 
-  void* Device::malloc(size_t size, size_t align, EmbreeMemoryType type) {
-    return alignedMalloc(size,align);
-  }
-
   void Device::free(void* ptr) {
     alignedFree(ptr);
   }
 
-  const std::vector<std::string> Device::error_strings = {
-    "No Error",
-    "Unknown error",
-    "Invalid argument",
-    "Invalid operation",
-    "Out of Memory",
-    "Unsupported CPU",
-    "Build cancelled",
-    "Level Zero raytracing support missing"
-  };
-
-  const char* Device::getErrorString(RTCError error) {
-    if (error >= 0 && error < error_strings.size()) {
-      return error_strings.at(error).c_str();
-    }
-    return "Invalid error code";
-  }
 
 #if defined(EMBREE_SYCL_SUPPORT)
 
@@ -662,6 +613,7 @@ namespace embree
     if (result != ZE_RESULT_SUCCESS)
       throw_RTCError(RTC_ERROR_UNKNOWN, "zeDriverGetExtensionProperties failed");
 
+#if defined(EMBREE_SYCL_L0_RTAS_BUILDER)
     bool ze_rtas_builder = false;
     for (uint32_t i=0; i<extensions.size(); i++)
     {
@@ -669,18 +621,23 @@ namespace embree
         ze_rtas_builder = true;
     }
     if (!ze_rtas_builder)
-      throw_RTCError(RTC_ERROR_LEVEL_ZERO_RAYTRACING_SUPPORT_MISSING, "ZE_experimental_rtas_builder extension not found. Please install a recent driver. On Linux, make sure that the package intel-level-zero-gpu-raytracing is installed");
+      throw_RTCError(RTC_ERROR_UNKNOWN, "ZE_experimental_rtas_builder extension not found");
 
-    result = ZeWrapper::initRTASBuilder(hDriver);
-    if (result == ZE_RESULT_ERROR_DEPENDENCY_UNAVAILABLE) {
-      throw_RTCError(RTC_ERROR_LEVEL_ZERO_RAYTRACING_SUPPORT_MISSING, "cannot load ZE_experimental_rtas_builder extension. Please install a recent driver. On Linux, make sure that the package intel-level-zero-gpu-raytracing is installed");
-    }
+    result = ZeWrapper::initRTASBuilder(hDriver,ZeWrapper::LEVEL_ZERO);
+    if (result == ZE_RESULT_ERROR_DEPENDENCY_UNAVAILABLE)
+      throw_RTCError(RTC_ERROR_UNKNOWN, "cannot load ZE_experimental_rtas_builder extension");
     if (result != ZE_RESULT_SUCCESS)
       throw_RTCError(RTC_ERROR_UNKNOWN, "cannot initialize ZE_experimental_rtas_builder extension");
+#else
+    ZeWrapper::initRTASBuilder(hDriver,ZeWrapper::INTERNAL);
+#endif
 
     if (State::verbosity(1))
     {
-      std::cout << "  Level Zero RTAS Builder" << std::endl;
+      if (ZeWrapper::rtas_builder == ZeWrapper::INTERNAL)
+        std::cout << "  Internal RTAS Builder" << std::endl;
+      else
+        std::cout << "  Level Zero RTAS Builder" << std::endl;
     }
 
     /* check if extension library can get loaded */
@@ -713,17 +670,15 @@ namespace embree
   }
 
   void DeviceGPU::enter() {
+    enableUSMAllocEmbree(&gpu_context,&gpu_device);
   }
 
   void DeviceGPU::leave() {
+    disableUSMAllocEmbree();
   }
 
   void* DeviceGPU::malloc(size_t size, size_t align) {
-    return alignedSYCLMalloc(&gpu_context,&gpu_device,size,align,EmbreeUSMMode::DEVICE_READ_ONLY);
-  }
-
-  void* DeviceGPU::malloc(size_t size, size_t align, EmbreeMemoryType type) {
-    return alignedSYCLMalloc(&gpu_context,&gpu_device,size,align,EmbreeUSMMode::DEVICE_READ_ONLY,type);
+    return alignedSYCLMalloc(&gpu_context,&gpu_device,size,align,EMBREE_USM_SHARED_DEVICE_READ_ONLY);
   }
 
   void DeviceGPU::free(void* ptr) {
@@ -733,16 +688,7 @@ namespace embree
   void DeviceGPU::setSYCLDevice(const sycl::device sycl_device_in) {
     gpu_device = sycl_device_in;
   }
-
-  // turn off deprecation warning for host_unified_memory property usage.
-  // there is currently no equivalent SYCL aspect that replaces this property.
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-  bool DeviceGPU::has_unified_memory() const {
-    return gpu_device.get_info<sycl::info::device::host_unified_memory>();
-  }
-#pragma GCC diagnostic pop
-
+  
 #endif
 
   DeviceEnterLeave::DeviceEnterLeave (RTCDevice hdevice)

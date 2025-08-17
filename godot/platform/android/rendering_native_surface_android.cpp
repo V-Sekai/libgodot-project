@@ -30,12 +30,6 @@
 
 #include "rendering_native_surface_android.h"
 
-#include "core/object/class_db.h"
-#include "core/object/ref_counted.h"
-#include "core/string/ustring.h"
-#include "core/variant/native_ptr.h"
-#include "servers/rendering/rendering_context_driver.h"
-
 #if defined(VULKAN_ENABLED)
 #include "rendering_context_driver_vulkan_android.h"
 #endif

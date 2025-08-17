@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GLTF_NODE_H
+#define GLTF_NODE_H
 
 #include "../gltf_defines.h"
 
@@ -50,7 +51,6 @@ private:
 	GLTFSkinIndex skin = -1;
 	GLTFSkeletonIndex skeleton = -1;
 	bool joint = false;
-	bool visible = true;
 	Vector<int> children;
 	GLTFLightIndex light = -1;
 	Dictionary additional_data;
@@ -102,12 +102,11 @@ public:
 	GLTFLightIndex get_light();
 	void set_light(GLTFLightIndex p_light);
 
-	bool get_visible();
-	void set_visible(bool p_visible);
-
 	Variant get_additional_data(const StringName &p_extension_name);
 	bool has_additional_data(const StringName &p_extension_name);
 	void set_additional_data(const StringName &p_extension_name, Variant p_additional_data);
 
 	NodePath get_scene_node_path(Ref<GLTFState> p_state, bool p_handle_skeletons = true);
 };
+
+#endif // GLTF_NODE_H

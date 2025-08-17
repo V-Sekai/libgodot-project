@@ -30,14 +30,12 @@ namespace embree
                    size_t offset,
                    size_t stride,
                    unsigned int num);
-    void* getBufferData(RTCBufferType type, unsigned int slot, BufferDataPointerType pointerType);
+    void* getBuffer(RTCBufferType type, unsigned int slot);
     void updateBuffer(RTCBufferType type, unsigned int slot);
     void commit();
     bool verify();
     void setMaxRadiusScale(float s);
     void addElementsToCount (GeometryCounts & counts) const;
-    size_t getGeometryDataDeviceByteSize() const;
-    void convertToDeviceRepresentation(size_t offset, char* data_host, char* data_device) const;
 
    public:
     /*! returns the number of vertices */

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef NODE_2D_H
+#define NODE_2D_H
 
 #include "scene/main/canvas_item.h"
 
@@ -115,4 +116,8 @@ public:
 	Transform2D get_relative_transform_to_parent(const Node *p_parent) const;
 
 	Transform2D get_transform() const override;
+
+	Node2D() {}
 };
+
+#endif // NODE_2D_H

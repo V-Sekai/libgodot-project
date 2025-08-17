@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef RENDERING_SERVER_CONSTANTS_H
+#define RENDERING_SERVER_CONSTANTS_H
 
 // Use for constants etc. that need not be included as often as rendering_server.h
 // to reduce dependencies and prevent slow compilation.
@@ -43,3 +44,5 @@
 //#define RENDERING_SERVER_DEBUG_PHYSICS_INTERPOLATION
 
 #endif // DEV_ENABLED
+
+#endif // RENDERING_SERVER_CONSTANTS_H

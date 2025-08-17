@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef MULTIPLAYER_DEBUGGER_H
+#define MULTIPLAYER_DEBUGGER_H
 
 #include "core/debugger/engine_profiler.h"
 
@@ -127,3 +128,5 @@ public:
 	static void initialize();
 	static void deinitialize();
 };
+
+#endif // MULTIPLAYER_DEBUGGER_H

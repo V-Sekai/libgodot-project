@@ -57,7 +57,9 @@ void RendererCompositorStorage::compositor_effect_free(RID p_rid) {
 	ERR_FAIL_NULL(effect);
 
 	// Remove this RID from any compositor that uses it.
-	for (const RID &compositor_rid : compositor_owner.get_owned_list()) {
+	List<RID> compositor_rids;
+	compositor_owner.get_owned_list(&compositor_rids);
+	for (const RID &compositor_rid : compositor_rids) {
 		Compositor *compositor = compositor_owner.get_or_null(compositor_rid);
 		if (compositor) {
 			compositor->compositor_effects.erase(p_rid);

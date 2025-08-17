@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef COLLISION_OBJECT_3D_H
+#define COLLISION_OBJECT_3D_H
 
 #include "scene/3d/camera_3d.h"
 #include "scene/3d/node_3d.h"
@@ -179,3 +180,5 @@ public:
 };
 
 VARIANT_ENUM_CAST(CollisionObject3D::DisableMode);
+
+#endif // COLLISION_OBJECT_3D_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_TREE_H
+#define TEST_TREE_H
 
 #include "scene/gui/tree.h"
 
@@ -296,3 +297,5 @@ TEST_CASE("[SceneTree][Tree]") {
 }
 
 } // namespace TestTree
+
+#endif // TEST_TREE_H

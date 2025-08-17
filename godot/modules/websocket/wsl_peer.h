@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef WSL_PEER_H
+#define WSL_PEER_H
 
 #ifndef WEB_ENABLED
 
@@ -36,6 +37,7 @@
 #include "websocket_peer.h"
 
 #include "core/crypto/crypto_core.h"
+#include "core/error/error_list.h"
 #include "core/io/stream_peer_tcp.h"
 
 #include <wslay/wslay.h>
@@ -166,3 +168,5 @@ public:
 };
 
 #endif // WEB_ENABLED
+
+#endif // WSL_PEER_H

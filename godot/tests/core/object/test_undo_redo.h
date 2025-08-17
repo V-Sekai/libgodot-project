@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_UNDO_REDO_H
+#define TEST_UNDO_REDO_H
 
 #include "core/object/undo_redo.h"
 #include "tests/test_macros.h"
@@ -197,3 +198,5 @@ TEST_CASE("[UndoRedo] Merge Method UndoRedo") {
 }
 
 } //namespace TestUndoRedo
+
+#endif // TEST_UNDO_REDO_H

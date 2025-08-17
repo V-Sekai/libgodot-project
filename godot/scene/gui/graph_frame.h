@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GRAPH_FRAME_H
+#define GRAPH_FRAME_H
 
 #include "scene/gui/graph_element.h"
 
@@ -104,3 +105,5 @@ public:
 
 	GraphFrame();
 };
+
+#endif // GRAPH_FRAME_H

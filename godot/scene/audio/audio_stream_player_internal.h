@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef AUDIO_STREAM_PLAYER_INTERNAL_H
+#define AUDIO_STREAM_PLAYER_INTERNAL_H
 
 #include "core/object/ref_counted.h"
 #include "core/templates/safe_refcount.h"
@@ -112,3 +113,5 @@ public:
 
 	AudioStreamPlayerInternal(Node *p_node, const Callable &p_play_callable, const Callable &p_stop_callable, bool p_physical);
 };
+
+#endif // AUDIO_STREAM_PLAYER_INTERNAL_H

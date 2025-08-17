@@ -28,17 +28,17 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef FILE_ACCESS_ANDROID_H
+#define FILE_ACCESS_ANDROID_H
 
 #include "core/io/file_access.h"
 
 #include <android/asset_manager.h>
 #include <android/log.h>
 #include <jni.h>
-#include <cstdio>
+#include <stdio.h>
 
 class FileAccessAndroid : public FileAccess {
-	GDSOFTCLASS(FileAccessAndroid, FileAccess);
 	static AAssetManager *asset_manager;
 	static jobject j_asset_manager;
 
@@ -78,8 +78,6 @@ public:
 	virtual bool file_exists(const String &p_path) override; // return true if a file exists
 
 	virtual uint64_t _get_modified_time(const String &p_file) override { return 0; }
-	virtual uint64_t _get_access_time(const String &p_file) override { return 0; }
-	virtual int64_t _get_size(const String &p_file) override;
 	virtual BitField<FileAccess::UnixPermissionFlags> _get_unix_permissions(const String &p_file) override { return 0; }
 	virtual Error _set_unix_permissions(const String &p_file, BitField<FileAccess::UnixPermissionFlags> p_permissions) override { return ERR_UNAVAILABLE; }
 
@@ -96,3 +94,5 @@ public:
 
 	~FileAccessAndroid();
 };
+
+#endif // FILE_ACCESS_ANDROID_H

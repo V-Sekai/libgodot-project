@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef ANIMATION_TREE_H
+#define ANIMATION_TREE_H
 
 #include "animation_mixer.h"
 #include "scene/resources/animation.h"
@@ -251,6 +252,9 @@ protected:
 	virtual void _tree_changed();
 	virtual void _animation_node_renamed(const ObjectID &p_oid, const String &p_old_name, const String &p_new_name);
 	virtual void _animation_node_removed(const ObjectID &p_oid, const StringName &p_node);
+
+public:
+	AnimationRootNode() {}
 };
 
 class AnimationNodeStartState : public AnimationRootNode {
@@ -302,8 +306,8 @@ private:
 		uint64_t last_pass = 0;
 		real_t activity = 0.0;
 	};
-	mutable AHashMap<StringName, LocalVector<Activity>> input_activity_map;
-	mutable AHashMap<StringName, int> input_activity_map_get;
+	mutable HashMap<StringName, LocalVector<Activity>> input_activity_map;
+	mutable HashMap<StringName, LocalVector<Activity> *> input_activity_map_get;
 
 	NodePath animation_player;
 
@@ -358,3 +362,5 @@ public:
 #ifndef DISABLE_DEPRECATED
 VARIANT_ENUM_CAST(AnimationTree::AnimationProcessCallback);
 #endif // DISABLE_DEPRECATED
+
+#endif // ANIMATION_TREE_H

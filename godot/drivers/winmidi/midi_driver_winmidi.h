@@ -28,14 +28,15 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef MIDI_DRIVER_WINMIDI_H
+#define MIDI_DRIVER_WINMIDI_H
 
 #ifdef WINMIDI_ENABLED
 
 #include "core/os/midi_driver.h"
 #include "core/templates/vector.h"
 
-#include <cstdio>
+#include <stdio.h>
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
@@ -55,3 +56,5 @@ public:
 };
 
 #endif // WINMIDI_ENABLED
+
+#endif // MIDI_DRIVER_WINMIDI_H

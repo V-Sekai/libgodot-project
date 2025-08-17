@@ -8,7 +8,7 @@
 
 /**
  * @internal
- * @file
+ * @file hashlist.c
  * @~English
  *
  * @brief Functions for creating and using a hash list of key-value
@@ -546,8 +546,8 @@ ktxHashList_Deserialize(ktxHashList* pHead, unsigned int kvdLen, void* pKvd)
 
         while (keyLen < keyAndValueByteSize && key[keyLen] != '\0') keyLen++;
 
-        if (keyLen == keyAndValueByteSize || key[keyLen] != '\0') {
-            // Missing NULL terminator or no value
+        if (key[keyLen] != '\0') {
+            // Missing NULL terminator
             return KTX_FILE_DATA_ERROR;
         }
 

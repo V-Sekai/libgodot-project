@@ -99,22 +99,13 @@ void  RBBITableBuilder::buildForwardTable() {
     //   {bof} fake character.
     // 
     if (fRB->fSetBuilder->sawBOF()) {
-        RBBINode *bofTop    = new RBBINode(RBBINode::opCat, *fStatus);
-        if (bofTop == nullptr) {
-            *fStatus = U_MEMORY_ALLOCATION_ERROR;
-        }
-        if (U_FAILURE(*fStatus)) {
-            delete bofTop;
-            return;
-        }
-        RBBINode *bofLeaf   = new RBBINode(RBBINode::leafChar, *fStatus);
+        RBBINode *bofTop    = new RBBINode(RBBINode::opCat);
+        RBBINode *bofLeaf   = new RBBINode(RBBINode::leafChar);
         // Delete and exit if memory allocation failed.
-        if (bofLeaf == nullptr) {
+        if (bofTop == nullptr || bofLeaf == nullptr) {
             *fStatus = U_MEMORY_ALLOCATION_ERROR;
-        }
-        if (U_FAILURE(*fStatus)) {
-            delete bofLeaf;
             delete bofTop;
+            delete bofLeaf;
             return;
         }
         bofTop->fLeftChild  = bofLeaf;
@@ -129,23 +120,18 @@ void  RBBITableBuilder::buildForwardTable() {
     //   Appears as a cat-node, left child being the original tree,
     //   right child being the end marker.
     //
-    RBBINode *cn = new RBBINode(RBBINode::opCat, *fStatus);
+    RBBINode *cn = new RBBINode(RBBINode::opCat);
     // Exit if memory allocation failed.
     if (cn == nullptr) {
         *fStatus = U_MEMORY_ALLOCATION_ERROR;
-    }
-    if (U_FAILURE(*fStatus)) {
-        delete cn;
         return;
     }
     cn->fLeftChild = fTree;
     fTree->fParent = cn;
-    RBBINode *endMarkerNode = cn->fRightChild = new RBBINode(RBBINode::endMark, *fStatus);
+    RBBINode *endMarkerNode = cn->fRightChild = new RBBINode(RBBINode::endMark);
     // Delete and exit if memory allocation failed.
     if (cn->fRightChild == nullptr) {
         *fStatus = U_MEMORY_ALLOCATION_ERROR;
-    }
-    if (U_FAILURE(*fStatus)) {
         delete cn;
         return;
     }
@@ -156,7 +142,7 @@ void  RBBITableBuilder::buildForwardTable() {
     //  Replace all references to UnicodeSets with the tree for the equivalent
     //      expression.
     //
-    fTree->flattenSets(*fStatus, 0);
+    fTree->flattenSets();
 #ifdef RBBI_DEBUG
     if (fRB->fDebugEnv && uprv_strstr(fRB->fDebugEnv, "stree")) {
         RBBIDebugPuts("\nParse tree after flattening Unicode Set references.");

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef LIBGODOT_H
+#define LIBGODOT_H
 
 #include "gdextension_interface.h"
 
@@ -76,3 +77,5 @@ LIBGODOT_API void libgodot_destroy_godot_instance(GDExtensionObjectPtr p_godot_i
 #ifdef __cplusplus
 }
 #endif
+
+#endif // LIBGODOT_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef BUTTON_H
+#define BUTTON_H
 
 #include "scene/gui/base_button.h"
 #include "scene/resources/text_paragraph.h"
@@ -45,7 +46,6 @@ private:
 	String language;
 	TextDirection text_direction = TEXT_DIRECTION_AUTO;
 	TextServer::AutowrapMode autowrap_mode = TextServer::AUTOWRAP_OFF;
-	BitField<TextServer::LineBreakFlag> autowrap_flags_trim = TextServer::BREAK_TRIM_END_EDGE_SPACES;
 	TextServer::OverrunBehavior overrun_behavior = TextServer::OVERRUN_NO_TRIMMING;
 
 	Ref<Texture2D> icon;
@@ -111,7 +111,6 @@ protected:
 
 	void _set_internal_margin(Side p_side, float p_value);
 	virtual void _queue_update_size_cache();
-	virtual String _get_translated_text(const String &p_text) const;
 
 	Size2 _fit_icon_size(const Size2 &p_size) const;
 	Ref<StyleBox> _get_current_stylebox() const;
@@ -132,9 +131,6 @@ public:
 
 	void set_autowrap_mode(TextServer::AutowrapMode p_mode);
 	TextServer::AutowrapMode get_autowrap_mode() const;
-
-	void set_autowrap_trim_flags(BitField<TextServer::LineBreakFlag> p_flags);
-	BitField<TextServer::LineBreakFlag> get_autowrap_trim_flags() const;
 
 	void set_text_direction(TextDirection p_text_direction);
 	TextDirection get_text_direction() const;
@@ -165,3 +161,5 @@ public:
 	Button(const String &p_text = String());
 	~Button();
 };
+
+#endif // BUTTON_H

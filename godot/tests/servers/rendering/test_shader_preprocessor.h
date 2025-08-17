@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_SHADER_PREPROCESSOR_H
+#define TEST_SHADER_PREPROCESSOR_H
 
 #include "servers/rendering/shader_preprocessor.h"
 
@@ -58,7 +59,7 @@ bool is_operator_char(unsigned char c) {
 String remove_spaces(String &p_str) {
 	String res;
 	// Result is guaranteed to not be longer than the input.
-	res.resize_uninitialized(p_str.size());
+	res.resize(p_str.size());
 	int wp = 0;
 	char32_t last = 0;
 	bool has_removed = false;
@@ -82,7 +83,7 @@ String remove_spaces(String &p_str) {
 			last = c;
 		}
 	}
-	res.resize_uninitialized(wp);
+	res.resize(wp);
 	return res;
 }
 
@@ -328,3 +329,5 @@ TEST_CASE("[ShaderPreprocessor] Invalid concatenations") {
 }
 
 } // namespace TestShaderPreprocessor
+
+#endif // TEST_SHADER_PREPROCESSOR_H

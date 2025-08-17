@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef LINK_BUTTON_H
+#define LINK_BUTTON_H
 
 #include "scene/gui/base_button.h"
 #include "scene/resources/text_line.h"
@@ -109,3 +110,5 @@ public:
 };
 
 VARIANT_ENUM_CAST(LinkButton::UnderlineMode);
+
+#endif // LINK_BUTTON_H

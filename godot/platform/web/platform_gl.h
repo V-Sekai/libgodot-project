@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef PLATFORM_GL_H
+#define PLATFORM_GL_H
 
 #ifndef GLES_API_ENABLED
 #define GLES_API_ENABLED // Allow using GLES.
@@ -39,3 +40,5 @@
 #define eglGetProcAddress(n) static_assert(false, "Usage of eglGetProcessAddress() on the web is a bug.")
 
 #include "platform/web/godot_webgl2.h"
+
+#endif // PLATFORM_GL_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef XR_POSE_H
+#define XR_POSE_H
 
 #include "core/object/ref_counted.h"
 
@@ -76,3 +77,5 @@ public:
 };
 
 VARIANT_ENUM_CAST(XRPose::TrackingConfidence);
+
+#endif // XR_POSE_H

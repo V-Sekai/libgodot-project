@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_LOGGER_H
+#define TEST_LOGGER_H
 
 #include "core/io/dir_access.h"
 #include "core/io/logger.h"
@@ -165,3 +166,5 @@ TEST_CASE("[Logger][CompositeLogger] Logs the same into multiple loggers") {
 }
 
 } // namespace TestLogger
+
+#endif // TEST_LOGGER_H

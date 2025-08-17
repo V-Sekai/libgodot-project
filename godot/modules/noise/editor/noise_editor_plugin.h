@@ -28,7 +28,10 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef NOISE_EDITOR_PLUGIN_H
+#define NOISE_EDITOR_PLUGIN_H
+
+#ifdef TOOLS_ENABLED
 
 #include "editor/plugins/editor_plugin.h"
 
@@ -40,3 +43,7 @@ public:
 
 	NoiseEditorPlugin();
 };
+
+#endif // TOOLS_ENABLED
+
+#endif // NOISE_EDITOR_PLUGIN_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef GODOT_BODY_PAIR_2D_H
+#define GODOT_BODY_PAIR_2D_H
 
 #include "godot_body_2d.h"
 #include "godot_constraint_2d.h"
@@ -96,3 +97,5 @@ public:
 	GodotBodyPair2D(GodotBody2D *p_A, int p_shape_A, GodotBody2D *p_B, int p_shape_B);
 	~GodotBodyPair2D();
 };
+
+#endif // GODOT_BODY_PAIR_2D_H

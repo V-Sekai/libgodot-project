@@ -37,7 +37,7 @@
 #include <miniupnpc/miniwget.h>
 #include <miniupnpc/upnpcommands.h>
 
-#include <cstdlib>
+#include <stdlib.h>
 
 void UPNPMiniUPNP::make_default() {
 	UPNP::_create = UPNPMiniUPNP::_create;

@@ -30,31 +30,18 @@
 #include "hb.hh"
 
 
-/* Implements a lockfree and thread-safe cache for int->int functions,
- * using (optionally) _relaxed_ atomic integer operations.
+/* Implements a lockfree cache for int->int functions.
  *
- * The cache is a fixed-size array of 16-bit or 32-bit integers,
- * typically 256 elements.
+ * The cache is a fixed-size array of 16-bit or 32-bit integers.
+ * The key is split into two parts: the cache index and the rest.
  *
- * The key is split into two parts: the cache index (high bits)
- * and the rest (low bits).
- *
- * The cache index is used to index into the array.  The array
- * member is a 16-bit or 32-bit integer that is used *both*
- * to store the low bits of the key, and the value.
+ * The cache index is used to index into the array.  The rest is used
+ * to store the key and the value.
  *
  * The value is stored in the least significant bits of the integer.
- * The low bits of the key are stored in the most significant bits
- * of the integer.
- *
- * A cache hit is detected by comparing the low bits of the key
- * with the high bits of the integer at the array position indexed
- * by the high bits of the key. If they match, the value is extracted
- * from the least significant bits of the integer and returned.
- * Otherwise, a cache miss is reported.
- *
- * Cache operations (storage and retrieval) involve just a few
- * arithmetic operations and a single memory access.
+ * The key is stored in the most significant bits of the integer.
+ * The key is shifted by cache_bits to the left to make room for the
+ * value.
  */
 
 template <unsigned int key_bits=16,
@@ -65,11 +52,11 @@ struct hb_cache_t
 {
   using item_t = typename std::conditional<thread_safe,
 					   typename std::conditional<key_bits + value_bits - cache_bits <= 16,
-								     hb_atomic_t<unsigned short>,
-								     hb_atomic_t<unsigned int>>::type,
+								     hb_atomic_short_t,
+								     hb_atomic_int_t>::type,
 					   typename std::conditional<key_bits + value_bits - cache_bits <= 16,
-								     unsigned short,
-								     unsigned int>::type
+								     short,
+								     int>::type
 					  >::type;
 
   static_assert ((key_bits >= cache_bits), "");
@@ -83,7 +70,6 @@ struct hb_cache_t
       v = -1;
   }
 
-  HB_HOT
   bool get (unsigned int key, unsigned int *value) const
   {
     unsigned int k = key & ((1u<<cache_bits)-1);
@@ -95,14 +81,14 @@ struct hb_cache_t
     return true;
   }
 
-  HB_HOT
-  void set (unsigned int key, unsigned int value)
+  bool set (unsigned int key, unsigned int value)
   {
     if (unlikely ((key >> key_bits) || (value >> value_bits)))
-      return; /* Overflows */
+      return false; /* Overflows */
     unsigned int k = key & ((1u<<cache_bits)-1);
     unsigned int v = ((key>>cache_bits)<<value_bits) | value;
     values[k] = v;
+    return true;
   }
 
   private:

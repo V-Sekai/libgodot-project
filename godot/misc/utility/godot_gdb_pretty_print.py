@@ -25,7 +25,6 @@ From there you can figure out how to print it nicely.
 import re
 
 import gdb  # type: ignore
-import gdb.printing  # type: ignore
 
 
 # Printer for Godot StringName variables.

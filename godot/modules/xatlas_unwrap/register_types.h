@@ -28,9 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef XATLAS_UNWRAP_REGISTER_TYPES_H
+#define XATLAS_UNWRAP_REGISTER_TYPES_H
 
 #include "modules/register_module_types.h"
 
 void initialize_xatlas_unwrap_module(ModuleInitializationLevel p_level);
 void uninitialize_xatlas_unwrap_module(ModuleInitializationLevel p_level);
+
+#endif // XATLAS_UNWRAP_REGISTER_TYPES_H

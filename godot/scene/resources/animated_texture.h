@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef ANIMATED_TEXTURE_H
+#define ANIMATED_TEXTURE_H
 
 #include "scene/resources/texture.h"
 
@@ -105,3 +106,5 @@ public:
 	AnimatedTexture();
 	~AnimatedTexture();
 };
+
+#endif // ANIMATED_TEXTURE_H

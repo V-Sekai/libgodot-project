@@ -28,9 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef LIGHTMAPPER_RD_REGISTER_TYPES_H
+#define LIGHTMAPPER_RD_REGISTER_TYPES_H
 
 #include "modules/register_module_types.h"
 
 void initialize_lightmapper_rd_module(ModuleInitializationLevel p_level);
 void uninitialize_lightmapper_rd_module(ModuleInitializationLevel p_level);
+
+#endif // LIGHTMAPPER_RD_REGISTER_TYPES_H

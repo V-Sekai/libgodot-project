@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_STREAM_PEER_BUFFER_H
+#define TEST_STREAM_PEER_BUFFER_H
 
 #include "core/io/stream_peer.h"
 #include "tests/test_macros.h"
@@ -180,3 +181,5 @@ TEST_CASE("[StreamPeerBuffer] Get data with invalid size returns an error") {
 }
 
 } // namespace TestStreamPeerBuffer
+
+#endif // TEST_STREAM_PEER_BUFFER_H

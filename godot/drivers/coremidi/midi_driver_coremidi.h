@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef MIDI_DRIVER_COREMIDI_H
+#define MIDI_DRIVER_COREMIDI_H
 
 #ifdef COREMIDI_ENABLED
 
@@ -37,7 +38,7 @@
 #include "core/templates/vector.h"
 
 #import <CoreMIDI/CoreMIDI.h>
-#include <cstdio>
+#include <stdio.h>
 
 class MIDIDriverCoreMidi : public MIDIDriver {
 	MIDIClientRef client = 0;
@@ -66,3 +67,5 @@ public:
 };
 
 #endif // COREMIDI_ENABLED
+
+#endif // MIDI_DRIVER_COREMIDI_H

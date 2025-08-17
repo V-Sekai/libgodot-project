@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef AUDIO_STREAM_OGG_VORBIS_H
+#define AUDIO_STREAM_OGG_VORBIS_H
 
 #include "core/variant/variant.h"
 #include "servers/audio/audio_stream.h"
@@ -133,7 +134,6 @@ class AudioStreamOggVorbis : public AudioStream {
 	double bpm = 0;
 	int beat_count = 0;
 	int bar_beats = 4;
-	Dictionary tags;
 
 protected:
 	static void _bind_methods();
@@ -157,9 +157,6 @@ public:
 	void set_bar_beats(int p_bar_beats);
 	virtual int get_bar_beats() const override;
 
-	void set_tags(const Dictionary &p_tags);
-	virtual Dictionary get_tags() const override;
-
 	virtual Ref<AudioStreamPlayback> instantiate_playback() override;
 	virtual String get_stream_name() const override;
 
@@ -180,3 +177,5 @@ public:
 	AudioStreamOggVorbis();
 	virtual ~AudioStreamOggVorbis();
 };
+
+#endif // AUDIO_STREAM_OGG_VORBIS_H

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef ANDROID_INPUT_HANDLER_H
+#define ANDROID_INPUT_HANDLER_H
 
 #include "core/input/input.h"
 
@@ -62,7 +63,7 @@ public:
 		int index = 0; // Can be either JoyAxis or JoyButton.
 		bool pressed = false;
 		float value = 0;
-		BitField<HatMask> hat = HatMask::CENTER;
+		BitField<HatMask> hat;
 	};
 
 private:
@@ -71,7 +72,7 @@ private:
 	bool control_mem = false;
 	bool meta_mem = false;
 
-	BitField<MouseButtonMask> buttons_state = MouseButtonMask::NONE;
+	BitField<MouseButtonMask> buttons_state;
 
 	Vector<TouchPos> touch;
 	MouseEventInfo mouse_event_info;
@@ -104,3 +105,5 @@ public:
 	void process_joy_event(JoypadEvent p_event);
 	void process_key_event(int p_physical_keycode, int p_unicode, int p_key_label, bool p_pressed, bool p_echo);
 };
+
+#endif // ANDROID_INPUT_HANDLER_H

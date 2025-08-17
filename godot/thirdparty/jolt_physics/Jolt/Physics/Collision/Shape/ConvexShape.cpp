@@ -57,9 +57,8 @@ void ConvexShape::sCollideConvexVsConvex(const Shape *inShape1, const Shape *inS
 	Mat44 transform_2_to_1 = inverse_transform1 * inCenterOfMassTransform2;
 
 	// Get bounding boxes
-	float max_separation_distance = inCollideShapeSettings.mMaxSeparationDistance;
 	AABox shape1_bbox = shape1->GetLocalBounds().Scaled(inScale1);
-	shape1_bbox.ExpandBy(Vec3::sReplicate(max_separation_distance));
+	shape1_bbox.ExpandBy(Vec3::sReplicate(inCollideShapeSettings.mMaxSeparationDistance));
 	AABox shape2_bbox = shape2->GetLocalBounds().Scaled(inScale2);
 
 	// Check if they overlap
@@ -87,10 +86,10 @@ void ConvexShape::sCollideConvexVsConvex(const Shape *inShape1, const Shape *inS
 		const Support *shape2_excl_cvx_radius = shape2->GetSupportFunction(ConvexShape::ESupportMode::ExcludeConvexRadius, buffer2_excl_cvx_radius, inScale2);
 
 		// Transform shape 2 in the space of shape 1
-		TransformedConvexObject transformed2_excl_cvx_radius(transform_2_to_1, *shape2_excl_cvx_radius);
+		TransformedConvexObject<Support> transformed2_excl_cvx_radius(transform_2_to_1, *shape2_excl_cvx_radius);
 
 		// Perform GJK step
-		status = pen_depth.GetPenetrationDepthStepGJK(*shape1_excl_cvx_radius, shape1_excl_cvx_radius->GetConvexRadius() + max_separation_distance, transformed2_excl_cvx_radius, shape2_excl_cvx_radius->GetConvexRadius(), inCollideShapeSettings.mCollisionTolerance, penetration_axis, point1, point2);
+		status = pen_depth.GetPenetrationDepthStepGJK(*shape1_excl_cvx_radius, shape1_excl_cvx_radius->GetConvexRadius() + inCollideShapeSettings.mMaxSeparationDistance, transformed2_excl_cvx_radius, shape2_excl_cvx_radius->GetConvexRadius(), inCollideShapeSettings.mCollisionTolerance, penetration_axis, point1, point2);
 	}
 
 	// Check result of collision detection
@@ -106,22 +105,16 @@ void ConvexShape::sCollideConvexVsConvex(const Shape *inShape1, const Shape *inS
 		{
 			// Need to run expensive EPA algorithm
 
-			// We know we're overlapping at this point, so we can set the max separation distance to 0.
-			// Numerically it is possible that GJK finds that the shapes are overlapping but EPA finds that they're separated.
-			// In order to avoid this, we clamp the max separation distance to 1 so that we don't excessively inflate the shape,
-			// but we still inflate it enough to avoid the case where EPA misses the collision.
-			max_separation_distance = min(max_separation_distance, 1.0f);
-
 			// Create support function
 			SupportBuffer buffer1_incl_cvx_radius, buffer2_incl_cvx_radius;
 			const Support *shape1_incl_cvx_radius = shape1->GetSupportFunction(ConvexShape::ESupportMode::IncludeConvexRadius, buffer1_incl_cvx_radius, inScale1);
 			const Support *shape2_incl_cvx_radius = shape2->GetSupportFunction(ConvexShape::ESupportMode::IncludeConvexRadius, buffer2_incl_cvx_radius, inScale2);
 
 			// Add separation distance
-			AddConvexRadius shape1_add_max_separation_distance(*shape1_incl_cvx_radius, max_separation_distance);
+			AddConvexRadius<Support> shape1_add_max_separation_distance(*shape1_incl_cvx_radius, inCollideShapeSettings.mMaxSeparationDistance);
 
 			// Transform shape 2 in the space of shape 1
-			TransformedConvexObject transformed2_incl_cvx_radius(transform_2_to_1, *shape2_incl_cvx_radius);
+			TransformedConvexObject<Support> transformed2_incl_cvx_radius(transform_2_to_1, *shape2_incl_cvx_radius);
 
 			// Perform EPA step
 			if (!pen_depth.GetPenetrationDepthStepEPA(shape1_add_max_separation_distance, transformed2_incl_cvx_radius, inCollideShapeSettings.mPenetrationTolerance, penetration_axis, point1, point2))
@@ -131,14 +124,14 @@ void ConvexShape::sCollideConvexVsConvex(const Shape *inShape1, const Shape *inS
 	}
 
 	// Check if the penetration is bigger than the early out fraction
-	float penetration_depth = (point2 - point1).Length() - max_separation_distance;
+	float penetration_depth = (point2 - point1).Length() - inCollideShapeSettings.mMaxSeparationDistance;
 	if (-penetration_depth >= ioCollector.GetEarlyOutFraction())
 		return;
 
 	// Correct point1 for the added separation distance
 	float penetration_axis_len = penetration_axis.Length();
 	if (penetration_axis_len > 0.0f)
-		point1 -= penetration_axis * (max_separation_distance / penetration_axis_len);
+		point1 -= penetration_axis * (inCollideShapeSettings.mMaxSeparationDistance / penetration_axis_len);
 
 	// Convert to world space
 	point1 = inCenterOfMassTransform1 * point1;
@@ -171,7 +164,7 @@ bool ConvexShape::CastRay(const RayCast &inRay, const SubShapeIDCreator &inSubSh
 
 	// Create support function
 	SupportBuffer buffer;
-	const Support *support = GetSupportFunction(ConvexShape::ESupportMode::IncludeConvexRadius, buffer, Vec3::sOne());
+	const Support *support = GetSupportFunction(ConvexShape::ESupportMode::IncludeConvexRadius, buffer, Vec3::sReplicate(1.0f));
 
 	// Cast ray
 	GJKClosestPoint gjk;
@@ -241,7 +234,7 @@ void ConvexShape::CollidePoint(Vec3Arg inPoint, const SubShapeIDCreator &inSubSh
 	{
 		// Create support function
 		SupportBuffer buffer;
-		const Support *support = GetSupportFunction(ConvexShape::ESupportMode::IncludeConvexRadius, buffer, Vec3::sOne());
+		const Support *support = GetSupportFunction(ConvexShape::ESupportMode::IncludeConvexRadius, buffer, Vec3::sReplicate(1.0f));
 
 		// Create support function for point
 		PointConvexSupport point { inPoint };
@@ -319,7 +312,7 @@ public:
 		mLocalToWorld(Mat44::sRotationTranslation(inRotation, inPositionCOM) * Mat44::sScale(inScale)),
 		mIsInsideOut(ScaleHelpers::IsInsideOut(inScale))
 	{
-		mSupport = inShape->GetSupportFunction(ESupportMode::IncludeConvexRadius, mSupportBuffer, Vec3::sOne());
+		mSupport = inShape->GetSupportFunction(ESupportMode::IncludeConvexRadius, mSupportBuffer, Vec3::sReplicate(1.0f));
 	}
 
 	SupportBuffer		mSupportBuffer;
@@ -453,7 +446,7 @@ void ConvexShape::DrawGetSupportFunction(DebugRenderer *inRenderer, RMat44Arg in
 	// Get the support function with convex radius
 	SupportBuffer buffer;
 	const Support *support = GetSupportFunction(ESupportMode::ExcludeConvexRadius, buffer, inScale);
-	AddConvexRadius add_convex(*support, support->GetConvexRadius());
+	AddConvexRadius<Support> add_convex(*support, support->GetConvexRadius());
 
 	// Draw the shape
 	DebugRenderer::GeometryRef geometry = inRenderer->CreateTriangleGeometryForConvex([&add_convex](Vec3Arg inDirection) { return add_convex.GetSupport(inDirection); });
@@ -505,7 +498,7 @@ void ConvexShape::DrawGetSupportingFace(DebugRenderer *inRenderer, RMat44Arg inC
 		SupportingFace face = ftd.first;
 
 		// Displace the face a little bit forward so it is easier to see
-		Vec3 normal = face.size() >= 3? (face[2] - face[1]).Cross(face[0] - face[1]).NormalizedOr(Vec3::sZero()) : Vec3::sZero();
+		Vec3 normal = face.size() >= 3? (face[2] - face[1]).Cross(face[0] - face[1]).Normalized() : Vec3::sZero();
 		Vec3 displacement = 0.001f * normal;
 
 		// Transform face to world space and calculate center of mass

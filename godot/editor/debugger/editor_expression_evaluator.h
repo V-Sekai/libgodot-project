@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef EDITOR_EXPRESSION_EVALUATOR_H
+#define EDITOR_EXPRESSION_EVALUATOR_H
 
 #include "scene/gui/box_container.h"
 
@@ -72,3 +73,5 @@ public:
 
 	EditorExpressionEvaluator();
 };
+
+#endif // EDITOR_EXPRESSION_EVALUATOR_H

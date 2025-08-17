@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef EDITOR_UNDO_REDO_MANAGER_H
+#define EDITOR_UNDO_REDO_MANAGER_H
 
 #include "core/object/object.h"
 #include "core/object/undo_redo.h"
@@ -51,7 +52,6 @@ public:
 		String action_name;
 		UndoRedo::MergeMode merge_mode = UndoRedo::MERGE_DISABLE;
 		bool backward_undo_ops = false;
-		bool mark_unsaved = true;
 	};
 
 	struct History {
@@ -74,11 +74,6 @@ private:
 protected:
 	static void _bind_methods();
 
-#ifndef DISABLE_DEPRECATED
-	void _create_action_bind_compat_106121(const String &p_name = "", UndoRedo::MergeMode p_mode = UndoRedo::MERGE_DISABLE, Object *p_custom_context = nullptr, bool p_backward_undo_ops = false);
-	static void _bind_compatibility_methods();
-#endif
-
 public:
 	History &get_or_create_history(int p_idx);
 	UndoRedo *get_history_undo_redo(int p_idx) const;
@@ -86,8 +81,8 @@ public:
 	History &get_history_for_object(Object *p_object);
 	void force_fixed_history();
 
-	void create_action_for_history(const String &p_name, int p_history_id, UndoRedo::MergeMode p_mode = UndoRedo::MERGE_DISABLE, bool p_backward_undo_ops = false, bool p_mark_unsaved = true);
-	void create_action(const String &p_name = "", UndoRedo::MergeMode p_mode = UndoRedo::MERGE_DISABLE, Object *p_custom_context = nullptr, bool p_backward_undo_ops = false, bool p_mark_unsaved = true);
+	void create_action_for_history(const String &p_name, int p_history_id, UndoRedo::MergeMode p_mode = UndoRedo::MERGE_DISABLE, bool p_backward_undo_ops = false);
+	void create_action(const String &p_name = "", UndoRedo::MergeMode p_mode = UndoRedo::MERGE_DISABLE, Object *p_custom_context = nullptr, bool p_backward_undo_ops = false);
 
 	void add_do_methodp(Object *p_object, const StringName &p_method, const Variant **p_args, int p_argcount);
 	void add_undo_methodp(Object *p_object, const StringName &p_method, const Variant **p_args, int p_argcount);
@@ -149,3 +144,5 @@ public:
 };
 
 VARIANT_ENUM_CAST(EditorUndoRedoManager::SpecialHistory);
+
+#endif // EDITOR_UNDO_REDO_MANAGER_H

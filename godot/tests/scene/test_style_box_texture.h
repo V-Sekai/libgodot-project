@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_STYLE_BOX_TEXTURE_H
+#define TEST_STYLE_BOX_TEXTURE_H
 
 #include "scene/resources/style_box_texture.h"
 
@@ -189,3 +190,5 @@ TEST_CASE("[StyleBoxTexture] get_draw_rect") {
 }
 
 } // namespace TestStyleBoxTexture
+
+#endif // TEST_STYLE_BOX_TEXTURE_H

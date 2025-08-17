@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef TEST_NODE_2D_H
+#define TEST_NODE_2D_H
 
 #include "scene/2d/node_2d.h"
 #include "scene/main/window.h"
@@ -211,3 +212,5 @@ TEST_CASE("[SceneTree][Node2D] Utility methods") {
 }
 
 } // namespace TestNode2D
+
+#endif // TEST_NODE_2D_H

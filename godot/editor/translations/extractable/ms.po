@@ -21,12 +21,6 @@ msgstr ""
 msgid "All Recognized"
 msgstr "Semua Dikenali"
 
-msgid "Save"
-msgstr "Simpan"
-
-msgid "Clear"
-msgstr "Kosongkan"
-
 msgid "Network"
 msgstr "Rangkaian"
 
@@ -35,6 +29,9 @@ msgstr "Buka"
 
 msgid "Select Current Folder"
 msgstr "Pilih Folder Semasa"
+
+msgid "Save"
+msgstr "Simpan"
 
 msgid "Select This Folder"
 msgstr "Pilih Folder Ini"
@@ -69,11 +66,11 @@ msgstr "Laluan:"
 msgid "Refresh files."
 msgstr "Muat semula fail."
 
-msgid "Directories & Files:"
-msgstr "Direktori & Fail:"
-
 msgid "Toggle the visibility of hidden files."
 msgstr "Togol keterlihatan fail tersembunyi."
+
+msgid "Directories & Files:"
+msgstr "Direktori & Fail:"
 
 msgid "File:"
 msgstr "Fail:"
@@ -107,6 +104,9 @@ msgstr "Tampal"
 
 msgid "Select All"
 msgstr "Pilih Semua"
+
+msgid "Clear"
+msgstr "Kosongkan"
 
 msgid "Undo"
 msgstr "Buat Asal"

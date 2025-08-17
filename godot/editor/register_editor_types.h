@@ -28,7 +28,10 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef REGISTER_EDITOR_TYPES_H
+#define REGISTER_EDITOR_TYPES_H
 
 void register_editor_types();
 void unregister_editor_types();
+
+#endif // REGISTER_EDITOR_TYPES_H

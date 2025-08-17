@@ -28,9 +28,12 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef ENET_REGISTER_TYPES_H
+#define ENET_REGISTER_TYPES_H
 
 #include "modules/register_module_types.h"
 
 void initialize_enet_module(ModuleInitializationLevel p_level);
 void uninitialize_enet_module(ModuleInitializationLevel p_level);
+
+#endif // ENET_REGISTER_TYPES_H

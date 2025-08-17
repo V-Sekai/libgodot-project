@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef DECAL_H
+#define DECAL_H
 
 #include "scene/3d/visual_instance_3d.h"
 
@@ -113,3 +114,5 @@ public:
 };
 
 VARIANT_ENUM_CAST(Decal::DecalTexture);
+
+#endif // DECAL_H

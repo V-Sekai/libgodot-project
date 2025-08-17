@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef SCRIPT_ITERATOR_H
+#define SCRIPT_ITERATOR_H
 
 #ifdef GDEXTENSION
 
@@ -73,3 +74,5 @@ private:
 public:
 	ScriptIterator(const String &p_string, int p_start, int p_length);
 };
+
+#endif // SCRIPT_ITERATOR_H

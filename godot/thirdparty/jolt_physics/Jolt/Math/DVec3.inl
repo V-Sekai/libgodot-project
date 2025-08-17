@@ -147,11 +147,6 @@ DVec3 DVec3::sReplicate(double inV)
 #endif
 }
 
-DVec3 DVec3::sOne()
-{
-	return sReplicate(1.0);
-}
-
 DVec3 DVec3::sNaN()
 {
 	return sReplicate(numeric_limits<double>::quiet_NaN());
@@ -732,7 +727,7 @@ DVec3 DVec3::Abs() const
 
 DVec3 DVec3::Reciprocal() const
 {
-	return sOne() / mValue;
+	return sReplicate(1.0) / mValue;
 }
 
 DVec3 DVec3::Cross(DVec3Arg inV2) const

@@ -28,7 +28,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#pragma once
+#ifndef JOINT_3D_H
+#define JOINT_3D_H
 
 #include "scene/3d/node_3d.h"
 #include "scene/3d/physics/physics_body_3d.h"
@@ -80,3 +81,5 @@ public:
 	Joint3D();
 	~Joint3D();
 };
+
+#endif // JOINT_3D_H
