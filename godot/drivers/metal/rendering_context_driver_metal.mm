@@ -197,10 +197,23 @@ public:
 };
 
 RenderingContextDriver::SurfaceID RenderingContextDriverMetal::surface_create(Ref<RenderingNativeSurface> p_native_surface) {
+	CAMetalLayer *metal_layer = nullptr;
+	
+	// Try casting to RenderingNativeSurfaceApple first (macOS)
 	Ref<RenderingNativeSurfaceApple> apple_native_surface = Object::cast_to<RenderingNativeSurfaceApple>(*p_native_surface);
-	ERR_FAIL_COND_V(apple_native_surface.is_null(), SurfaceID());
+	if (apple_native_surface.is_valid()) {
+		// RenderingNativeSurfaceApple::get_layer() returns uint64_t
+		metal_layer = (__bridge CAMetalLayer *)(void *)apple_native_surface->get_layer();
+	} else {
+		// Try casting to RenderingNativeSurfaceAppleEmbedded (iOS/embedded)
+		Ref<RenderingNativeSurfaceAppleEmbedded> apple_embedded_surface = Object::cast_to<RenderingNativeSurfaceAppleEmbedded>(*p_native_surface);
+		ERR_FAIL_COND_V(apple_embedded_surface.is_null(), SurfaceID());
+		// RenderingNativeSurfaceAppleEmbedded::get_layer() returns CALayerPtr
+		CALayerPtr layer_ptr = apple_embedded_surface->get_layer();
+		metal_layer = (CAMetalLayer *)layer_ptr;
+	}
 
-	CAMetalLayer *metal_layer = (__bridge CAMetalLayer *)(void *)apple_native_surface->get_layer();
+	ERR_FAIL_COND_V(metal_layer == nullptr, SurfaceID());
 	Surface *surface = memnew(SurfaceLayer(metal_layer, metal_device));
 
 	return SurfaceID(surface);
