@@ -41,8 +41,8 @@
 #endif
 
 #ifdef METAL_ENABLED
-#include "servers/rendering/rendering_device.h"
 #include "drivers/metal/rendering_context_driver_metal.h"
+#include "servers/rendering/rendering_device.h"
 #endif
 
 void RenderingNativeSurfaceAppleEmbedded::_bind_methods() {
