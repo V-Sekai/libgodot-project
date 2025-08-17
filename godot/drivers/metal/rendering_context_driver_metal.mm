@@ -30,8 +30,19 @@
 
 #import "rendering_context_driver_metal.h"
 
-#include "drivers/apple/rendering_native_surface_apple.h"
+#import "drivers/apple/rendering_native_surface_apple.h"
+#import "metal_objects.h"
 #import "rendering_device_driver_metal.h"
+
+#include "drivers/apple_embedded/rendering_native_surface_apple_embedded.h"
+
+#include "core/error/error_macros.h"
+#include "core/math/math_defs.h"
+#include "core/os/os.h"
+#include "core/string/ustring.h"
+#include "core/templates/local_vector.h"
+#include "servers/display_server.h"
+#include "servers/rendering/rendering_device_driver.h"
 
 @protocol MTLDeviceEx <MTLDevice>
 #if TARGET_OS_OSX && __MAC_OS_X_VERSION_MAX_ALLOWED < 130300
@@ -46,6 +57,10 @@ RenderingContextDriverMetal::~RenderingContextDriverMetal() {
 }
 
 Error RenderingContextDriverMetal::initialize() {
+	if (OS::get_singleton()->get_environment("MTL_CAPTURE_ENABLED") == "1") {
+		capture_available = true;
+	}
+
 	metal_device = MTLCreateSystemDefaultDevice();
 #if TARGET_OS_OSX
 	if (@available(macOS 13.3, *)) {
@@ -185,7 +200,8 @@ RenderingContextDriver::SurfaceID RenderingContextDriverMetal::surface_create(Re
 	Ref<RenderingNativeSurfaceApple> apple_native_surface = Object::cast_to<RenderingNativeSurfaceApple>(*p_native_surface);
 	ERR_FAIL_COND_V(apple_native_surface.is_null(), SurfaceID());
 
-	Surface *surface = memnew(SurfaceLayer((__bridge CAMetalLayer *)apple_native_surface->get_layer(), metal_device));
+	CAMetalLayer *metal_layer = (__bridge CAMetalLayer *)(void *)apple_native_surface->get_layer();
+	Surface *surface = memnew(SurfaceLayer(metal_layer, metal_device));
 
 	return SurfaceID(surface);
 }

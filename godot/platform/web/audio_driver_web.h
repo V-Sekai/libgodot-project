@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef AUDIO_DRIVER_WEB_H
-#define AUDIO_DRIVER_WEB_H
+#pragma once
 
 #include "godot_audio.h"
 #include "godot_js.h"
@@ -167,6 +166,7 @@ public:
 	static AudioDriverWorklet *get_singleton() { return singleton; }
 
 	AudioDriverWorklet() { singleton = this; }
+	~AudioDriverWorklet() { singleton = nullptr; }
 };
 
 #endif // THREADS_ENABLED
@@ -190,6 +190,5 @@ public:
 	static AudioDriverScriptProcessor *get_singleton() { return singleton; }
 
 	AudioDriverScriptProcessor() { singleton = this; }
+	~AudioDriverScriptProcessor() { singleton = nullptr; }
 };
-
-#endif // AUDIO_DRIVER_WEB_H

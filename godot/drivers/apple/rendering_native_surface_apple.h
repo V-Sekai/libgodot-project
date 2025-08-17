@@ -42,9 +42,7 @@ public:
 
 	static Ref<RenderingNativeSurfaceApple> create(void *p_layer);
 
-	void *get_layer() const {
-		return layer;
-	}
+	uint64_t get_layer();
 
 	RenderingContextDriver *create_rendering_context(const String &p_driver_name) override;
 	GLESContext *create_gles_context() override;

@@ -33,7 +33,9 @@
 #include "core/variant/native_ptr.h"
 #include "servers/rendering/rendering_native_surface.h"
 
+#ifdef VULKAN_ENABLED
 #include "drivers/vulkan/godot_vulkan.h"
+#endif
 
 class RenderingNativeSurfaceVulkan : public RenderingNativeSurface {
 	GDCLASS(RenderingNativeSurfaceVulkan, RenderingNativeSurface);
@@ -45,9 +47,9 @@ class RenderingNativeSurfaceVulkan : public RenderingNativeSurface {
 #endif
 
 public:
-#ifdef VULKAN_ENABLED
 	static Ref<RenderingNativeSurfaceVulkan> create_api(GDExtensionConstPtr<const void> vulkan_surface);
 
+#ifdef VULKAN_ENABLED
 	static Ref<RenderingNativeSurfaceVulkan> create(VkSurfaceKHR vulkan_surface);
 
 	VkSurfaceKHR get_vulkan_surface() const {

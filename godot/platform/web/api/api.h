@@ -28,12 +28,9 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef WEB_API_H
-#define WEB_API_H
+#pragma once
 
 void register_core_web_api();
 void unregister_core_web_api();
 void register_web_api();
 void unregister_web_api();
-
-#endif // WEB_API_H

@@ -35,8 +35,6 @@
 #include "core/object/class_db.h"
 #include "core/variant/variant.h"
 
-HashMap<StringName, LocalVector<GDExtensionSpecialCompatHashes::Mapping>> GDExtensionSpecialCompatHashes::mappings;
-
 bool GDExtensionSpecialCompatHashes::lookup_current_hash(const StringName &p_class, const StringName &p_method, uint32_t p_legacy_hash, uint32_t *r_current_hash) {
 	LocalVector<Mapping> *methods = mappings.getptr(p_class);
 	if (!methods) {
@@ -751,7 +749,7 @@ void GDExtensionSpecialCompatHashes::initialize() {
 		{ "canvas_item_add_multimesh", 1541595251, 2131855138 },
 		{ "canvas_item_add_animation_slice", 4107531031, 2646834499 },
 		{ "canvas_item_set_canvas_group_mode", 41973386, 3973586316 },
-		{ "set_boot_image", 2244367877, 4241564265 },
+		{ "set_boot_image", 2244367877, 3759744527 },
 #ifdef REAL_T_IS_DOUBLE
 		{ "viewport_attach_to_screen", 1410474027, 2248302004 },
 		{ "canvas_item_set_custom_rect", 2180266943, 1134449082 },

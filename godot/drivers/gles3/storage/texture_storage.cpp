@@ -43,6 +43,7 @@
 
 using namespace GLES3;
 
+GLuint TextureStorage::system_fbo = 0;
 TextureStorage *TextureStorage::singleton = nullptr;
 
 TextureStorage *TextureStorage::get_singleton() {
@@ -396,7 +397,6 @@ static inline Error _get_gl_uncompressed_format(const Ref<Image> &p_image, Image
 				r_gl_format = GL_RED;
 				r_gl_type = GL_FLOAT;
 			} else {
-				ERR_PRINT("R32 float texture not supported, converting to R16.");
 				if (p_image.is_valid()) {
 					p_image->convert(Image::FORMAT_RH);
 				}
@@ -412,7 +412,6 @@ static inline Error _get_gl_uncompressed_format(const Ref<Image> &p_image, Image
 				r_gl_format = GL_RG;
 				r_gl_type = GL_FLOAT;
 			} else {
-				ERR_PRINT("RG32 float texture not supported, converting to RG16.");
 				if (p_image.is_valid()) {
 					p_image->convert(Image::FORMAT_RGH);
 				}
@@ -428,7 +427,6 @@ static inline Error _get_gl_uncompressed_format(const Ref<Image> &p_image, Image
 				r_gl_format = GL_RGB;
 				r_gl_type = GL_FLOAT;
 			} else {
-				ERR_PRINT("RGB32 float texture not supported, converting to RGB16.");
 				if (p_image.is_valid()) {
 					p_image->convert(Image::FORMAT_RGBH);
 				}
@@ -444,7 +442,6 @@ static inline Error _get_gl_uncompressed_format(const Ref<Image> &p_image, Image
 				r_gl_format = GL_RGBA;
 				r_gl_type = GL_FLOAT;
 			} else {
-				ERR_PRINT("RGBA32 float texture not supported, converting to RGBA16.");
 				if (p_image.is_valid()) {
 					p_image->convert(Image::FORMAT_RGBAH);
 				}
@@ -497,6 +494,11 @@ Ref<Image> TextureStorage::_get_gl_image_and_format(const Ref<Image> &p_image, I
 	if (!Image::is_format_compressed(p_format)) {
 		Error err = _get_gl_uncompressed_format(p_image, p_format, r_real_format, r_gl_format, r_gl_internal_format, r_gl_type);
 		ERR_FAIL_COND_V_MSG(err != OK, Ref<Image>(), vformat("The image format %d is not supported by the Compatibility renderer.", p_format));
+
+		if (p_format != r_real_format) {
+			WARN_PRINT(vformat("Image format %s not supported by hardware, converting to %s.", Image::get_format_name(p_format), Image::get_format_name(r_real_format)));
+		}
+
 		return p_image;
 	}
 
@@ -745,6 +747,10 @@ Ref<Image> TextureStorage::_get_gl_image_and_format(const Ref<Image> &p_image, I
 
 			r_real_format = image->get_format();
 			r_compressed = false;
+
+			if (p_format != image->get_format()) {
+				WARN_PRINT(vformat("Image format %s not supported by hardware, converting to %s.", Image::get_format_name(p_format), Image::get_format_name(image->get_format())));
+			}
 		}
 
 		return image;
@@ -1465,11 +1471,8 @@ void TextureStorage::texture_set_detect_roughness_callback(RID p_texture, RS::Te
 }
 
 void TextureStorage::texture_debug_usage(List<RS::TextureInfo> *r_info) {
-	List<RID> textures;
-	texture_owner.get_owned_list(&textures);
-
-	for (List<RID>::Element *E = textures.front(); E; E = E->next()) {
-		Texture *t = texture_owner.get_or_null(E->get());
+	for (const RID &rid : texture_owner.get_owned_list()) {
+		Texture *t = texture_owner.get_or_null(rid);
 		if (!t) {
 			continue;
 		}
@@ -1479,6 +1482,7 @@ void TextureStorage::texture_debug_usage(List<RS::TextureInfo> *r_info) {
 		tinfo.width = t->alloc_width;
 		tinfo.height = t->alloc_height;
 		tinfo.bytes = t->total_data_size;
+		tinfo.type = static_cast<RenderingServer::TextureType>(t->type);
 
 		switch (t->type) {
 			case Texture::TYPE_3D:
@@ -2091,8 +2095,6 @@ AABB TextureStorage::decal_get_aabb(RID p_decal) const {
 
 /* RENDER TARGET API */
 
-GLuint TextureStorage::system_fbo = 0;
-
 void TextureStorage::_update_render_target(RenderTarget *rt) {
 	// do not allocate a render target with no size
 	if (rt->size.x <= 0 || rt->size.y <= 0) {
@@ -2103,7 +2105,7 @@ void TextureStorage::_update_render_target(RenderTarget *rt) {
 
 	// do not allocate a render target that is attached to the screen
 	if (rt->direct_to_screen) {
-		rt->fbo = DisplayServer::get_singleton()->window_get_native_handle(DisplayServer::OPENGL_FBO, rt->direct_to_screen_id);
+		rt->fbo = system_fbo; // Use default framebuffer (0) for direct-to-screen rendering
 		return;
 	}
 
@@ -2184,14 +2186,15 @@ void TextureStorage::_update_render_target(RenderTarget *rt) {
 			ERR_FAIL_NULL(texture);
 
 			rt->depth = texture->tex_id;
+			rt->depth_has_stencil = rt->overridden.depth_has_stencil;
 		} else {
 			glGenTextures(1, &rt->depth);
 			glBindTexture(texture_target, rt->depth);
 
 			if (use_multiview) {
-				glTexImage3D(texture_target, 0, GL_DEPTH_COMPONENT24, rt->size.x, rt->size.y, rt->view_count, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, nullptr);
+				glTexImage3D(texture_target, 0, GL_DEPTH24_STENCIL8, rt->size.x, rt->size.y, rt->view_count, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
 			} else {
-				glTexImage2D(texture_target, 0, GL_DEPTH_COMPONENT24, rt->size.x, rt->size.y, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, nullptr);
+				glTexImage2D(texture_target, 0, GL_DEPTH24_STENCIL8, rt->size.x, rt->size.y, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
 			}
 
 			glTexParameteri(texture_target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -2199,16 +2202,19 @@ void TextureStorage::_update_render_target(RenderTarget *rt) {
 			glTexParameteri(texture_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri(texture_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-			GLES3::Utilities::get_singleton()->texture_allocated_data(rt->depth, rt->size.x * rt->size.y * rt->view_count * 3, "Render target depth texture");
+			rt->depth_has_stencil = true;
+
+			GLES3::Utilities::get_singleton()->texture_allocated_data(rt->depth, rt->size.x * rt->size.y * rt->view_count * 4, "Render target depth texture");
 		}
+
 #ifndef IOS_ENABLED
 		if (use_multiview) {
-			glFramebufferTextureMultiviewOVR(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, rt->depth, 0, 0, rt->view_count);
+			glFramebufferTextureMultiviewOVR(GL_FRAMEBUFFER, rt->depth_has_stencil ? GL_DEPTH_STENCIL_ATTACHMENT : GL_DEPTH_ATTACHMENT, rt->depth, 0, 0, rt->view_count);
 		} else {
 #else
 		{
 #endif
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, texture_target, rt->depth, 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, rt->depth_has_stencil ? GL_DEPTH_STENCIL_ATTACHMENT : GL_DEPTH_ATTACHMENT, texture_target, rt->depth, 0);
 		}
 
 		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -2354,12 +2360,33 @@ void GLES3::TextureStorage::check_backbuffer(RenderTarget *rt, const bool uses_s
 	if (rt->backbuffer_depth == 0 && uses_depth_texture) {
 		glGenTextures(1, &rt->backbuffer_depth);
 		glBindTexture(texture_target, rt->backbuffer_depth);
-		if (use_multiview) {
-			glTexImage3D(texture_target, 0, GL_DEPTH_COMPONENT24, rt->size.x, rt->size.y, rt->view_count, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, nullptr);
+
+		GLint internal_format;
+		GLenum format;
+		GLenum type;
+		GLenum attachment;
+		int element_size;
+
+		if (rt->depth_has_stencil) {
+			internal_format = GL_DEPTH24_STENCIL8;
+			format = GL_DEPTH_STENCIL;
+			type = GL_UNSIGNED_INT_24_8;
+			attachment = GL_DEPTH_STENCIL_ATTACHMENT;
+			element_size = 4;
 		} else {
-			glTexImage2D(texture_target, 0, GL_DEPTH_COMPONENT24, rt->size.x, rt->size.y, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, nullptr);
+			internal_format = GL_DEPTH_COMPONENT24;
+			format = GL_DEPTH_COMPONENT;
+			type = GL_UNSIGNED_INT;
+			attachment = GL_DEPTH_ATTACHMENT;
+			element_size = 3;
 		}
-		GLES3::Utilities::get_singleton()->texture_allocated_data(rt->backbuffer_depth, rt->size.x * rt->size.y * rt->view_count * 3, "Render target backbuffer depth texture");
+
+		if (use_multiview) {
+			glTexImage3D(texture_target, 0, internal_format, rt->size.x, rt->size.y, rt->view_count, 0, format, type, nullptr);
+		} else {
+			glTexImage2D(texture_target, 0, internal_format, rt->size.x, rt->size.y, 0, format, type, nullptr);
+		}
+		GLES3::Utilities::get_singleton()->texture_allocated_data(rt->backbuffer_depth, rt->size.x * rt->size.y * rt->view_count * element_size, "Render target backbuffer depth texture");
 
 		glTexParameteri(texture_target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(texture_target, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -2367,12 +2394,12 @@ void GLES3::TextureStorage::check_backbuffer(RenderTarget *rt, const bool uses_s
 		glTexParameteri(texture_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 #ifndef IOS_ENABLED
 		if (use_multiview) {
-			glFramebufferTextureMultiviewOVR(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, rt->backbuffer_depth, 0, 0, rt->view_count);
+			glFramebufferTextureMultiviewOVR(GL_FRAMEBUFFER, attachment, rt->backbuffer_depth, 0, 0, rt->view_count);
 		} else {
 #else
 		{
 #endif
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, rt->backbuffer_depth, 0);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, rt->backbuffer_depth, 0);
 		}
 	}
 }
@@ -2546,6 +2573,7 @@ void TextureStorage::render_target_set_override(RID p_render_target, RID p_color
 
 	rt->overridden.color = p_color_texture;
 	rt->overridden.depth = p_depth_texture;
+	rt->overridden.depth_has_stencil = p_depth_texture.is_null();
 	rt->overridden.is_overridden = true;
 
 	uint32_t hash_key = hash_murmur3_one_64(p_color_texture.get_id());
@@ -2557,6 +2585,7 @@ void TextureStorage::render_target_set_override(RID p_render_target, RID p_color
 		rt->fbo = cache->get().fbo;
 		rt->color = cache->get().color;
 		rt->depth = cache->get().depth;
+		rt->depth_has_stencil = cache->get().depth_has_stencil;
 		rt->size = cache->get().size;
 		rt->texture = p_color_texture;
 		return;
@@ -2568,6 +2597,7 @@ void TextureStorage::render_target_set_override(RID p_render_target, RID p_color
 	new_entry.fbo = rt->fbo;
 	new_entry.color = rt->color;
 	new_entry.depth = rt->depth;
+	new_entry.depth_has_stencil = rt->depth_has_stencil;
 	new_entry.size = rt->size;
 	// Keep track of any textures we had to allocate because they weren't overridden.
 	if (p_color_texture.is_null()) {
@@ -2824,6 +2854,13 @@ GLuint TextureStorage::render_target_get_depth(RID p_render_target) const {
 	} else {
 		return rt->depth;
 	}
+}
+
+bool TextureStorage::render_target_get_depth_has_stencil(RID p_render_target) const {
+	RenderTarget *rt = render_target_owner.get_or_null(p_render_target);
+	ERR_FAIL_NULL_V(rt, 0);
+
+	return rt->depth_has_stencil;
 }
 
 void TextureStorage::render_target_set_reattach_textures(RID p_render_target, bool p_reattach_textures) const {

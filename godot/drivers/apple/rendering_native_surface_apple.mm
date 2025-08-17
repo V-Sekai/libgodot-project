@@ -52,8 +52,10 @@ struct WindowData {
 #if defined(IOS_ENABLED)
 	CAEAGLLayer *layer;
 #endif
-#if defined(MACOS_ENABLED) && defined(GLES3_ENABLED)
+#if defined(MACOS_ENABLED)
+	GODOT_CLANG_WARNING_PUSH_AND_IGNORE("-Wdeprecated-declarations") // OpenGL is deprecated in macOS 10.14.
 	CAOpenGLLayer *layer;
+	GODOT_CLANG_WARNING_POP
 #endif
 };
 
@@ -151,7 +153,7 @@ bool GLESContextApple::create_framebuffer(DisplayServer::WindowID p_id, Ref<Rend
 	CAEAGLLayer *layer = nullptr;
 	Ref<RenderingNativeSurfaceApple> apple_surface = Object::cast_to<RenderingNativeSurfaceApple>(*p_native_surface);
 	if (apple_surface.is_valid()) {
-		layer = (__bridge CAEAGLLayer *)apple_surface->get_layer();
+		layer = (__bridge CAEAGLLayer *)(void *)apple_surface->get_layer();
 	}
 	if (layer == nullptr) {
 		return false;
@@ -232,6 +234,7 @@ uint64_t GLESContextApple::get_fbo(DisplayServer::WindowID p_id) const {
 
 void RenderingNativeSurfaceApple::_bind_methods() {
 	ClassDB::bind_static_method("RenderingNativeSurfaceApple", D_METHOD("create", "layer"), &RenderingNativeSurfaceApple::create_api);
+	ClassDB::bind_method(D_METHOD("get_layer"), &RenderingNativeSurfaceApple::get_layer);
 }
 
 Ref<RenderingNativeSurfaceApple> RenderingNativeSurfaceApple::create_api(/* GDExtensionConstPtr<const void> */ uint64_t p_layer) {
@@ -244,10 +247,14 @@ Ref<RenderingNativeSurfaceApple> RenderingNativeSurfaceApple::create(void *p_lay
 	return result;
 }
 
+uint64_t RenderingNativeSurfaceApple::get_layer() {
+	return (uint64_t)layer;
+}
+
 RenderingContextDriver *RenderingNativeSurfaceApple::create_rendering_context(const String &p_rendering_driver) {
 #if defined(VULKAN_ENABLED)
 	if (p_rendering_driver == "vulkan") {
-		return memnew(RenderingContextDriverVulkanMoltenVk);
+		return memnew(RenderingContextDriverVulkanMoltenVK);
 	}
 #endif
 #if defined(METAL_ENABLED)

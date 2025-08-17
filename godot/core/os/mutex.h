@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef MUTEX_H
-#define MUTEX_H
+#pragma once
 
 #include "core/typedefs.h"
 
@@ -37,6 +36,7 @@
 #define MINGW_STDTHREAD_REDUNDANCY_WARNING
 #include "thirdparty/mingw-std-threads/mingw.mutex.h"
 #define THREADING_NAMESPACE mingw_stdthread
+#undef MemoryBarrier // override from Windows SDK, clashes with RenderingDeviceDriver::MemoryBarrier
 #else
 #include <mutex>
 #define THREADING_NAMESPACE std
@@ -127,5 +127,3 @@ using Mutex = MutexImpl;
 using BinaryMutex = MutexImpl;
 
 #endif // THREADS_ENABLED
-
-#endif // MUTEX_H

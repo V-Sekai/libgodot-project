@@ -39,7 +39,7 @@
 #include "texture.h"
 
 #ifdef TOOLS_ENABLED
-#include "editor/editor_help.h"
+#include "editor/doc/editor_help.h"
 
 #include "modules/modules_enabled.gen.h" // For regex.
 #ifdef MODULE_REGEX_ENABLED
@@ -100,11 +100,23 @@ void Shader::set_code(const String &p_code) {
 		// 2) Server does not do interaction with Resource filetypes, this is a scene level feature.
 		HashSet<Ref<ShaderInclude>> new_include_dependencies;
 		ShaderPreprocessor preprocessor;
-		Error result = preprocessor.preprocess(p_code, path, preprocessed_code, nullptr, nullptr, nullptr, &new_include_dependencies);
-		if (result == OK) {
-			// This ensures previous include resources are not freed and then re-loaded during parse (which would make compiling slower)
-			include_dependencies = new_include_dependencies;
+		String error_pp;
+		List<ShaderPreprocessor::FilePosition> err_positions;
+		Error result = preprocessor.preprocess(p_code, path, preprocessed_code, &error_pp, &err_positions, nullptr, &new_include_dependencies);
+		if (result != OK) {
+			ERR_FAIL_COND(err_positions.is_empty());
+
+			String err_text = error_pp;
+			int err_line = err_positions.front()->get().line;
+			if (err_positions.size() == 1) {
+				// Error in main file
+				err_text = "error(" + itos(err_line) + "): " + err_text;
+			} else {
+				err_text = "error(" + itos(err_line) + ") in include " + err_positions.back()->get().file.get_file() + ":" + itos(err_positions.back()->get().line) + ": " + err_text;
+			}
+			ERR_FAIL_MSG(vformat("Preprocessing shader %s failed: %s", path, err_text));
 		}
+		include_dependencies = new_include_dependencies;
 	}
 
 	// Try to get the shader type from the final, fully preprocessed shader code.
@@ -198,8 +210,8 @@ void Shader::get_shader_uniform_list(List<PropertyInfo> *p_params, bool p_get_gr
 		}
 	}
 #ifdef TOOLS_ENABLED
-	if (EditorHelp::get_doc_data() != nullptr && Engine::get_singleton()->is_editor_hint() && !class_doc.name.is_empty() && p_params) {
-		EditorHelp::get_doc_data()->add_doc(class_doc);
+	if (Engine::get_singleton()->is_editor_hint() && !class_doc.name.is_empty() && p_params) {
+		EditorHelp::add_doc(class_doc);
 	}
 #endif
 }
@@ -277,7 +289,7 @@ void Shader::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_shader_uniform_list", "get_groups"), &Shader::_get_shader_uniform_list, DEFVAL(false));
 
 	ClassDB::bind_method(D_METHOD("inspect_native_shader_code"), &Shader::inspect_native_shader_code);
-	ClassDB::set_method_flags(get_class_static(), _scs_create("inspect_native_shader_code"), METHOD_FLAGS_DEFAULT | METHOD_FLAG_EDITOR);
+	ClassDB::set_method_flags(get_class_static(), StringName("inspect_native_shader_code"), METHOD_FLAGS_DEFAULT | METHOD_FLAG_EDITOR);
 
 	ADD_PROPERTY(PropertyInfo(Variant::STRING, "code", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NO_EDITOR), "set_code", "get_code");
 
@@ -312,7 +324,7 @@ Ref<Resource> ResourceFormatLoaderShader::load(const String &p_path, const Strin
 
 	String str;
 	if (buffer.size() > 0) {
-		error = str.parse_utf8((const char *)buffer.ptr(), buffer.size());
+		error = str.append_utf8((const char *)buffer.ptr(), buffer.size());
 		ERR_FAIL_COND_V_MSG(error, nullptr, "Cannot parse shader: " + p_path);
 	}
 
@@ -327,6 +339,47 @@ Ref<Resource> ResourceFormatLoaderShader::load(const String &p_path, const Strin
 	}
 
 	return shader;
+}
+
+void ResourceFormatLoaderShader::get_dependencies(const String &p_path, List<String> *p_dependencies, bool p_add_types) {
+	Error error = OK;
+	Vector<uint8_t> buffer = FileAccess::get_file_as_bytes(p_path, &error);
+	ERR_FAIL_COND_MSG(error, "Cannot load shader: " + p_path);
+
+	String str;
+	if (buffer.size() > 0) {
+		error = str.append_utf8((const char *)buffer.ptr(), buffer.size());
+		ERR_FAIL_COND_MSG(error, "Cannot parse shader: " + p_path);
+	}
+
+	{
+		HashSet<Ref<ShaderInclude>> new_include_dependencies;
+		ShaderPreprocessor preprocessor;
+		String preprocessed_code;
+		String error_pp;
+		List<ShaderPreprocessor::FilePosition> err_positions;
+		Error result = preprocessor.preprocess(str, p_path, preprocessed_code, &error_pp, &err_positions, nullptr, &new_include_dependencies);
+		if (result != OK) {
+			ERR_FAIL_COND(err_positions.is_empty());
+
+			String err_text = error_pp;
+			int err_line = err_positions.front()->get().line;
+			if (err_positions.size() == 1) {
+				// Error in main file
+				err_text = "error(" + itos(err_line) + "): " + err_text;
+			} else {
+				err_text = "error(" + itos(err_line) + ") in include " + err_positions.back()->get().file.get_file() + ":" + itos(err_positions.back()->get().line) + ": " + err_text;
+			}
+			ERR_FAIL_MSG(vformat("Preprocessing shader %s failed: %s", p_path, err_text));
+		}
+		if (p_dependencies) {
+			List<String> deps;
+			for (Ref<ShaderInclude> inc : new_include_dependencies) {
+				deps.push_back(inc->get_path());
+			}
+			*p_dependencies = deps;
+		}
+	}
 }
 
 void ResourceFormatLoaderShader::get_recognized_extensions(List<String> *p_extensions) const {

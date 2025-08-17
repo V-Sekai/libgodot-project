@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef GODOT_PHYSICS_SERVER_2D_H
-#define GODOT_PHYSICS_SERVER_2D_H
+#pragma once
 
 #include "godot_joints_2d.h"
 #include "godot_shape_2d.h"
@@ -61,7 +60,7 @@ class GodotPhysicsServer2D : public PhysicsServer2D {
 	mutable RID_PtrOwner<GodotShape2D, true> shape_owner;
 	mutable RID_PtrOwner<GodotSpace2D, true> space_owner;
 	mutable RID_PtrOwner<GodotArea2D, true> area_owner;
-	mutable RID_PtrOwner<GodotBody2D, true> body_owner;
+	mutable RID_PtrOwner<GodotBody2D, true> body_owner{ 65536, 1048576 };
 	mutable RID_PtrOwner<GodotJoint2D, true> joint_owner;
 
 	static GodotPhysicsServer2D *godot_singleton;
@@ -301,7 +300,5 @@ public:
 	int get_process_info(ProcessInfo p_info) override;
 
 	GodotPhysicsServer2D(bool p_using_threads = false);
-	~GodotPhysicsServer2D() {}
+	~GodotPhysicsServer2D();
 };
-
-#endif // GODOT_PHYSICS_SERVER_2D_H

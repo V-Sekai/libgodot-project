@@ -33,10 +33,38 @@
 #include "main/main.h"
 #include "servers/display_server.h"
 
+#define GODOT_INSTANCE_LOG(...) print_line(__VA_ARGS__)
+
+TaskExecutor::TaskExecutor(InvokeCallbackFunction p_async_func, ExecutorData p_async_data, InvokeCallbackFunction p_sync_func, ExecutorData p_sync_data) {
+	async_func = p_async_func;
+	async_data = p_async_data;
+	sync_func = p_sync_func;
+	sync_data = p_sync_data;
+}
+
+void TaskExecutor::sync(std::function<void()> p_callback) {
+	sync_func(&TaskExecutor::invokeCallback, new std::function<void()>(p_callback), sync_data);
+}
+
+void TaskExecutor::async(std::function<void()> p_callback) {
+	async_func(&TaskExecutor::invokeCallback, new std::function<void()>(p_callback), async_data);
+}
+
+void TaskExecutor::invokeCallback(void *p_callback) {
+	std::function<void()> *callback = (std::function<void()> *)p_callback;
+	(*callback)();
+	delete callback;
+}
+
 void GodotInstance::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("start"), &GodotInstance::start);
 	ClassDB::bind_method(D_METHOD("is_started"), &GodotInstance::is_started);
 	ClassDB::bind_method(D_METHOD("iteration"), &GodotInstance::iteration);
+	ClassDB::bind_method(D_METHOD("focus_in"), &GodotInstance::focus_in);
+	ClassDB::bind_method(D_METHOD("focus_out"), &GodotInstance::focus_out);
+	ClassDB::bind_method(D_METHOD("pause"), &GodotInstance::pause);
+	ClassDB::bind_method(D_METHOD("resume"), &GodotInstance::resume);
+	ClassDB::bind_method(D_METHOD("execute", "callback", "async"), &GodotInstance::execute);
 }
 
 GodotInstance::GodotInstance() {
@@ -46,6 +74,7 @@ GodotInstance::~GodotInstance() {
 }
 
 bool GodotInstance::initialize(GDExtensionInitializationFunction p_init_func, GodotInstanceCallbacks *p_callbacks) {
+	GODOT_INSTANCE_LOG("Godot Instance initialization");
 	callbacks = p_callbacks;
 	GDExtensionManager *gdextension_manager = GDExtensionManager::get_singleton();
 	GDExtensionConstPtr<const GDExtensionInitializationFunction> ptr((const GDExtensionInitializationFunction *)&p_init_func);
@@ -59,6 +88,7 @@ bool GodotInstance::initialize(GDExtensionInitializationFunction p_init_func, Go
 	}
 
 bool GodotInstance::start() {
+	GODOT_INSTANCE_LOG("GodotInstance::start()");
 	CALL_CB(before_setup2);
 	Error err = Main::setup2();
 	if (err != OK) {
@@ -83,8 +113,74 @@ bool GodotInstance::iteration() {
 }
 
 void GodotInstance::stop() {
+	GODOT_INSTANCE_LOG("GodotInstance::stop()");
 	if (started) {
 		OS::get_singleton()->get_main_loop()->finalize();
 	}
 	started = false;
+}
+
+void GodotInstance::focus_out() {
+	GODOT_INSTANCE_LOG("GodotInstance::focus_out()");
+	if (started) {
+		if (OS::get_singleton()->get_main_loop()) {
+			OS::get_singleton()->get_main_loop()->notification(MainLoop::NOTIFICATION_APPLICATION_FOCUS_OUT);
+		}
+
+		callbacks->focus_out(this);
+	}
+}
+
+void GodotInstance::focus_in() {
+	GODOT_INSTANCE_LOG("GodotInstance::focus_in()");
+	if (started) {
+		if (OS::get_singleton()->get_main_loop()) {
+			OS::get_singleton()->get_main_loop()->notification(MainLoop::NOTIFICATION_APPLICATION_FOCUS_IN);
+		}
+		callbacks->focus_in(this);
+	}
+}
+
+void GodotInstance::pause() {
+	GODOT_INSTANCE_LOG("GodotInstance::pause()");
+	if (started) {
+		if (OS::get_singleton()->get_main_loop()) {
+			OS::get_singleton()->get_main_loop()->notification(MainLoop::NOTIFICATION_APPLICATION_PAUSED);
+		}
+		callbacks->pause(this);
+	}
+}
+
+void GodotInstance::resume() {
+	GODOT_INSTANCE_LOG("GodotInstance::resume()");
+	if (started) {
+		callbacks->resume(this);
+		if (OS::get_singleton()->get_main_loop()) {
+			OS::get_singleton()->get_main_loop()->notification(MainLoop::NOTIFICATION_APPLICATION_RESUMED);
+		}
+	}
+}
+
+void GodotInstance::set_executor(TaskExecutor *p_executor) {
+	executor = p_executor;
+}
+
+TaskExecutor *GodotInstance::get_executor() {
+	return executor;
+}
+
+void GodotInstance::execute(Callable p_callback, bool p_async) {
+	if (executor == nullptr) {
+		p_callback.call();
+		return;
+	}
+	if (p_async) {
+		executor->async([p_callback]() {
+			p_callback.call();
+		});
+	} else {
+		executor->sync([p_callback]() {
+			p_callback.call();
+		});
+	}
 }

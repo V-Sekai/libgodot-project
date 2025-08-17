@@ -40,33 +40,53 @@ static GodotInstance *instance = nullptr;
 
 class GodotInstanceCallbacksIOS : public GodotInstanceCallbacks {
 public:
-	void before_setup2(GodotInstance *p_instance) override {
+	void focus_out(GodotInstance *p_instance) override {
+		os->on_focus_out();
 	}
-
-	void before_start(GodotInstance *p_instance) override {
+	void focus_in(GodotInstance *p_instance) override {
+		os->on_focus_in();
 	}
-
-	void after_start(GodotInstance *p_instance) override {
+	void pause(GodotInstance *p_instance) override {
+		p_instance->focus_out();
+	}
+	void resume(GodotInstance *p_instance) override {
+		p_instance->focus_in();
 	}
 };
 
 static GodotInstanceCallbacksIOS callbacks;
 
-GDExtensionObjectPtr libgodot_create_godot_instance(int p_argc, char *p_argv[], GDExtensionInitializationFunction p_init_func) {
+extern LIBGODOT_API GDExtensionObjectPtr libgodot_create_godot_instance(int p_argc, char *p_argv[], GDExtensionInitializationFunction p_init_func, InvokeCallbackFunction p_async_func, ExecutorData p_async_data, InvokeCallbackFunction p_sync_func, ExecutorData p_sync_data) {
 	ERR_FAIL_COND_V_MSG(instance != nullptr, nullptr, "Only one Godot Instance may be created.");
 
-	os = new OS_IOS();
-
-	Error err = Main::setup(p_argv[0], p_argc - 1, &p_argv[1], false);
-	if (err != OK) {
-		return nullptr;
+	TaskExecutor *executor = nullptr;
+	if (p_async_func != nullptr && p_sync_func != nullptr) {
+		executor = new TaskExecutor(p_async_func, p_async_data, p_sync_func, p_sync_data);
 	}
 
-	instance = memnew(GodotInstance);
-	if (!instance->initialize(p_init_func, &callbacks)) {
-		memdelete(instance);
-		instance = nullptr;
-		return nullptr;
+	std::function<void()> init = [executor, p_argv, p_argc, p_init_func]() {
+		os = new OS_IOS();
+
+		Error err = Main::setup(p_argv[0], p_argc - 1, &p_argv[1], false);
+		if (err != OK) {
+			return;
+		}
+
+		instance = memnew(GodotInstance);
+		if (!instance->initialize(p_init_func, &callbacks)) {
+			memdelete(instance);
+			instance = nullptr;
+			return;
+		}
+
+		os->initialize_modules();
+
+		instance->set_executor(executor);
+	};
+	if (executor != nullptr) {
+		executor->sync(init);
+	} else {
+		init();
 	}
 
 	return (GDExtensionObjectPtr)instance;
@@ -75,9 +95,19 @@ GDExtensionObjectPtr libgodot_create_godot_instance(int p_argc, char *p_argv[], 
 void libgodot_destroy_godot_instance(GDExtensionObjectPtr p_godot_instance) {
 	GodotInstance *godot_instance = (GodotInstance *)p_godot_instance;
 	if (instance == godot_instance) {
-		godot_instance->stop();
-		memdelete(godot_instance);
-		instance = nullptr;
-		Main::cleanup();
+		const std::function<void()> deinit = [godot_instance]() {
+			godot_instance->stop();
+			memdelete(godot_instance);
+			instance = nullptr;
+			Main::cleanup();
+		};
+
+		TaskExecutor *executor = instance->get_executor();
+		if (executor != nullptr) {
+			executor->sync(deinit);
+			delete executor;
+		} else {
+			deinit();
+		}
 	}
 }

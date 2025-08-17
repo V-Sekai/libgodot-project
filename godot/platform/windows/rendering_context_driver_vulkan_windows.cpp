@@ -33,15 +33,9 @@
 #include "core/os/os.h"
 
 #include "rendering_context_driver_vulkan_windows.h"
+#include "rendering_native_surface_windows.h"
 
 #include "drivers/vulkan/godot_vulkan.h"
-
-#include "platform/windows/rendering_native_surface_windows.h"
-
-#include "drivers/vulkan/rendering_native_surface_vulkan.h"
-
-#include "drivers/vulkan/rendering_context_driver_vulkan.h"
-
 #include "drivers/vulkan/rendering_native_surface_vulkan.h"
 
 const char *RenderingContextDriverVulkanWindows::_get_platform_surface_extension() const {

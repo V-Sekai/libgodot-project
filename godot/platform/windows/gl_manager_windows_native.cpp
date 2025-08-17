@@ -38,8 +38,8 @@
 #include "thirdparty/misc/nvapi_minimal.h"
 
 #include <dwmapi.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
 #define WGL_CONTEXT_MAJOR_VERSION_ARB 0x2091
 #define WGL_CONTEXT_MINOR_VERSION_ARB 0x2092
@@ -170,7 +170,7 @@ void GLManagerNative_Windows::_nvapi_setup_profile() {
 	// We need a name anyways, so let's use the engine name if an application name is not available
 	// (this is used mostly by the Project Manager)
 	if (app_profile_name.is_empty()) {
-		app_profile_name = VERSION_NAME;
+		app_profile_name = GODOT_VERSION_NAME;
 	}
 	String old_profile_name = app_profile_name + " Nvidia Profile";
 	Char16String app_profile_name_u16 = app_profile_name.utf16();

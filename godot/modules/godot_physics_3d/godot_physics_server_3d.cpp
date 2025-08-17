@@ -737,6 +737,34 @@ void GodotPhysicsServer3D::body_apply_force(RID p_body, const Vector3 &p_force, 
 	body->wakeup();
 }
 
+void GodotPhysicsServer3D::soft_body_apply_point_impulse(RID p_body, int p_point_index, const Vector3 &p_impulse) {
+	GodotSoftBody3D *soft_body = soft_body_owner.get_or_null(p_body);
+	ERR_FAIL_NULL(soft_body);
+
+	soft_body->apply_node_impulse(p_point_index, p_impulse);
+}
+
+void GodotPhysicsServer3D::soft_body_apply_point_force(RID p_body, int p_point_index, const Vector3 &p_force) {
+	GodotSoftBody3D *soft_body = soft_body_owner.get_or_null(p_body);
+	ERR_FAIL_NULL(soft_body);
+
+	soft_body->apply_node_force(p_point_index, p_force);
+}
+
+void GodotPhysicsServer3D::soft_body_apply_central_impulse(RID p_body, const Vector3 &p_impulse) {
+	GodotSoftBody3D *soft_body = soft_body_owner.get_or_null(p_body);
+	ERR_FAIL_NULL(soft_body);
+
+	soft_body->apply_central_impulse(p_impulse);
+}
+
+void GodotPhysicsServer3D::soft_body_apply_central_force(RID p_body, const Vector3 &p_force) {
+	GodotSoftBody3D *soft_body = soft_body_owner.get_or_null(p_body);
+	ERR_FAIL_NULL(soft_body);
+
+	soft_body->apply_central_force(p_force);
+}
+
 void GodotPhysicsServer3D::body_apply_torque(RID p_body, const Vector3 &p_torque) {
 	GodotBody3D *body = body_owner.get_or_null(p_body);
 	ERR_FAIL_NULL(body);
@@ -1102,6 +1130,20 @@ real_t GodotPhysicsServer3D::soft_body_get_linear_stiffness(RID p_body) const {
 	ERR_FAIL_NULL_V(soft_body, 0.f);
 
 	return soft_body->get_linear_stiffness();
+}
+
+void GodotPhysicsServer3D::soft_body_set_shrinking_factor(RID p_body, real_t p_shrinking_factor) {
+	GodotSoftBody3D *soft_body = soft_body_owner.get_or_null(p_body);
+	ERR_FAIL_NULL(soft_body);
+
+	soft_body->set_shrinking_factor(p_shrinking_factor);
+}
+
+real_t GodotPhysicsServer3D::soft_body_get_shrinking_factor(RID p_body) const {
+	GodotSoftBody3D *soft_body = soft_body_owner.get_or_null(p_body);
+	ERR_FAIL_NULL_V(soft_body, 0.f);
+
+	return soft_body->get_shrinking_factor();
 }
 
 void GodotPhysicsServer3D::soft_body_set_pressure_coefficient(RID p_body, real_t p_pressure_coefficient) {
@@ -1770,4 +1812,9 @@ GodotPhysicsServer3D::GodotPhysicsServer3D(bool p_using_threads) {
 	GodotBroadPhase3D::create_func = GodotBroadPhase3DBVH::_create;
 
 	using_threads = p_using_threads;
+}
+
+GodotPhysicsServer3D::~GodotPhysicsServer3D() {
+	ERR_FAIL_COND(godot_singleton != this);
+	godot_singleton = nullptr;
 }

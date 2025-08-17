@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef JAVA_CLASS_WRAPPER_H
-#define JAVA_CLASS_WRAPPER_H
+#pragma once
 
 #include "core/object/ref_counted.h"
 #include "core/variant/typed_array.h"
@@ -295,6 +294,5 @@ public:
 	Ref<JavaClass> wrap_jclass(jclass p_class, bool p_allow_private_methods_access = false);
 #endif
 	JavaClassWrapper();
+	~JavaClassWrapper();
 };
-
-#endif // JAVA_CLASS_WRAPPER_H

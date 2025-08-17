@@ -28,20 +28,45 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef GODOT_INSTANCE_H
-#define GODOT_INSTANCE_H
+#pragma once
 
 #include "core/extension/gdextension_interface.h"
 #include "core/object/class_db.h"
 #include "core/object/object.h"
 
+#include <functional>
+
+typedef void *CallbackData;
+typedef void *ExecutorData;
+typedef void (*InvokeCallback)(CallbackData p_data);
+typedef void (*InvokeCallbackFunction)(InvokeCallback p_callback, CallbackData p_callback_data, ExecutorData p_executor_data);
+
 class GodotInstance;
 class GodotInstanceCallbacks {
 public:
+	virtual void before_setup2(GodotInstance *p_instance) {}
+	virtual void before_start(GodotInstance *p_instance) {}
+	virtual void after_start(GodotInstance *p_instance) {}
+	virtual void focus_out(GodotInstance *p_instance) {}
+	virtual void focus_in(GodotInstance *p_instance) {}
+	virtual void pause(GodotInstance *p_instance) {}
+	virtual void resume(GodotInstance *p_instance) {}
+
 	virtual ~GodotInstanceCallbacks() {}
-	virtual void before_setup2(GodotInstance *p_instance) = 0;
-	virtual void before_start(GodotInstance *p_instance) = 0;
-	virtual void after_start(GodotInstance *p_instance) = 0;
+};
+
+class TaskExecutor {
+	InvokeCallbackFunction async_func;
+	ExecutorData async_data;
+	InvokeCallbackFunction sync_func;
+	ExecutorData sync_data;
+
+public:
+	TaskExecutor(InvokeCallbackFunction p_async_func, ExecutorData p_async_data, InvokeCallbackFunction p_sync_func, ExecutorData p_sync_data);
+	void sync(std::function<void()> p_callback);
+	void async(std::function<void()> p_callback);
+
+	static void invokeCallback(void *p_callback);
 };
 
 class GodotInstance : public Object {
@@ -52,6 +77,7 @@ class GodotInstance : public Object {
 	bool started = false;
 
 	GodotInstanceCallbacks *callbacks = nullptr;
+	TaskExecutor *executor = nullptr;
 
 public:
 	GodotInstance();
@@ -63,6 +89,13 @@ public:
 	bool is_started();
 	bool iteration();
 	void stop();
-};
 
-#endif // GODOT_INSTANCE_H
+	void focus_out();
+	void focus_in();
+	void pause();
+	void resume();
+
+	void set_executor(TaskExecutor *p_executor);
+	TaskExecutor *get_executor();
+	void execute(Callable p_callback, bool p_async);
+};

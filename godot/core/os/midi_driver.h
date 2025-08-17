@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef MIDI_DRIVER_H
-#define MIDI_DRIVER_H
+#pragma once
 
 #include "core/typedefs.h"
 #include "core/variant/variant.h"
@@ -103,12 +102,10 @@ public:
 	static MIDIDriver *get_singleton();
 
 	MIDIDriver();
-	virtual ~MIDIDriver() = default;
+	virtual ~MIDIDriver();
 
 	virtual Error open() = 0;
 	virtual void close() = 0;
 
 	PackedStringArray get_connected_inputs() const;
 };
-
-#endif // MIDI_DRIVER_H

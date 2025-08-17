@@ -259,7 +259,7 @@ PackedStringArray IP::_get_local_addresses() const {
 	List<IPAddress> ip_addresses;
 	get_local_addresses(&ip_addresses);
 	for (const IPAddress &E : ip_addresses) {
-		addresses.push_back(E);
+		addresses.push_back(String(E));
 	}
 
 	return addresses;
@@ -324,8 +324,6 @@ void IP::_bind_methods() {
 	BIND_ENUM_CONSTANT(TYPE_ANY);
 }
 
-IP *IP::singleton = nullptr;
-
 IP *IP::get_singleton() {
 	return singleton;
 }
@@ -347,6 +345,7 @@ IP::IP() {
 }
 
 IP::~IP() {
+	singleton = nullptr;
 	resolver->thread_abort.set();
 	resolver->sem.post();
 	resolver->thread.wait_to_finish();

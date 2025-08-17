@@ -7,6 +7,23 @@
 	<tutorials>
 	</tutorials>
 	<methods>
+		<method name="execute">
+			<return type="void" />
+			<param index="0" name="callback" type="Callable" />
+			<param index="1" name="async" type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="focus_in">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+		<method name="focus_out">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
 		<method name="is_started">
 			<return type="bool" />
 			<description>
@@ -14,6 +31,16 @@
 		</method>
 		<method name="iteration">
 			<return type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="pause">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+		<method name="resume">
+			<return type="void" />
 			<description>
 			</description>
 		</method>

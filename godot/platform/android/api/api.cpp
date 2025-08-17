@@ -41,6 +41,9 @@ static JavaClassWrapper *java_class_wrapper = nullptr;
 #endif
 
 void register_core_android_api() {
+#if defined(ANDROID_ENABLED)
+	GDREGISTER_ABSTRACT_CLASS(RenderingNativeSurfaceAndroid);
+#endif
 }
 
 void unregister_core_android_api() {
@@ -123,6 +126,11 @@ Ref<JavaClass> JavaClassWrapper::_wrap(const String &, bool) {
 
 JavaClassWrapper::JavaClassWrapper() {
 	singleton = this;
+}
+
+JavaClassWrapper::~JavaClassWrapper() {
+	ERR_FAIL_COND(singleton != this);
+	singleton = nullptr;
 }
 
 #endif

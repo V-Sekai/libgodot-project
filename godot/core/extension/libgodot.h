@@ -30,11 +30,23 @@
 
 #pragma once
 
+#include "gdextension_interface.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "gdextension_interface.h"
+// Export macros for DLL visibility
+#if defined(_MSC_VER) || defined(__MINGW32__)
+#define LIBGODOT_API __declspec(dllexport)
+#elif defined(__GNUC__) || defined(__clang__)
+#define LIBGODOT_API __attribute__((visibility("default")))
+#endif // if defined(_MSC_VER)
+
+typedef void *CallbackData;
+typedef void *ExecutorData;
+typedef void (*InvokeCallback)(CallbackData p_data);
+typedef void (*InvokeCallbackFunction)(InvokeCallback p_callback, CallbackData p_callback_data, ExecutorData p_executor_data);
 
 /**
  * @name libgodot_create_godot_instance
@@ -48,7 +60,7 @@ extern "C" {
  *
  * @return A pointer to created \ref GodotInstance GDExtension object or nullptr if there was an error.
  */
-GDExtensionObjectPtr libgodot_create_godot_instance(int p_argc, char *p_argv[], GDExtensionInitializationFunction p_init_func);
+LIBGODOT_API GDExtensionObjectPtr libgodot_create_godot_instance(int p_argc, char *p_argv[], GDExtensionInitializationFunction p_init_func, InvokeCallbackFunction p_async_func, ExecutorData p_async_data, InvokeCallbackFunction p_sync_func, ExecutorData p_sync_data);
 
 /**
  * @name libgodot_destroy_godot_instance
@@ -59,7 +71,7 @@ GDExtensionObjectPtr libgodot_create_godot_instance(int p_argc, char *p_argv[], 
  * @param p_godot_instance The reference to the GodotInstance object to destroy.
  *
  */
-void libgodot_destroy_godot_instance(GDExtensionObjectPtr p_godot_instance);
+LIBGODOT_API void libgodot_destroy_godot_instance(GDExtensionObjectPtr p_godot_instance);
 
 #ifdef __cplusplus
 }

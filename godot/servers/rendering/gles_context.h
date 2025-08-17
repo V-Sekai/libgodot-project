@@ -37,7 +37,6 @@
 
 class GLESContext {
 public:
-	virtual ~GLESContext() {}
 	virtual void initialize() = 0;
 	virtual bool create_framebuffer(DisplayServer::WindowID p_id, Ref<RenderingNativeSurface> p_native_surface) = 0;
 	virtual void resized(DisplayServer::WindowID p_id) = 0;
@@ -46,4 +45,6 @@ public:
 	virtual bool destroy_framebuffer(DisplayServer::WindowID p_id) = 0;
 	virtual void deinitialize() = 0;
 	virtual uint64_t get_fbo(DisplayServer::WindowID p_id) const = 0;
+
+	virtual ~GLESContext() {}
 };

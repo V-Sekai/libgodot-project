@@ -73,6 +73,15 @@ void RenderingServerDefault::_draw(bool p_swap_buffers, double frame_step) {
 	uint64_t time_usec = OS::get_singleton()->get_ticks_usec();
 
 	RENDER_TIMESTAMP("Prepare Render Frame");
+
+#ifndef XR_DISABLED
+	XRServer *xr_server = XRServer::get_singleton();
+	if (xr_server != nullptr) {
+		// Let XR server know we're about to render a frame.
+		xr_server->pre_render();
+	}
+#endif // XR_DISABLED
+
 	RSG::scene->update(); //update scenes stuff before updating instances
 	RSG::canvas->update();
 
@@ -87,13 +96,12 @@ void RenderingServerDefault::_draw(bool p_swap_buffers, double frame_step) {
 
 	RSG::rasterizer->end_frame(p_swap_buffers);
 
-#ifndef _3D_DISABLED
-	XRServer *xr_server = XRServer::get_singleton();
+#ifndef XR_DISABLED
 	if (xr_server != nullptr) {
 		// let our XR server know we're done so we can get our frame timing
 		xr_server->end_frame();
 	}
-#endif // _3D_DISABLED
+#endif // XR_DISABLED
 
 	RSG::canvas->update_visibility_notifiers();
 	RSG::scene->update_visibility_notifiers();
@@ -234,18 +242,38 @@ void RenderingServerDefault::_finish() {
 
 	RSG::canvas->finalize();
 	memdelete(RSG::canvas);
+	RSG::canvas = nullptr;
+
 	RSG::rasterizer->finalize();
 	memdelete(RSG::viewport);
+	RSG::viewport = nullptr;
+
 	memdelete(RSG::rasterizer);
+	RSG::rasterizer = nullptr;
 	memdelete(RSG::scene);
+	RSG::scene = nullptr;
+
 	memdelete(RSG::camera_attributes);
+	RSG::camera_attributes = nullptr;
+
+	RSG::threaded = false;
+
+	RSG::utilities = nullptr;
+	RSG::light_storage = nullptr;
+	RSG::material_storage = nullptr;
+	RSG::mesh_storage = nullptr;
+	RSG::particles_storage = nullptr;
+	RSG::texture_storage = nullptr;
+	RSG::gi = nullptr;
+	RSG::fog = nullptr;
+	RSG::canvas_render = nullptr;
 }
 
 void RenderingServerDefault::init() {
 	if (create_thread) {
 		print_verbose("RenderingServerWrapMT: Starting render thread");
 		DisplayServer::get_singleton()->release_rendering_thread();
-		WorkerThreadPool::TaskID tid = WorkerThreadPool::get_singleton()->add_task(callable_mp(this, &RenderingServerDefault::_thread_loop), true);
+		WorkerThreadPool::TaskID tid = WorkerThreadPool::get_singleton()->add_task(callable_mp(this, &RenderingServerDefault::_thread_loop), true, "Rendering Server pump task", true);
 		command_queue.set_pump_task_id(tid);
 		command_queue.push(this, &RenderingServerDefault::_assign_mt_ids, tid);
 		command_queue.push_and_sync(this, &RenderingServerDefault::_init);
@@ -368,8 +396,12 @@ Size2i RenderingServerDefault::get_maximum_viewport_size() const {
 void RenderingServerDefault::_assign_mt_ids(WorkerThreadPool::TaskID p_pump_task_id) {
 	server_thread = Thread::get_caller_id();
 	server_task_id = p_pump_task_id;
-	// This is needed because the main RD is created on the main thread.
-	RenderingDevice::get_singleton()->make_current();
+
+	RenderingDevice *rd = RenderingDevice::get_singleton();
+	if (rd) {
+		// This is needed because the main RD is created on the main thread.
+		rd->make_current();
+	}
 }
 
 void RenderingServerDefault::_thread_exit() {

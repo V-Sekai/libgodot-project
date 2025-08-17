@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef RENDERING_CONTEXT_DRIVER_VULKAN_MOLTENVK_H
-#define RENDERING_CONTEXT_DRIVER_VULKAN_MOLTENVK_H
+#pragma once
 
 #ifdef __APPLE__
 #ifdef VULKAN_ENABLED
@@ -42,7 +41,7 @@
 typedef void CAMetalLayer;
 #endif
 
-class RenderingContextDriverVulkanMoltenVk : public RenderingContextDriverVulkan {
+class RenderingContextDriverVulkanMoltenVK : public RenderingContextDriverVulkan {
 private:
 	virtual const char *_get_platform_surface_extension() const override final;
 
@@ -50,10 +49,9 @@ protected:
 	SurfaceID surface_create(Ref<RenderingNativeSurface> p_native_surface) override final;
 
 public:
-	RenderingContextDriverVulkanMoltenVk();
-	~RenderingContextDriverVulkanMoltenVk();
+	RenderingContextDriverVulkanMoltenVK();
+	~RenderingContextDriverVulkanMoltenVK();
 };
 
 #endif // VULKAN_ENABLED
 #endif // __APPLE__
-#endif // RENDERING_CONTEXT_DRIVER_VULKAN_MOLTENVK_H

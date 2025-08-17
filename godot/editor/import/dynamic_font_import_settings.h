@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef DYNAMIC_FONT_IMPORT_SETTINGS_H
-#define DYNAMIC_FONT_IMPORT_SETTINGS_H
+#pragma once
 
 #include "core/io/resource_importer.h"
 
@@ -171,6 +170,5 @@ public:
 	static DynamicFontImportSettingsDialog *get_singleton();
 
 	DynamicFontImportSettingsDialog();
+	~DynamicFontImportSettingsDialog();
 };
-
-#endif // DYNAMIC_FONT_IMPORT_SETTINGS_H

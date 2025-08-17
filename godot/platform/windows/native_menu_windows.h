@@ -28,8 +28,7 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef NATIVE_MENU_WINDOWS_H
-#define NATIVE_MENU_WINDOWS_H
+#pragma once
 
 #include "core/io/image.h"
 #include "core/templates/hash_map.h"
@@ -38,6 +37,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#undef MemoryBarrier // override from Windows SDK, clashes with RenderingDeviceDriver::MemoryBarrier
 
 class NativeMenuWindows : public NativeMenu {
 	GDCLASS(NativeMenuWindows, NativeMenu)
@@ -153,5 +153,3 @@ public:
 	NativeMenuWindows();
 	~NativeMenuWindows();
 };
-
-#endif // NATIVE_MENU_WINDOWS_H

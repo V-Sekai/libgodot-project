@@ -36,8 +36,6 @@
 #include "core/os/time.h"
 #include "core/templates/local_vector.h"
 
-thread_local Error DirAccess::last_dir_open_error = OK;
-
 String DirAccess::_get_root_path() const {
 	switch (_access_type) {
 		case ACCESS_RESOURCES:
@@ -146,7 +144,7 @@ Error DirAccess::make_dir_recursive(const String &p_dir) {
 		full_dir = p_dir;
 	}
 
-	full_dir = full_dir.replace("\\", "/");
+	full_dir = full_dir.replace_char('\\', '/');
 
 	String base;
 
@@ -336,7 +334,7 @@ Ref<DirAccess> DirAccess::create_temp(const String &p_prefix, bool p_keep, Error
 	uint32_t suffix_i = 0;
 	String path;
 	while (true) {
-		String datetime = Time::get_singleton()->get_datetime_string_from_system().replace("-", "").replace("T", "").replace(":", "");
+		String datetime = Time::get_singleton()->get_datetime_string_from_system().remove_chars("-T:");
 		datetime += itos(Time::get_singleton()->get_ticks_usec());
 		String suffix = datetime + (suffix_i > 0 ? itos(suffix_i) : "");
 		path = (p_prefix.is_empty() ? "" : p_prefix + "-") + suffix;
@@ -626,6 +624,10 @@ bool DirAccess::is_case_sensitive(const String &p_path) const {
 	return true;
 }
 
+bool DirAccess::is_equivalent(const String &p_path_a, const String &p_path_b) const {
+	return p_path_a == p_path_b;
+}
+
 void DirAccess::_bind_methods() {
 	ClassDB::bind_static_method("DirAccess", D_METHOD("open", "path"), &DirAccess::_open);
 	ClassDB::bind_static_method("DirAccess", D_METHOD("get_open_error"), &DirAccess::get_open_error);
@@ -670,7 +672,10 @@ void DirAccess::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_include_hidden", "enable"), &DirAccess::set_include_hidden);
 	ClassDB::bind_method(D_METHOD("get_include_hidden"), &DirAccess::get_include_hidden);
 
+	ClassDB::bind_method(D_METHOD("get_filesystem_type"), &DirAccess::get_filesystem_type);
+
 	ClassDB::bind_method(D_METHOD("is_case_sensitive", "path"), &DirAccess::is_case_sensitive);
+	ClassDB::bind_method(D_METHOD("is_equivalent", "path_a", "path_b"), &DirAccess::is_equivalent);
 
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "include_navigational"), "set_include_navigational", "get_include_navigational");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "include_hidden"), "set_include_hidden", "get_include_hidden");
