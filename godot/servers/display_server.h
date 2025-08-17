@@ -92,6 +92,7 @@ public:
 		CONTEXT_EDITOR,
 		CONTEXT_PROJECTMAN,
 		CONTEXT_ENGINE,
+		CONTEXT_EMBEDDED,
 	};
 
 	typedef DisplayServer *(*CreateFunction)(const String &, WindowMode, VSyncMode, uint32_t, const Point2i *, const Size2i &, int p_screen, Context, int64_t p_parent_window, Error &r_error);

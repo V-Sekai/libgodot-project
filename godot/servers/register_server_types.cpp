@@ -58,7 +58,6 @@
 #include "debugger/servers_debugger.h"
 #include "display/native_menu.h"
 #include "display_server.h"
-#include "display_server_embedded.h"
 #include "movie_writer/movie_writer.h"
 #include "movie_writer/movie_writer_pngwav.h"
 #include "rendering/renderer_rd/framebuffer_cache_rd.h"
@@ -142,7 +141,6 @@ void register_core_server_types() {
 	OS::get_singleton()->benchmark_begin_measure("Servers", "Register Core Extensions");
 	GDREGISTER_ABSTRACT_CLASS(RenderingNativeSurface);
 	GDREGISTER_ABSTRACT_CLASS(DisplayServer);
-	GDREGISTER_ABSTRACT_CLASS(DisplayServerEmbedded);
 	OS::get_singleton()->benchmark_end_measure("Servers", "Register Core Extensions");
 }
 

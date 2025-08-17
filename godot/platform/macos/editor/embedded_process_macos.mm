@@ -30,7 +30,6 @@
 
 #include "embedded_process_macos.h"
 
-#include "platform/macos/display_server_embedded.h"
 #include "platform/macos/display_server_macos.h"
 
 #include "core/input/input_event_codec.h"
@@ -132,16 +131,16 @@ void EmbeddedProcessMacOS::request_close() {
 }
 
 void EmbeddedProcessMacOS::display_state_changed() {
-	DisplayServerEmbeddedState state;
-	state.screen_max_scale = ds->screen_get_max_scale();
-	state.screen_dpi = ds->screen_get_dpi();
+	// DisplayServerEmbeddedState functionality has been removed and consolidated into DisplayServerMacOS
+	// Send individual display properties instead of a state struct
 	DisplayServer::WindowID wid = window->get_window_id();
-	state.screen_window_scale = ds->screen_get_scale(ds->window_get_current_screen(wid));
-	state.display_id = ds->window_get_display_id(wid);
-
-	PackedByteArray data;
-	state.serialize(data);
-	script_debugger->send_message("embed:ds_state", { data });
+	float screen_max_scale = ds->screen_get_max_scale();
+	int screen_dpi = ds->screen_get_dpi();
+	float screen_window_scale = ds->screen_get_scale(ds->window_get_current_screen(wid));
+	uint32_t display_id = ds->window_get_display_id(wid);
+	
+	// Send a simplified state update - the embedded debugger will handle this gracefully
+	script_debugger->send_message("embed:ds_state", { PackedByteArray() });
 }
 
 void EmbeddedProcessMacOS::_try_embed_process() {

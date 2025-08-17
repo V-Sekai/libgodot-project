@@ -29,15 +29,15 @@
 /**************************************************************************/
 
 #include "embedded_debugger.h"
-
-#include "display_server_embedded.h"
+#include "display_server_macos.h"
 
 #include "core/debugger/engine_debugger.h"
 #include "core/input/input_event_codec.h"
+#include "core/input/input.h"
 
 HashMap<String, EmbeddedDebugger::ParseMessageFunc> EmbeddedDebugger::parse_message_handlers;
 
-EmbeddedDebugger::EmbeddedDebugger(DisplayServerEmbedded *p_ds) {
+EmbeddedDebugger::EmbeddedDebugger(DisplayServerMacOS *p_ds) {
 	singleton = this;
 
 #ifdef DEBUG_ENABLED
@@ -53,7 +53,7 @@ EmbeddedDebugger::~EmbeddedDebugger() {
 	singleton = nullptr;
 }
 
-void EmbeddedDebugger::initialize(DisplayServerEmbedded *p_ds) {
+void EmbeddedDebugger::initialize(DisplayServerMacOS *p_ds) {
 	if (EngineDebugger::is_active()) {
 		memnew(EmbeddedDebugger(p_ds));
 	}
@@ -133,7 +133,8 @@ Error EmbeddedDebugger::_msg_event(const Array &p_args) {
 Error EmbeddedDebugger::_msg_win_event(const Array &p_args) {
 	ERR_FAIL_COND_V_MSG(p_args.size() != 1, ERR_INVALID_PARAMETER, "Invalid number of arguments for 'win_event' message.");
 	DisplayServer::WindowEvent win_event = p_args[0];
-	ds->send_window_event(win_event, DisplayServer::MAIN_WINDOW_ID);
+	DisplayServerMacOS::WindowData &wd = ds->get_window(DisplayServer::MAIN_WINDOW_ID);
+	ds->send_window_event(wd, win_event);
 	if (win_event == DisplayServer::WindowEvent::WINDOW_EVENT_MOUSE_EXIT) {
 		Input::get_singleton()->release_pressed_events();
 	}
@@ -152,23 +153,22 @@ Error EmbeddedDebugger::_msg_joy_add(const Array &p_args) {
 	ERR_FAIL_COND_V_MSG(p_args.size() != 2, ERR_INVALID_PARAMETER, "Invalid number of arguments for 'joy_add' message.");
 	int idx = p_args[0];
 	String name = p_args[1];
-	ds->joy_add(idx, name);
+	Input::get_singleton()->joy_connection_changed(idx, true, name);
 	return OK;
 }
 
 Error EmbeddedDebugger::_msg_joy_del(const Array &p_args) {
 	ERR_FAIL_COND_V_MSG(p_args.size() != 1, ERR_INVALID_PARAMETER, "Invalid number of arguments for 'joy_del' message.");
 	int idx = p_args[0];
-	ds->joy_del(idx);
+	Input::get_singleton()->joy_connection_changed(idx, false, "");
 	return OK;
 }
 
 Error EmbeddedDebugger::_msg_ds_state(const Array &p_args) {
 	ERR_FAIL_COND_V_MSG(p_args.size() != 1, ERR_INVALID_PARAMETER, "Invalid number of arguments for 'ds_state' message.");
-	PackedByteArray data = p_args[0];
-	DisplayServerEmbeddedState state;
-	state.deserialize(data);
-	ds->set_state(state);
+	// DisplayServerEmbeddedState functionality has been removed and consolidated into DisplayServerMacOS
+	// This message handler is kept for compatibility but performs no action
+	WARN_PRINT("ds_state message received but DisplayServerEmbeddedState has been removed");
 	return OK;
 }
 

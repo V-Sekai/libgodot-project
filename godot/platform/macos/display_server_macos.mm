@@ -53,7 +53,6 @@
 #include "scene/resources/image_texture.h"
 
 #ifdef TOOLS_ENABLED
-#import "display_server_embedded.h"
 #import "editor/embedded_process_macos.h"
 #endif
 
@@ -80,6 +79,67 @@
 #import <IOKit/IOKitLib.h>
 #import <IOKit/hid/IOHIDKeys.h>
 #import <IOKit/hid/IOHIDLib.h>
+
+void DisplayServerMacOS::_create_embedded_layer(const Size2i &p_resolution, VSyncMode p_vsync_mode) {
+	// Create embedded layer for Metal rendering (similar to DisplayServerEmbedded)
+#if defined(RD_ENABLED)
+	if (rendering_context) {
+		embedded_layer = [CAMetalLayer new];
+		embedded_layer.anchorPoint = CGPointMake(0, 1);
+
+#if defined(METAL_ENABLED)
+		// Initialize CAMetalLayer properties when using Metal driver
+		if (rendering_driver == "metal") {
+			RenderingContextDriverMetal *metal_context = static_cast<RenderingContextDriverMetal *>(rendering_context);
+			id<MTLDevice> metal_device = metal_context->get_metal_device();
+			
+			CAMetalLayer *metal_layer = (CAMetalLayer *)embedded_layer;
+			metal_layer.allowsNextDrawableTimeout = YES;
+			metal_layer.framebufferOnly = YES;
+			metal_layer.opaque = OS::get_singleton()->is_layered_allowed() ? NO : YES;
+			metal_layer.pixelFormat = MTLPixelFormatBGRA8Unorm;
+			metal_layer.device = metal_device;
+			metal_layer.maximumDrawableCount = 3; // Metal supports a maximum of 3 drawables
+			
+			// Set drawable size - this is crucial for drawable allocation
+			CGSize drawableSize = CGSizeMake(p_resolution.width, p_resolution.height);
+			metal_layer.drawableSize = drawableSize;
+		}
+#endif
+
+		Ref<RenderingNativeSurfaceApple> apple_native_surface = RenderingNativeSurfaceApple::create((__bridge void *)embedded_layer);
+		RenderingContextDriver::SurfaceID surface_id = rendering_context->surface_create(apple_native_surface);
+		ERR_FAIL_COND_MSG(surface_id == 0, vformat("Can't create a %s surface", rendering_driver));
+
+		Error err = rendering_context->window_create(MAIN_WINDOW_ID, apple_native_surface);
+		ERR_FAIL_COND_MSG(err != OK, vformat("Can't create a %s context", rendering_driver));
+
+		// The rendering context is always in pixels
+		rendering_context->window_set_size(MAIN_WINDOW_ID, p_resolution.width, p_resolution.height);
+		rendering_context->window_set_vsync_mode(MAIN_WINDOW_ID, p_vsync_mode);
+	}
+#endif
+
+	// Configure layer properties
+	CGFloat scale = screen_get_max_scale();
+	embedded_layer.contentsScale = scale;
+	embedded_layer.magnificationFilter = kCAFilterNearest;
+	embedded_layer.minificationFilter = kCAFilterNearest;
+	
+	bool transparent = false; // Can be set via window flags later
+	embedded_layer.opaque = !(OS::get_singleton()->is_layered_allowed() && transparent);
+	embedded_layer.actions = @{ @"contents" : [NSNull null] }; // Disable implicit animations for contents.
+	
+	// AppKit frames, bounds and positions are always in points.
+	CGRect bounds = CGRectMake(0, 0, p_resolution.width, p_resolution.height);
+	bounds = CGRectApplyAffineTransform(bounds, CGAffineTransformInvert(CGAffineTransformMakeScale(scale, scale)));
+	embedded_layer.bounds = bounds;
+
+	// Create CAContext for embedded scenarios
+	CGSConnectionID connection_id = CGSMainConnectionID();
+	embedded_ca_context = [CAContext contextWithCGSConnection:connection_id options:@{ kCAContextCIFilterBehavior : @"ignore" }];
+	embedded_ca_context.layer = embedded_layer;
+}
 
 DisplayServerMacOS::WindowID DisplayServerMacOS::_create_window(WindowMode p_mode, VSyncMode p_vsync_mode, const Rect2i &p_rect) {
 	const float scale = screen_get_max_scale();
@@ -3723,6 +3783,9 @@ DisplayServerMacOS::DisplayServerMacOS(const String &p_rendering_driver, WindowM
 
 	memset(cursors, 0, sizeof(cursors));
 
+	// Check if we're in embedded mode
+	bool is_embedded = (p_context == CONTEXT_EMBEDDED);
+
 	event_source = CGEventSourceCreate(kCGEventSourceStateHIDSystemState);
 	ERR_FAIL_COND(!event_source);
 
@@ -3736,7 +3799,10 @@ DisplayServerMacOS::DisplayServerMacOS(const String &p_rendering_driver, WindowM
 	// Register to be notified on displays arrangement changes.
 	CGDisplayRegisterReconfigurationCallback(_displays_arrangement_changed, nullptr);
 
-	native_menu = memnew(NativeMenuMacOS);
+	// Only create native menu for non-embedded contexts
+	if (!is_embedded) {
+		native_menu = memnew(NativeMenuMacOS);
+	}
 
 #ifdef ACCESSKIT_ENABLED
 	if (accessibility_get_mode() != DisplayServer::AccessibilityMode::ACCESSIBILITY_DISABLED) {
@@ -3919,25 +3985,31 @@ DisplayServerMacOS::DisplayServerMacOS(const String &p_rendering_driver, WindowM
 	}
 #endif
 
-	Point2i window_position;
-	if (p_position != nullptr) {
-		window_position = *p_position;
+	// Handle embedded vs regular window creation
+	if (is_embedded) {
+		// Create embedded layer instead of a window
+		_create_embedded_layer(p_resolution, p_vsync_mode);
 	} else {
-		if (p_screen == SCREEN_OF_MAIN_WINDOW) {
-			p_screen = SCREEN_PRIMARY;
+		Point2i window_position;
+		if (p_position != nullptr) {
+			window_position = *p_position;
+		} else {
+			if (p_screen == SCREEN_OF_MAIN_WINDOW) {
+				p_screen = SCREEN_PRIMARY;
+			}
+			Rect2i scr_rect = screen_get_usable_rect(p_screen);
+			window_position = scr_rect.position + (scr_rect.size - p_resolution) / 2;
 		}
-		Rect2i scr_rect = screen_get_usable_rect(p_screen);
-		window_position = scr_rect.position + (scr_rect.size - p_resolution) / 2;
-	}
 
-	WindowID main_window = _create_window(p_mode, p_vsync_mode, Rect2i(window_position, p_resolution));
-	ERR_FAIL_COND(main_window == INVALID_WINDOW_ID);
-	for (int i = 0; i < WINDOW_FLAG_MAX; i++) {
-		if (p_flags & (1 << i)) {
-			window_set_flag(WindowFlags(i), true, main_window);
+		WindowID main_window = _create_window(p_mode, p_vsync_mode, Rect2i(window_position, p_resolution));
+		ERR_FAIL_COND(main_window == INVALID_WINDOW_ID);
+		for (int i = 0; i < WINDOW_FLAG_MAX; i++) {
+			if (p_flags & (1 << i)) {
+				window_set_flag(WindowFlags(i), true, main_window);
+			}
 		}
+		force_process_and_drop_events();
 	}
-	force_process_and_drop_events();
 
 	if (rendering_driver == "dummy") {
 		RasterizerDummy::make_current();

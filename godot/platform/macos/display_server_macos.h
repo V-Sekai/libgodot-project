@@ -59,6 +59,11 @@
 #import <CoreVideo/CoreVideo.h>
 #import <Foundation/Foundation.h>
 #import <IOKit/pwr_mgt/IOPMLib.h>
+#import <QuartzCore/QuartzCore.h>
+#if defined(METAL_ENABLED)
+#import <QuartzCore/CAMetalLayer.h>
+#endif
+#import "macos_quartz_core_spi.h"
 
 @class GodotWindow;
 @class GodotContentView;
@@ -246,6 +251,11 @@ private:
 	};
 	HashMap<OS::ProcessID, EmbeddedProcessData> embedded_processes;
 	void _window_update_display_id(WindowData *p_wd);
+
+	// Embedded mode support
+	CALayer *embedded_layer = nullptr;
+	CAContext *embedded_ca_context = nullptr;
+	void _create_embedded_layer(const Size2i &p_resolution, VSyncMode p_vsync_mode);
 
 public:
 	void menu_callback(id p_sender);
