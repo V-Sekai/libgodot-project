@@ -11,6 +11,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -g")
 set(GODOT_CPP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../godot-cpp)
 set(LIBGODOT_BUILD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../build)
 
+# Set godot-cpp to use the extension_api.json from our build directory
+set(GODOTCPP_CUSTOM_API_FILE ${LIBGODOT_BUILD_DIR}/extension_api.json CACHE FILEPATH "Path to custom extension_api.json file" FORCE)
+
 # Add godot-cpp as subdirectory
 add_subdirectory(${GODOT_CPP_DIR} ${CMAKE_CURRENT_BINARY_DIR}/godot-cpp)
 

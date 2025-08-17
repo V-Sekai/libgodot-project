@@ -14,7 +14,7 @@
         return buf;
     }
     #define dlopen(x,y) LoadLibrary(x)
-    #define dlsym(x,y) reinterpret_cast<GDExtensionObjectPtr (*)(int, char *[], GDExtensionInitializationFunction)>(GetProcAddress((HMODULE)x,y))
+    #define dlsym(x,y) reinterpret_cast<GDExtensionObjectPtr (*)(int, char *[], GDExtensionInitializationFunction, InvokeCallbackFunction, ExecutorData, InvokeCallbackFunction, ExecutorData)>(GetProcAddress((HMODULE)x,y))
     #define dlclose(x) FreeLibrary((HMODULE)x)
 #else
     #include <dlfcn.h>
@@ -25,6 +25,12 @@
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/godot.hpp>
 #include <godot_cpp/classes/godot_instance.hpp>
+
+// New callback types for updated API
+typedef void *CallbackData;
+typedef void *ExecutorData;
+typedef void (*InvokeCallback)(CallbackData p_data);
+typedef void (*InvokeCallbackFunction)(InvokeCallback p_callback, CallbackData p_callback_data, ExecutorData p_executor_data);
 
 #ifdef _WIN32
 #define LIBGODOT_LIBRARY_NAME "libgodot.dll"
@@ -71,7 +77,7 @@ public:
             fprintf(stderr, "Error opening libgodot: %s\n", dlerror());
             return;
         }
-        func_libgodot_create_godot_instance = reinterpret_cast<GDExtensionObjectPtr (*)(int, char *[], GDExtensionInitializationFunction)>(dlsym(handle, "libgodot_create_godot_instance"));
+        func_libgodot_create_godot_instance = reinterpret_cast<GDExtensionObjectPtr (*)(int, char *[], GDExtensionInitializationFunction, InvokeCallbackFunction, ExecutorData, InvokeCallbackFunction, ExecutorData)>(dlsym(handle, "libgodot_create_godot_instance"));
         if (func_libgodot_create_godot_instance == nullptr) {
             fprintf(stderr, "Error acquiring function: %s\n", dlerror());
             dlclose(handle);
@@ -94,7 +100,7 @@ public:
         if (!is_open()) {
             return nullptr;
         }
-        GDExtensionObjectPtr instance = func_libgodot_create_godot_instance(p_argc, p_argv, p_init_func);
+        GDExtensionObjectPtr instance = func_libgodot_create_godot_instance(p_argc, p_argv, p_init_func, nullptr, nullptr, nullptr, nullptr);
         if (instance == nullptr) {
             return nullptr;
         }
@@ -103,7 +109,7 @@ public:
 
 private:
     void *handle = nullptr;
-    GDExtensionObjectPtr (*func_libgodot_create_godot_instance)(int, char *[], GDExtensionInitializationFunction) = nullptr;
+    GDExtensionObjectPtr (*func_libgodot_create_godot_instance)(int, char *[], GDExtensionInitializationFunction, InvokeCallbackFunction, ExecutorData, InvokeCallbackFunction, ExecutorData) = nullptr;
 };
 
 int main(int argc, char **argv) {
@@ -114,7 +120,7 @@ int main(int argc, char **argv) {
     if (argc > 0) {
         program = std::string(argv[0]);
     }
-    std::vector<std::string> args = { program, "--path", "../../project/" };
+    std::vector<std::string> args = { program, "--headless", "--path", "../../../samples/project/" };
 
     std::vector<char*> argvs;
     for (const auto& arg : args) {

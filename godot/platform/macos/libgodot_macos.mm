@@ -35,14 +35,14 @@
 
 #include "os_macos.h"
 
-static OS_MacOS *os = nullptr;
+static OS_MacOS_Headless *os = nullptr;
 
 static GodotInstance *instance = nullptr;
 
 GDExtensionObjectPtr libgodot_create_godot_instance(int p_argc, char *p_argv[], GDExtensionInitializationFunction p_init_func, InvokeCallbackFunction p_async_func, ExecutorData p_async_data, InvokeCallbackFunction p_sync_func, ExecutorData p_sync_data) {
 	ERR_FAIL_COND_V_MSG(instance != nullptr, nullptr, "Only one Godot Instance may be created.");
 
-	os = new OS_MacOS();
+	os = new OS_MacOS_Headless(p_argv[0], p_argc, p_argv);
 
 	@autoreleasepool {
 		Error err = Main::setup(p_argv[0], p_argc - 1, &p_argv[1], false);

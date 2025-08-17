@@ -70,7 +70,6 @@ add_custom_command(
         target=editor
         precision=${PRECISION}
         arch=${ARCH_SUFFIX}
-        library_type=shared_library
         cache_path=${SCONS_CACHE_PATH}
         -j${num_cores}
     WORKING_DIRECTORY "${GODOT_DIR}"
@@ -78,10 +77,26 @@ add_custom_command(
     DEPENDS "${GODOT_DIR}/SConstruct"
 )
 
+# Also build the shared library version
+add_custom_command(
+    OUTPUT "${GODOT_LIB_PATH}"
+    COMMAND scons
+        platform=${TARGET_PLATFORM}
+        target=editor
+        precision=${PRECISION}
+        arch=${ARCH_SUFFIX}
+        library_type=shared_library
+        cache_path=${SCONS_CACHE_PATH}
+        -j${num_cores}
+    WORKING_DIRECTORY "${GODOT_DIR}"
+    COMMENT "Building Godot shared library with ${num_cores} cores"
+    DEPENDS "${GODOT_DIR}/SConstruct"
+)
+
 add_custom_command(
     OUTPUT "${GODOT_LIB_COPY_PATH}"
     COMMAND ${CMAKE_COMMAND} -E copy "${GODOT_LIB_PATH}" "${GODOT_LIB_COPY_PATH}"
-    DEPENDS "${GODOT_BIN_PATH}"
+    DEPENDS "${GODOT_LIB_PATH}"
     COMMENT "Copying libgodot shared library to build directory"
 )
 
@@ -96,19 +111,38 @@ add_custom_command(
     COMMENT "Generating extension API JSON"
 )
 
-set(GODOT_CPP_LIB "${BUILD_DIR}/libgodot-cpp.a")
+# Copy gdextension_interface.h to build directory for godot-cpp
+set(GDEXTENSION_INTERFACE "${BUILD_DIR}/gdextension_interface.h")
 add_custom_command(
-    OUTPUT "${GODOT_CPP_LIB}"
-    COMMAND scons
-        generate_bindings=yes
-        platform=${TARGET_PLATFORM}
-        precision=${PRECISION}
-        cache_path=${SCONS_CACHE_PATH}
-        -j${num_cores}
-    WORKING_DIRECTORY "${GODOT_CPP_DIR}"
-    COMMENT "Building godot-cpp library"
-    DEPENDS "${EXTENSION_API}"
+    OUTPUT "${GDEXTENSION_INTERFACE}"
+    COMMAND ${CMAKE_COMMAND} -E copy "${GODOT_CPP_DIR}/gdextension/gdextension_interface.h" "${GDEXTENSION_INTERFACE}"
+    DEPENDS "${GODOT_CPP_DIR}/gdextension/gdextension_interface.h"
+    COMMENT "Copying gdextension_interface.h to build directory"
 )
+
+add_custom_target(copy_gdextension_interface ALL DEPENDS "${GDEXTENSION_INTERFACE}")
+
+# Custom target to configure and build cpp_sample after API generation
+add_custom_target(configure_cpp_sample
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${BUILD_DIR}/samples/cpp_sample"
+    COMMAND ${CMAKE_COMMAND} -S "${BASE_DIR}/samples/cpp_sample" -B "${BUILD_DIR}/samples/cpp_sample"
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -DGODOTCPP_CUSTOM_API_FILE=${EXTENSION_API}
+        -DLIBGODOT_BUILD_DIR=${BUILD_DIR}
+    DEPENDS "${EXTENSION_API}" "${GDEXTENSION_INTERFACE}"
+    COMMENT "Configuring cpp_sample with generated API"
+    WORKING_DIRECTORY "${BUILD_DIR}"
+)
+
+# Custom target to build the sample after configuration
+add_custom_target(build_cpp_sample
+    COMMAND ${CMAKE_COMMAND} --build "${BUILD_DIR}/samples/cpp_sample" --target sample
+    DEPENDS configure_cpp_sample
+    COMMENT "Building cpp_sample"
+)
+
+# Create a target alias for convenience
+add_custom_target(sample DEPENDS build_cpp_sample)
 
 if(TARGET_PLATFORM STREQUAL "ios")
     set(SWIFT_FRAMEWORK "${BUILD_DIR}/libgodot.framework")
@@ -119,21 +153,23 @@ if(TARGET_PLATFORM STREQUAL "ios")
             "${BUILD_DIR}"
         WORKING_DIRECTORY "${SWIFT_DIR}"
         COMMENT "Building Swift framework"
-        DEPENDS "${GODOT_BIN_PATH}" "${GODOT_CPP_LIB}"
+        DEPENDS "${GODOT_BIN_PATH}"
     )
     add_custom_target(swift_framework ALL DEPENDS "${SWIFT_FRAMEWORK}")
 endif()
 
 add_custom_target(build_godot ALL DEPENDS "${GODOT_BIN_PATH}")
 add_custom_target(generate_api ALL DEPENDS "${EXTENSION_API}")
-add_custom_target(build_cpp ALL DEPENDS "${GODOT_CPP_LIB}")
 
 add_dependencies(generate_api build_godot)
-add_dependencies(build_cpp generate_api)
 add_dependencies(copy_godot_lib build_godot)
 
+# Ensure cpp_sample depends on the extension API being generated
+add_dependencies(sample generate_api)
+add_dependencies(sample copy_gdextension_interface)
+
 if(TARGET_PLATFORM STREQUAL "ios")
-    add_dependencies(swift_framework build_cpp)
+    add_dependencies(swift_framework sample)
 endif()
 
 if(TARGET_PLATFORM STREQUAL "windows")
