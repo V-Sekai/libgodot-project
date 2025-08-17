@@ -35,9 +35,7 @@
 #include "core/debugger/engine_debugger.h"
 #include "core/input/input_event_codec.h"
 
-#ifdef DEBUG_ENABLED
 HashMap<String, EmbeddedDebugger::ParseMessageFunc> EmbeddedDebugger::parse_message_handlers;
-#endif
 
 EmbeddedDebugger::EmbeddedDebugger(DisplayServerEmbedded *p_ds) {
 	singleton = this;
@@ -67,7 +65,6 @@ void EmbeddedDebugger::deinitialize() {
 	}
 }
 
-#ifdef DEBUG_ENABLED
 void EmbeddedDebugger::_init_parse_message_handlers() {
 	parse_message_handlers["window_size"] = &EmbeddedDebugger::_msg_window_size;
 	parse_message_handlers["mouse_set_mode"] = &EmbeddedDebugger::_msg_mouse_set_mode;
@@ -188,4 +185,3 @@ Error EmbeddedDebugger::parse_message(void *p_user, const String &p_msg, const A
 		return ERR_SKIP;
 	}
 }
-#endif

@@ -91,12 +91,7 @@ int main(int argc, char **argv) {
 
 	OS_MacOS *os = nullptr;
 	if (is_embedded) {
-#ifdef DEBUG_ENABLED
 		os = memnew(OS_MacOS_Embedded(args[0], remaining_args, remaining_args > 0 ? &args[1] : nullptr));
-#else
-		WARN_PRINT("Embedded mode is not supported in release builds.");
-		return EXIT_FAILURE;
-#endif
 	} else if (is_headless) {
 		os = memnew(OS_MacOS_Headless(args[0], remaining_args, remaining_args > 0 ? &args[1] : nullptr));
 	} else {

@@ -120,7 +120,7 @@ int main(int argc, char **argv) {
     if (argc > 0) {
         program = std::string(argv[0]);
     }
-    std::vector<std::string> args = { program, "--headless", "--path", "../../../samples/project/" };
+    std::vector<std::string> args = { program, "--verbose", "--path", "../../../samples/project/" };
 
     std::vector<char*> argvs;
     for (const auto& arg : args) {

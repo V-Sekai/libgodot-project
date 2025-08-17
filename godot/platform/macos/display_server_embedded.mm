@@ -47,6 +47,8 @@
 #endif // VULKAN_ENABLED
 #if defined(METAL_ENABLED)
 #import "drivers/metal/rendering_context_driver_metal.h"
+#import <Metal/Metal.h>
+#import <QuartzCore/CAMetalLayer.h>
 #endif
 #endif // RD_ENABLED
 
@@ -144,6 +146,25 @@ DisplayServerEmbedded::DisplayServerEmbedded(const String &p_rendering_driver, W
 	if (rendering_context) {
 		layer = [CAMetalLayer new];
 		layer.anchorPoint = CGPointMake(0, 1);
+
+#if defined(METAL_ENABLED)
+		// Initialize CAMetalLayer properties when using Metal driver
+		if (rendering_driver == "metal") {
+			RenderingContextDriverMetal *metal_context = static_cast<RenderingContextDriverMetal *>(rendering_context);
+			id<MTLDevice> metal_device = metal_context->get_metal_device();
+			
+			CAMetalLayer *metal_layer = (CAMetalLayer *)layer;
+			metal_layer.allowsNextDrawableTimeout = YES;
+			metal_layer.framebufferOnly = YES;
+			metal_layer.opaque = OS::get_singleton()->is_layered_allowed() ? NO : YES;
+			metal_layer.pixelFormat = MTLPixelFormatBGRA8Unorm;
+			metal_layer.device = metal_device;
+			
+			// Set drawable size - this is crucial for drawable allocation
+			CGSize drawableSize = CGSizeMake(p_resolution.width, p_resolution.height);
+			metal_layer.drawableSize = drawableSize;
+		}
+#endif
 
 		Ref<RenderingNativeSurfaceApple> apple_native_surface = RenderingNativeSurfaceApple::create((__bridge void *)layer);
 		RenderingContextDriver::SurfaceID surface_id = rendering_context->surface_create(apple_native_surface);
@@ -387,6 +408,9 @@ void DisplayServerEmbedded::joy_del(int p_idx) {
 	if (joysticks.erase(p_idx)) {
 		Input::get_singleton()->joy_connection_changed(p_idx, false, String());
 	}
+}
+
+void DisplayServerEmbedded::_bind_methods() {
 }
 
 void DisplayServerEmbedded::process_events() {
