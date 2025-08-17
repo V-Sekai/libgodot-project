@@ -1,6 +1,6 @@
 extends Node
 
-@onready var test: Node = $A
+var test: Node = $A
 
 func a():
     test.➡

@@ -721,9 +721,6 @@ msgstr "Näita Sisemisi Vigu Hüpikteate Märguannetes"
 msgid "Show Update Spinner"
 msgstr "Kuva Värskenduse Spinner"
 
-msgid "V-Sync Mode"
-msgstr "V-Sync Režiim"
-
 msgid "Update Continuously"
 msgstr "Värskenda Pidevalt"
 
@@ -774,9 +771,6 @@ msgstr "Teema"
 
 msgid "Icon and Font Color"
 msgstr "Ikooni Ja Font Värv"
-
-msgid "Contrast"
-msgstr "Kontrast"
 
 msgid "Draw Extra Borders"
 msgstr "Joonista Lisaäärised"
@@ -903,9 +897,6 @@ msgstr "Tekstiredaktor"
 
 msgid "Line Spacing"
 msgstr "Reavahe"
-
-msgid "Color Theme"
-msgstr "Värviskeem"
 
 msgid "Appearance"
 msgstr "Välimus"
@@ -1252,6 +1243,9 @@ msgstr "Shader-Redaktor"
 msgid "Visual Editors"
 msgstr "Visuaalsed Redaktorid"
 
+msgid "Color Theme"
+msgstr "Värviskeem"
+
 msgid "Minimap Opacity"
 msgstr "Minikaardi Läbipaistvus"
 
@@ -1270,12 +1264,6 @@ msgstr "SCP"
 msgid "Window Placement"
 msgstr "Akna Asetus"
 
-msgid "Rect"
-msgstr "Kast"
-
-msgid "Screen"
-msgstr "Ekraan"
-
 msgid "Auto Save"
 msgstr "Automaatne Salvestus"
 
@@ -1284,9 +1272,6 @@ msgstr "Salvesta Enne Käivitamist"
 
 msgid "Output"
 msgstr "Väljund"
-
-msgid "Font Size"
-msgstr "Fondi Suurus"
 
 msgid "Always Clear Output on Play"
 msgstr "Puhasta Alati Väljund Käivitamisel"
@@ -1921,6 +1906,9 @@ msgstr "Lõime Mudel"
 msgid "Orientation"
 msgstr "Orientatsioon"
 
+msgid "V-Sync Mode"
+msgstr "V-Sync Režiim"
+
 msgid "Output Latency"
 msgstr "Väljund Viivitus"
 
@@ -2521,6 +2509,9 @@ msgstr "XR Funktsionaalsus"
 msgid "XR Mode"
 msgstr "XR Režiim"
 
+msgid "Screen"
+msgstr "Ekraan"
+
 msgid "Immersive Mode"
 msgstr "Kaasahaarav Režiim"
 
@@ -2839,6 +2830,9 @@ msgstr "Kohandatud HTML-kest"
 msgid "Frame"
 msgstr "Kaader"
 
+msgid "Rect"
+msgstr "Kast"
+
 msgid "Top"
 msgstr "Ülaosa"
 
@@ -2889,6 +2883,9 @@ msgstr "Moduleeri"
 
 msgid "Text"
 msgstr "Tekst"
+
+msgid "Font Size"
+msgstr "Fondi Suurus"
 
 msgid "Uppercase"
 msgstr "Suurtähed"
@@ -3021,6 +3018,9 @@ msgstr "Sära"
 
 msgid "Fog"
 msgstr "Udu"
+
+msgid "Contrast"
+msgstr "Kontrast"
 
 msgid "Features"
 msgstr "Funktsionaalsused"

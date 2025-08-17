@@ -60,23 +60,25 @@ typedef GLXContext (*GLXCREATECONTEXTATTRIBSARBPROC)(Display *, GLXFBConfig, GLX
 // To prevent shadowing warnings
 #undef glGetString
 
-int silent_error_handler(Display *display, XErrorEvent *error) {
-	static char message[1024];
-	XGetErrorText(display, error->error_code, message, sizeof(message));
-	print_verbose(vformat("XServer error: %s"
-						  "\n   Major opcode of failed request: %d"
-						  "\n   Serial number of failed request: %d"
-						  "\n   Current serial number in output stream: %d",
-			String::utf8(message), (uint64_t)error->request_code, (uint64_t)error->minor_code, (uint64_t)error->serial));
+struct vendor {
+	const char *glxvendor = nullptr;
+	int priority = 0;
+};
 
-	quick_exit(1);
-	return 0;
-}
+vendor vendormap[] = {
+	{ "Advanced Micro Devices, Inc.", 30 },
+	{ "AMD", 30 },
+	{ "NVIDIA Corporation", 30 },
+	{ "X.Org", 30 },
+	{ "Intel Open Source Technology Center", 20 },
+	{ "Intel", 20 },
+	{ "nouveau", 10 },
+	{ "Mesa Project", 0 },
+	{ nullptr, 0 }
+};
 
 // Runs inside a child. Exiting will not quit the engine.
-void DetectPrimeX11::create_context() {
-	XSetErrorHandler(&silent_error_handler);
-
+void create_context() {
 	Display *x11_display = XOpenDisplay(nullptr);
 	Window x11_window;
 	GLXContext glx_context;
@@ -135,7 +137,20 @@ void DetectPrimeX11::create_context() {
 	XFree(vi);
 }
 
-int DetectPrimeX11::detect_prime() {
+int silent_error_handler(Display *display, XErrorEvent *error) {
+	static char message[1024];
+	XGetErrorText(display, error->error_code, message, sizeof(message));
+	print_verbose(vformat("XServer error: %s"
+						  "\n   Major opcode of failed request: %d"
+						  "\n   Serial number of failed request: %d"
+						  "\n   Current serial number in output stream: %d",
+			String::utf8(message), (uint64_t)error->request_code, (uint64_t)error->minor_code, (uint64_t)error->serial));
+
+	quick_exit(1);
+	return 0;
+}
+
+int detect_prime() {
 	pid_t p;
 	int priorities[2] = {};
 	String vendors[2];
@@ -187,6 +202,7 @@ int DetectPrimeX11::detect_prime() {
 			// cleaning up these processes, and fork() makes a copy
 			// of all globals.
 			CoreGlobals::leak_reporting_enabled = false;
+			XSetErrorHandler(&silent_error_handler);
 
 			char string[201];
 
@@ -237,7 +253,7 @@ int DetectPrimeX11::detect_prime() {
 	}
 
 	for (int i = 1; i >= 0; --i) {
-		const Vendor *v = vendor_map;
+		vendor *v = vendormap;
 		while (v->glxvendor) {
 			if (v->glxvendor == vendors[i]) {
 				priorities[i] = v->priority;

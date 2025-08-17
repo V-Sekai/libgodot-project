@@ -37,8 +37,6 @@
 
 WorkerThreadPool::Task *const WorkerThreadPool::ThreadData::YIELDING = (Task *)1;
 
-HashMap<StringName, WorkerThreadPool *> WorkerThreadPool::named_pools;
-
 void WorkerThreadPool::Task::free_template_userdata() {
 	ERR_FAIL_NULL(template_userdata);
 	ERR_FAIL_NULL(native_func_userdata);
@@ -186,25 +184,25 @@ void WorkerThreadPool::_thread_function(void *p_user) {
 	while (true) {
 		Task *task_to_process = nullptr;
 		{
-			MutexLock lock(thread_data->pool->task_mutex);
+			MutexLock lock(singleton->task_mutex);
 
-			bool exit = thread_data->pool->_handle_runlevel(thread_data, lock);
+			bool exit = singleton->_handle_runlevel(thread_data, lock);
 			if (unlikely(exit)) {
 				break;
 			}
 
 			thread_data->signaled = false;
 
-			if (thread_data->pool->task_queue.first()) {
-				task_to_process = thread_data->pool->task_queue.first()->self();
-				thread_data->pool->task_queue.remove(thread_data->pool->task_queue.first());
+			if (singleton->task_queue.first()) {
+				task_to_process = singleton->task_queue.first()->self();
+				singleton->task_queue.remove(singleton->task_queue.first());
 			} else {
 				thread_data->cond_var.wait(lock);
 			}
 		}
 
 		if (task_to_process) {
-			thread_data->pool->_process_task(task_to_process);
+			singleton->_process_task(task_to_process);
 		}
 	}
 }
@@ -499,7 +497,7 @@ void WorkerThreadPool::_wait_collaboratively(ThreadData *p_caller_pool_thread, T
 				}
 			}
 
-			if (p_caller_pool_thread->pool->task_queue.first()) {
+			if (singleton->task_queue.first()) {
 				task_to_process = task_queue.first()->self();
 				task_queue.remove(task_queue.first());
 			}
@@ -507,9 +505,7 @@ void WorkerThreadPool::_wait_collaboratively(ThreadData *p_caller_pool_thread, T
 			if (!task_to_process) {
 				p_caller_pool_thread->awaited_task = p_task;
 
-				if (this == singleton) {
-					_unlock_unlockable_mutexes();
-				}
+				_unlock_unlockable_mutexes();
 				relock_unlockables = true;
 
 				p_caller_pool_thread->cond_var.wait(lock);
@@ -518,7 +514,7 @@ void WorkerThreadPool::_wait_collaboratively(ThreadData *p_caller_pool_thread, T
 			}
 		}
 
-		if (relock_unlockables && this == singleton) {
+		if (relock_unlockables) {
 			_lock_unlockable_mutexes();
 		}
 
@@ -694,13 +690,9 @@ void WorkerThreadPool::wait_for_group_task_completion(GroupID p_group) {
 	{
 		Group *group = *groupp;
 
-		if (this == singleton) {
-			_unlock_unlockable_mutexes();
-		}
+		_unlock_unlockable_mutexes();
 		group->done_semaphore.wait();
-		if (this == singleton) {
-			_lock_unlockable_mutexes();
-		}
+		_lock_unlockable_mutexes();
 
 		uint32_t max_users = group->tasks_used + 1; // Add 1 because the thread waiting for it is also user. Read before to avoid another thread freeing task after increment.
 		uint32_t finished_users = group->finished.increment(); // fetch happens before inc, so increment later.
@@ -717,15 +709,15 @@ void WorkerThreadPool::wait_for_group_task_completion(GroupID p_group) {
 #endif
 }
 
-int WorkerThreadPool::get_thread_index() const {
+int WorkerThreadPool::get_thread_index() {
 	Thread::ID tid = Thread::get_caller_id();
-	return thread_ids.has(tid) ? thread_ids[tid] : -1;
+	return singleton->thread_ids.has(tid) ? singleton->thread_ids[tid] : -1;
 }
 
-WorkerThreadPool::TaskID WorkerThreadPool::get_caller_task_id() const {
+WorkerThreadPool::TaskID WorkerThreadPool::get_caller_task_id() {
 	int th_index = get_thread_index();
-	if (th_index != -1 && threads[th_index].current_task) {
-		return threads[th_index].current_task->self;
+	if (th_index != -1 && singleton->threads[th_index].current_task) {
+		return singleton->threads[th_index].current_task->self;
 	} else {
 		return INVALID_TASK_ID;
 	}
@@ -774,7 +766,6 @@ void WorkerThreadPool::init(int p_thread_count, float p_low_priority_task_ratio)
 
 	for (uint32_t i = 0; i < threads.size(); i++) {
 		threads[i].index = i;
-		threads[i].pool = this;
 		threads[i].thread.start(&WorkerThreadPool::_thread_function, &threads[i]);
 		thread_ids.insert(threads[i].thread.get_id(), i);
 	}
@@ -841,33 +832,11 @@ void WorkerThreadPool::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("wait_for_group_task_completion", "group_id"), &WorkerThreadPool::wait_for_group_task_completion);
 }
 
-WorkerThreadPool *WorkerThreadPool::get_named_pool(const StringName &p_name) {
-	WorkerThreadPool **pool_ptr = named_pools.getptr(p_name);
-	if (pool_ptr) {
-		return *pool_ptr;
-	} else {
-		WorkerThreadPool *pool = memnew(WorkerThreadPool(false));
-		pool->init();
-		named_pools[p_name] = pool;
-		return pool;
-	}
-}
-
-WorkerThreadPool::WorkerThreadPool(bool p_singleton) {
-	if (p_singleton) {
-		singleton = this;
-	}
+WorkerThreadPool::WorkerThreadPool() {
+	singleton = this;
 }
 
 WorkerThreadPool::~WorkerThreadPool() {
 	finish();
-
-	if (this == singleton) {
-		singleton = nullptr;
-		for (KeyValue<StringName, WorkerThreadPool *> &E : named_pools) {
-			E.value->finish();
-			memdelete(E.value);
-		}
-		named_pools.clear();
-	}
+	singleton = nullptr;
 }

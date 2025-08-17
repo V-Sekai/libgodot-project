@@ -430,6 +430,7 @@ void EditorPropertyArray::update_property() {
 
 		if (!container) {
 			container = memnew(PanelContainer);
+			container->set_mouse_filter(MOUSE_FILTER_STOP);
 			add_child(container);
 			set_bottom_editor(container);
 
@@ -1207,6 +1208,7 @@ void EditorPropertyDictionary::update_property() {
 
 		if (!container) {
 			container = memnew(PanelContainer);
+			container->set_mouse_filter(MOUSE_FILTER_STOP);
 			add_child(container);
 			set_bottom_editor(container);
 

@@ -741,12 +741,11 @@ _FORCE_INLINE_ bool TextServerFallback::_ensure_glyph(FontFallback *p_font_data,
 			} break;
 		}
 
-		FT_GlyphSlot slot = fd->face->glyph;
-		bool from_svg = (slot->format == FT_GLYPH_FORMAT_SVG); // Need to check before FT_Render_Glyph as it will change format to bitmap.
 		if (!outline) {
 			if (!p_font_data->msdf) {
-				error = FT_Render_Glyph(slot, aa_mode);
+				error = FT_Render_Glyph(fd->face->glyph, aa_mode);
 			}
+			FT_GlyphSlot slot = fd->face->glyph;
 			if (!error) {
 				if (p_font_data->msdf) {
 #ifdef MODULE_MSDFGEN_ENABLED
@@ -787,7 +786,6 @@ _FORCE_INLINE_ bool TextServerFallback::_ensure_glyph(FontFallback *p_font_data,
 		cleanup_stroker:
 			FT_Stroker_Done(stroker);
 		}
-		gl.from_svg = from_svg;
 		E = fd->glyph_map.insert(p_glyph, gl);
 		r_glyph = E->value;
 		return gl.found;
@@ -2292,10 +2290,6 @@ RID TextServerFallback::_font_get_glyph_texture_rid(const RID &p_font_rid, const
 			if (ffsd->textures[fgl.texture_idx].dirty) {
 				ShelfPackTexture &tex = ffsd->textures.write[fgl.texture_idx];
 				Ref<Image> img = tex.image;
-				if (fgl.from_svg) {
-					// Same as the "fix alpha border" process option when importing SVGs
-					img->fix_alpha_edges();
-				}
 				if (fd->mipmaps && !img->has_mipmaps()) {
 					img = tex.image->duplicate();
 					img->generate_mipmaps();
@@ -2344,10 +2338,6 @@ Size2 TextServerFallback::_font_get_glyph_texture_size(const RID &p_font_rid, co
 			if (ffsd->textures[fgl.texture_idx].dirty) {
 				ShelfPackTexture &tex = ffsd->textures.write[fgl.texture_idx];
 				Ref<Image> img = tex.image;
-				if (fgl.from_svg) {
-					// Same as the "fix alpha border" process option when importing SVGs
-					img->fix_alpha_edges();
-				}
 				if (fd->mipmaps && !img->has_mipmaps()) {
 					img = tex.image->duplicate();
 					img->generate_mipmaps();
@@ -2739,7 +2729,7 @@ void TextServerFallback::_font_draw_glyph(const RID &p_font_rid, const RID &p_ca
 		if (fgl.texture_idx != -1) {
 			Color modulate = p_color;
 #ifdef MODULE_FREETYPE_ENABLED
-			if (!fgl.from_svg && ffsd->face && ffsd->textures[fgl.texture_idx].image.is_valid() && (ffsd->textures[fgl.texture_idx].image->get_format() == Image::FORMAT_RGBA8) && !lcd_aa && !fd->msdf) {
+			if (ffsd->face && ffsd->textures[fgl.texture_idx].image.is_valid() && (ffsd->textures[fgl.texture_idx].image->get_format() == Image::FORMAT_RGBA8) && !lcd_aa && !fd->msdf) {
 				modulate.r = modulate.g = modulate.b = 1.0;
 			}
 #endif
@@ -2747,10 +2737,6 @@ void TextServerFallback::_font_draw_glyph(const RID &p_font_rid, const RID &p_ca
 				if (ffsd->textures[fgl.texture_idx].dirty) {
 					ShelfPackTexture &tex = ffsd->textures.write[fgl.texture_idx];
 					Ref<Image> img = tex.image;
-					if (fgl.from_svg) {
-						// Same as the "fix alpha border" process option when importing SVGs
-						img->fix_alpha_edges();
-					}
 					if (fd->mipmaps && !img->has_mipmaps()) {
 						img = tex.image->duplicate();
 						img->generate_mipmaps();

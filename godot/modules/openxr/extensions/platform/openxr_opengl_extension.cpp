@@ -141,12 +141,7 @@ XrGraphicsBindingEGLMNDX OpenXROpenGLExtension::graphics_binding_egl;
 #endif
 
 void *OpenXROpenGLExtension::set_session_create_and_get_next_pointer(void *p_next_pointer) {
-	GLint gl_version_major = 0;
-	GLint gl_version_minor = 0;
-	glGetIntegerv(GL_MAJOR_VERSION, &gl_version_major);
-	glGetIntegerv(GL_MINOR_VERSION, &gl_version_minor);
-
-	XrVersion desired_version = XR_MAKE_VERSION(gl_version_major, gl_version_minor, 0);
+	XrVersion desired_version = XR_MAKE_VERSION(3, 3, 0);
 
 	if (!check_graphics_api_support(desired_version)) {
 		print_line("OpenXR: Trying to initialize with OpenGL anyway...");

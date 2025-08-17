@@ -453,13 +453,7 @@ void ConnectDialog::_update_ok_enabled() {
 }
 
 void ConnectDialog::_update_warning_label() {
-	Node *dst = source->get_node(dst_path);
-	if (dst == nullptr) {
-		warning_label->set_visible(false);
-		return;
-	}
-
-	Ref<Script> scr = dst->get_script();
+	Ref<Script> scr = source->get_node(dst_path)->get_script();
 	if (scr.is_null()) {
 		warning_label->set_visible(false);
 		return;
@@ -871,8 +865,9 @@ ConnectDialog::ConnectDialog() {
 	hbc_method->add_child(dst_method);
 	register_text_enter(dst_method);
 
-	open_method_tree = memnew(Button(TTRC("Pick")));
+	open_method_tree = memnew(Button);
 	hbc_method->add_child(open_method_tree);
+	open_method_tree->set_text("Pick");
 	open_method_tree->connect(SceneStringName(pressed), callable_mp(this, &ConnectDialog::_open_method_popup));
 
 	advanced = memnew(CheckButton(TTR("Advanced")));

@@ -1,6 +1,9 @@
 name: Build godot-cpp
 description: Build godot-cpp with the provided options.
 
+env:
+  GODOT_CPP_BRANCH: 4.3
+
 inputs:
   bin:
     description: Path to the Godot binary.
@@ -13,10 +16,6 @@ inputs:
     description: The SCons cache path.
     default: ${{ github.workspace }}/.scons_cache/
     type: string
-  godot-cpp-branch:
-    description: The godot-cpp branch.
-    default: master
-    type: string
 
 runs:
   using: composite
@@ -26,7 +25,7 @@ runs:
       with:
         submodules: recursive
         repository: godotengine/godot-cpp
-        ref: ${{ inputs.godot-cpp-branch }}
+        ref: ${{ env.GODOT_CPP_BRANCH }}
         path: godot-cpp
 
     - name: Extract API

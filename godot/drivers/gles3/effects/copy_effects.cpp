@@ -246,7 +246,7 @@ void CopyEffects::gaussian_blur(GLuint p_source_texture, int p_mipmap_count, con
 
 		glBindTexture(GL_TEXTURE_2D, p_source_texture);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, i - 1);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, i);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, i - 1);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, p_source_texture, i);
 #ifdef DEV_ENABLED
 		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);

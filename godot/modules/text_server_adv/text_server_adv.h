@@ -272,7 +272,6 @@ class TextServerAdvanced : public TextServerExtension {
 		Rect2 rect;
 		Rect2 uv_rect;
 		Vector2 advance;
-		bool from_svg = false;
 	};
 
 	struct FontForSizeAdvanced {

@@ -11,7 +11,7 @@
  *
  */
 
-#include "ssl_misc.h"
+#include "common.h"
 
 #if defined(MBEDTLS_DEBUG_C)
 

@@ -1549,9 +1549,6 @@ msgstr "Signaalargumenten ontbinden:"
 msgid "Receiver Method:"
 msgstr "Ontvangende methode:"
 
-msgid "Pick"
-msgstr "Kiezen"
-
 msgid "Advanced"
 msgstr "Geavanceerd"
 
@@ -9036,6 +9033,9 @@ msgstr "Ouder veranderen"
 
 msgid "Run Instances"
 msgstr "Run Instanties"
+
+msgid "Pick"
+msgstr "Kiezen"
 
 msgid "2D Scene"
 msgstr "2D Scène"

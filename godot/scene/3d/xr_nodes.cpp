@@ -72,35 +72,7 @@ void XRCamera3D::_removed_tracker(const StringName &p_tracker_name, int p_tracke
 
 void XRCamera3D::_pose_changed(const Ref<XRPose> &p_pose) {
 	if (p_pose->get_name() == pose_name) {
-		Node3D *parent = Object::cast_to<Node3D>(get_parent());
-
-		if (is_inside_tree() && parent && parent->is_physics_interpolated_and_enabled() && !is_set_as_top_level() && !is_physics_interpolated()) {
-			pose_offset = p_pose->get_adjusted_transform();
-		} else {
-			set_transform(p_pose->get_adjusted_transform());
-		}
-	}
-}
-
-void XRCamera3D::_notification(int p_what) {
-	switch (p_what) {
-		case NOTIFICATION_ENTER_TREE: {
-			if (!Engine::get_singleton()->is_editor_hint()) {
-				set_desired_process_modes(true, false);
-			}
-		} break;
-
-		case NOTIFICATION_INTERNAL_PROCESS: {
-			if (!is_inside_tree() || is_physics_interpolated() || Engine::get_singleton()->is_editor_hint()) {
-				break;
-			}
-
-			Node3D *parent = Object::cast_to<Node3D>(get_parent());
-
-			if (parent && parent->is_physics_interpolated_and_enabled() && !is_set_as_top_level()) {
-				set_global_transform(parent->get_global_transform_interpolated() * pose_offset);
-			}
-		} break;
+		set_transform(p_pose->get_adjusted_transform());
 	}
 }
 
@@ -224,9 +196,6 @@ Vector<Plane> XRCamera3D::get_frustum() const {
 }
 
 XRCamera3D::XRCamera3D() {
-	// XRCamera3D gets its transform updated every render frame and shouldn't be interpolated.
-	set_physics_interpolation_mode(Node::PHYSICS_INTERPOLATION_MODE_OFF);
-
 	XRServer *xr_server = XRServer::get_singleton();
 	ERR_FAIL_NULL(xr_server);
 
@@ -431,13 +400,7 @@ void XRNode3D::_removed_tracker(const StringName &p_tracker_name, int p_tracker_
 
 void XRNode3D::_pose_changed(const Ref<XRPose> &p_pose) {
 	if (p_pose.is_valid() && p_pose->get_name() == pose_name) {
-		Node3D *parent = Object::cast_to<Node3D>(get_parent());
-
-		if (is_inside_tree() && parent && parent->is_physics_interpolated_and_enabled() && !is_set_as_top_level() && !is_physics_interpolated()) {
-			pose_offset = p_pose->get_adjusted_transform();
-		} else {
-			set_transform(p_pose->get_adjusted_transform());
-		}
+		set_transform(p_pose->get_adjusted_transform());
 		_set_has_tracking_data(p_pose->get_has_tracking_data());
 	}
 }
@@ -477,32 +440,7 @@ void XRNode3D::_update_visibility() {
 	}
 }
 
-void XRNode3D::_notification(int p_what) {
-	switch (p_what) {
-		case NOTIFICATION_ENTER_TREE: {
-			if (!Engine::get_singleton()->is_editor_hint()) {
-				set_process_internal(true);
-			}
-		} break;
-
-		case NOTIFICATION_INTERNAL_PROCESS: {
-			if (!is_inside_tree() || is_physics_interpolated() || Engine::get_singleton()->is_editor_hint()) {
-				break;
-			}
-
-			Node3D *parent = Object::cast_to<Node3D>(get_parent());
-
-			if (parent && parent->is_physics_interpolated_and_enabled() && !is_set_as_top_level()) {
-				set_global_transform(parent->get_global_transform_interpolated() * pose_offset);
-			}
-		} break;
-	}
-}
-
 XRNode3D::XRNode3D() {
-	// XRNode3D gets its transform updated every render frame and shouldn't be interpolated.
-	set_physics_interpolation_mode(Node::PHYSICS_INTERPOLATION_MODE_OFF);
-
 	XRServer *xr_server = XRServer::get_singleton();
 	ERR_FAIL_NULL(xr_server);
 
@@ -776,12 +714,6 @@ void XROrigin3D::_set_current(bool p_enabled, bool p_update_others) {
 		ERR_FAIL_NULL(xr_server);
 
 		xr_server->set_world_origin(get_global_transform());
-
-		if (is_physics_interpolated()) {
-			set_process_internal(true);
-		}
-	} else if (is_physics_interpolated()) {
-		set_process_internal(false);
 	}
 
 	// Check if we need to update our other origin nodes accordingly
@@ -852,14 +784,8 @@ void XROrigin3D::_notification(int p_what) {
 
 		case NOTIFICATION_LOCAL_TRANSFORM_CHANGED:
 		case NOTIFICATION_TRANSFORM_CHANGED: {
-			if (current && !Engine::get_singleton()->is_editor_hint() && !is_physics_interpolated_and_enabled()) {
+			if (current && !Engine::get_singleton()->is_editor_hint()) {
 				xr_server->set_world_origin(get_global_transform());
-			}
-		} break;
-
-		case NOTIFICATION_INTERNAL_PROCESS: {
-			if (current && !Engine::get_singleton()->is_editor_hint() && is_physics_interpolated_and_enabled()) {
-				xr_server->set_world_origin(get_global_transform_interpolated());
 			}
 		} break;
 	}
@@ -872,11 +798,5 @@ void XROrigin3D::_notification(int p_what) {
 				interface->notification(p_what);
 			}
 		}
-	}
-}
-
-void XROrigin3D::_physics_interpolated_changed() {
-	if (current && !Engine::get_singleton()->is_editor_hint()) {
-		set_process_internal(is_physics_interpolated());
 	}
 }

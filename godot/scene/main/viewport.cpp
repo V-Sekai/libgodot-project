@@ -317,13 +317,7 @@ void Viewport::_sub_window_register(Window *p_window) {
 
 void Viewport::_sub_window_update(Window *p_window) {
 	int index = _sub_window_find(p_window);
-
-	// _sub_window_update is sometimes called deferred, and the window may have been closed since then.
-	// For example, when the user resizes the game window.
-	// In that case, _sub_window_find will not find it, which is expected.
-	if (index == -1) {
-		return;
-	}
+	ERR_FAIL_COND(index == -1);
 
 	SubWindow &sw = gui.sub_windows.write[index];
 	sw.pending_window_update = false;
@@ -1515,7 +1509,6 @@ void Viewport::_gui_show_tooltip() {
 	// This way, the custom tooltip from `ConnectionsDockTree` can create
 	// its own tooltip without conflicting with the default one, even an empty tooltip.
 	if (base_tooltip && !base_tooltip->is_visible()) {
-		memdelete(base_tooltip);
 		return;
 	}
 
@@ -1553,8 +1546,6 @@ void Viewport::_gui_show_tooltip() {
 	panel->set_flag(Window::FLAG_POPUP, false);
 	panel->set_flag(Window::FLAG_MOUSE_PASSTHROUGH, true);
 	panel->set_wrap_controls(true);
-	panel->set_default_canvas_item_texture_filter(get_default_canvas_item_texture_filter());
-	panel->set_default_canvas_item_texture_repeat(get_default_canvas_item_texture_repeat());
 	panel->add_child(base_tooltip);
 	panel->gui_parent = this;
 
