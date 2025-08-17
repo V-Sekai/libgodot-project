@@ -60,6 +60,8 @@ set(GODOT_DIR "${BASE_DIR}/godot")
 set(GODOT_CPP_DIR "${BASE_DIR}/godot-cpp")
 set(SWIFT_DIR "${BASE_DIR}/SwiftGodot")
 set(GODOT_BIN_PATH "${GODOT_DIR}/bin/godot.${BUILD_SUFFIX}.${ARCH_SUFFIX}${EXE_SUFFIX}")
+set(GODOT_LIB_PATH "${GODOT_DIR}/bin/obj/bin/libgodot.${BUILD_SUFFIX}.${ARCH_SUFFIX}.${LIB_SUFFIX}")
+set(GODOT_LIB_COPY_PATH "${BUILD_DIR}/libgodot.${LIB_SUFFIX}")
 
 add_custom_command(
     OUTPUT "${GODOT_BIN_PATH}"
@@ -75,6 +77,15 @@ add_custom_command(
     COMMENT "Building Godot executable with ${num_cores} cores"
     DEPENDS "${GODOT_DIR}/SConstruct"
 )
+
+add_custom_command(
+    OUTPUT "${GODOT_LIB_COPY_PATH}"
+    COMMAND ${CMAKE_COMMAND} -E copy "${GODOT_LIB_PATH}" "${GODOT_LIB_COPY_PATH}"
+    DEPENDS "${GODOT_BIN_PATH}"
+    COMMENT "Copying libgodot shared library to build directory"
+)
+
+add_custom_target(copy_godot_lib ALL DEPENDS "${GODOT_LIB_COPY_PATH}")
 
 set(EXTENSION_API "${BUILD_DIR}/extension_api.json")
 add_custom_command(
@@ -119,6 +130,7 @@ add_custom_target(build_cpp ALL DEPENDS "${GODOT_CPP_LIB}")
 
 add_dependencies(generate_api build_godot)
 add_dependencies(build_cpp generate_api)
+add_dependencies(copy_godot_lib build_godot)
 
 if(TARGET_PLATFORM STREQUAL "ios")
     add_dependencies(swift_framework build_cpp)
