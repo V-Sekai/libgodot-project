@@ -68,6 +68,7 @@ add_custom_command(
         target=editor
         precision=${PRECISION}
         arch=${ARCH_SUFFIX}
+        library_type=shared_library
         cache_path=${SCONS_CACHE_PATH}
         -j${num_cores}
     WORKING_DIRECTORY "${GODOT_DIR}"
